@@ -134,7 +134,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
 
     printf("Starting vertex ID too large.\n");
-    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &weights, &result, 10, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &weights, &result, 10, NULL, NULL, 0, 1) == IGRAPH_EINVVID);
     igraph_vector_destroy(&weights);
 
     printf("Negative weight.\n");

@@ -2,7 +2,7 @@
 #include <igraph.h>
 
 /* This is a callback function suitable for use with igraph_motifs_randesu_callback().
- * It prints each motif it is calld with. */
+ * It prints each motif it is called with. */
 igraph_error_t print_motif(const igraph_t *graph, const igraph_vector_int_t *vids,
                           igraph_int_t isoclass, void* extra) {
     printf("Found isoclass %2" IGRAPH_PRId ":  ", isoclass);
@@ -18,7 +18,7 @@ int main(void) {
     /* Initialize the library. */
     igraph_setup();
 
-    /* Compute the 4-motif distritbuion in Zachary's karate club network. */
+    /* Compute the 4-motif distribution in Zachary's karate club network. */
 
     igraph_famous(&graph, "Zachary");
     igraph_vector_init(&hist, 0);

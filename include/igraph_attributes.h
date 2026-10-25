@@ -260,7 +260,7 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    an error in the C core of igraph itself.
  * \member destroy This function is called whenever the graph object
  *    is destroyed, right before freeing the allocated memory. It is supposed
- *    to do any cleanup operations that are need to dispose of the \c attr
+ *    to do any cleanup operations that are needed to dispose of the \c attr
  *    member of the \c igraph_t object properly. The caller will set the
  *    \c attr member to a null pointer after this function returns.
  * \member copy This function is called when the C core wants to populate the
@@ -302,7 +302,7 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    function is called).
  * \member add_edges Called when new edges are added to a graph, after the
  *    base data structure was modified. A vector containing the endpoints of the
- *    new edges are supplied as an argument. The function is supposed to set up
+ *    new edges is supplied as an argument. The function is supposed to set up
  *    default values for each edge attribute that is currently registered on the
  *    graph, for all the newly added edges. Expected to return an error code.
  * \member permute_edges Called when a new graph is created based on an
@@ -321,7 +321,7 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    vertex attributes by the time this function is called).
  * \member combine_edges This function is called when the creation
  *    of a new graph involves a merge (contraction, etc.) of edges
- *    from another graph. The function is after the new graph was created.
+ *    from another graph. The function is called after the new graph was created.
  *    An argument specifies how several edges from the old graph map to a
  *    single edge in the new graph. It is guaranteed that the old and the
  *    new graph instances are different when this callback is called.
@@ -365,12 +365,12 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    to the provided \p value vector. No assumptions should be made
  *    about the initial contents of the \p value vector and it is not guaranteed
  *    to be empty.
- * \member get_string_edge_attr Query a string edge attribute, for the
+ * \member get_string_edge_attr Query a string edge attribute, for
  *    the edges included in \p es. The attribute values should be appended
  *    to the provided \p value vector. No assumptions should be made
  *    about the initial contents of the \p value vector and it is not guaranteed
  *    to be empty.
- * \member get_bool_edge_attr Query a boolean edge attribute, for the
+ * \member get_bool_edge_attr Query a boolean edge attribute, for
  *    the edges included in \p es. The attribute values should be appended
  *    to the provided \p value vector. No assumptions should be made
  *    about the initial contents of the \p value vector and it is not guaranteed
@@ -522,7 +522,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 
 /**
  * \define GAN
- * Query a numeric graph attribute.
+ * \brief Queries a numeric graph attribute.
  *
  * This is shorthand for \ref igraph_cattribute_GAN().
  * \param graph The graph.
@@ -532,7 +532,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define GAN(graph,n) (igraph_cattribute_GAN((graph), (n)))
 /**
  * \define GAB
- * Query a boolean graph attribute.
+ * \brief Queries a boolean graph attribute.
  *
  * This is shorthand for \ref igraph_cattribute_GAB().
  * \param graph The graph.
@@ -542,7 +542,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define GAB(graph,n) (igraph_cattribute_GAB((graph), (n)))
 /**
  * \define GAS
- * Query a string graph attribute.
+ * \brief Queries a string graph attribute.
  *
  * This is shorthand for \ref igraph_cattribute_GAS().
  * \param graph The graph.
@@ -552,40 +552,40 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define GAS(graph,n) (igraph_cattribute_GAS((graph), (n)))
 /**
  * \define VAN
- * Query a numeric vertex attribute.
+ * \brief Queries a numeric vertex attribute.
  *
  * This is shorthand for \ref igraph_cattribute_VAN().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param v The id of the vertex.
+ * \param v The ID of the vertex.
  * \return The value of the attribute.
  */
 #define VAN(graph,n,v) (igraph_cattribute_VAN((graph), (n), (v)))
 /**
  * \define VAB
- * Query a boolean vertex attribute.
+ * \brief Queries a boolean vertex attribute.
  *
  * This is shorthand for \ref igraph_cattribute_VAB().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param v The id of the vertex.
+ * \param v The ID of the vertex.
  * \return The value of the attribute.
  */
 #define VAB(graph,n,v) (igraph_cattribute_VAB((graph), (n), (v)))
 /**
  * \define VAS
- * Query a string vertex attribute.
+ * \brief Queries a string vertex attribute.
  *
  * This is shorthand for \ref igraph_cattribute_VAS().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param v The id of the vertex.
+ * \param v The ID of the vertex.
  * \return The value of the attribute.
  */
 #define VAS(graph,n,v) (igraph_cattribute_VAS((graph), (n), (v)))
 /**
  * \define VANV
- * Query a numeric vertex attribute for all vertices.
+ * \brief Queries a numeric vertex attribute for all vertices.
  *
  * This is a shorthand for \ref igraph_cattribute_VANV().
  * \param graph The graph.
@@ -598,7 +598,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
                            igraph_vss_all(), (vec)))
 /**
  * \define VABV
- * Query a boolean vertex attribute for all vertices.
+ * \brief Queries a boolean vertex attribute for all vertices.
  *
  * This is a shorthand for \ref igraph_cattribute_VABV().
  * \param graph The graph.
@@ -611,7 +611,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
                            igraph_vss_all(), (vec)))
 /**
  * \define VASV
- * Query a string vertex attribute for all vertices.
+ * \brief Queries a string vertex attribute for all vertices.
  *
  * This is a shorthand for \ref igraph_cattribute_VASV().
  * \param graph The graph.
@@ -624,40 +624,40 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
                            igraph_vss_all(), (vec)))
 /**
  * \define EAN
- * Query a numeric edge attribute.
+ * \brief Queries a numeric edge attribute.
  *
  * This is shorthand for \ref igraph_cattribute_EAN().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param e The id of the edge.
+ * \param e The ID of the edge.
  * \return The value of the attribute.
  */
 #define EAN(graph,n,e) (igraph_cattribute_EAN((graph), (n), (e)))
 /**
  * \define EAB
- * Query a boolean edge attribute.
+ * \brief Queries a boolean edge attribute.
  *
  * This is shorthand for \ref igraph_cattribute_EAB().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param e The id of the edge.
+ * \param e The ID of the edge.
  * \return The value of the attribute.
  */
 #define EAB(graph,n,e) (igraph_cattribute_EAB((graph), (n), (e)))
 /**
  * \define EAS
- * Query a string edge attribute.
+ * \brief Queries a string edge attribute.
  *
  * This is shorthand for \ref igraph_cattribute_EAS().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param e The id of the edge.
+ * \param e The ID of the edge.
  * \return The value of the attribute.
  */
 #define EAS(graph,n,e) (igraph_cattribute_EAS((graph), (n), (e)))
 /**
  * \define EANV
- * Query a numeric edge attribute for all edges.
+ * \brief Queries a numeric edge attribute for all edges.
  *
  * This is a shorthand for \ref igraph_cattribute_EANV().
  * \param graph The graph.
@@ -670,7 +670,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
                            igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 /**
  * \define EABV
- * Query a boolean edge attribute for all edges.
+ * \brief Queries a boolean edge attribute for all edges.
  *
  * This is a shorthand for \ref igraph_cattribute_EABV().
  * \param graph The graph.
@@ -684,7 +684,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 
 /**
  * \define EASV
- * Query a string edge attribute for all edges.
+ * \brief Queries a string edge attribute for all edges.
  *
  * This is a shorthand for \ref igraph_cattribute_EASV().
  * \param graph The graph.
@@ -697,7 +697,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
                            igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 /**
  * \define SETGAN
- * Set a numeric graph attribute
+ * \brief Sets a numeric graph attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_GAN_set().
  * \param graph The graph.
@@ -708,7 +708,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETGAN(graph,n,value) (igraph_cattribute_GAN_set((graph),(n),(value)))
 /**
  * \define SETGAB
- * Set a boolean graph attribute
+ * \brief Sets a boolean graph attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_GAB_set().
  * \param graph The graph.
@@ -719,7 +719,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETGAB(graph,n,value) (igraph_cattribute_GAB_set((graph),(n),(value)))
 /**
  * \define SETGAS
- * Set a string graph attribute
+ * \brief Sets a string graph attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_GAS_set().
  * \param graph The graph.
@@ -730,72 +730,72 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETGAS(graph,n,value) (igraph_cattribute_GAS_set((graph),(n),(value)))
 /**
  * \define SETVAN
- * Set a numeric vertex attribute
+ * \brief Sets a numeric vertex attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_VAN_set().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param vid Ids of the vertices to set.
+ * \param vid IDs of the vertices to set.
  * \param value The new value of the attribute.
  * \return Error code.
  */
 #define SETVAN(graph,n,vid,value) (igraph_cattribute_VAN_set((graph),(n),(vid),(value)))
 /**
  * \define SETVAB
- * Set a boolean vertex attribute
+ * \brief Sets a boolean vertex attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_VAB_set().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param vid Ids of the vertices to set.
+ * \param vid IDs of the vertices to set.
  * \param value The new value of the attribute.
  * \return Error code.
  */
 #define SETVAB(graph,n,vid,value) (igraph_cattribute_VAB_set((graph),(n),(vid),(value)))
 /**
  * \define SETVAS
- * Set a string vertex attribute
+ * \brief Sets a string vertex attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_VAS_set().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param vid Ids of the vertices to set.
+ * \param vid IDs of the vertices to set.
  * \param value The new value of the attribute.
  * \return Error code.
  */
 #define SETVAS(graph,n,vid,value) (igraph_cattribute_VAS_set((graph),(n),(vid),(value)))
 /**
  * \define SETEAN
- * Set a numeric edge attribute
+ * \brief Sets a numeric edge attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_EAN_set().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param eid Ids of the edges to set.
+ * \param eid IDs of the edges to set.
  * \param value The new value of the attribute.
  * \return Error code.
  */
 #define SETEAN(graph,n,eid,value) (igraph_cattribute_EAN_set((graph),(n),(eid),(value)))
 /**
  * \define SETEAB
- * Set a boolean edge attribute
+ * \brief Sets a boolean edge attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_EAB_set().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param eid Ids of the edges to set.
+ * \param eid IDs of the edges to set.
  * \param value The new value of the attribute.
  * \return Error code.
  */
 #define SETEAB(graph,n,eid,value) (igraph_cattribute_EAB_set((graph),(n),(eid),(value)))
 /**
  * \define SETEAS
- * Set a string edge attribute
+ * \brief Sets a string edge attribute.
  *
  * This is a shorthand for \ref igraph_cattribute_EAS_set().
  * \param graph The graph.
  * \param n The name of the attribute.
- * \param eid Ids of the edges to set.
+ * \param eid IDs of the edges to set.
  * \param value The new value of the attribute.
  * \return Error code.
  */
@@ -803,7 +803,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 
 /**
  * \define SETVANV
- *  Set a numeric vertex attribute for all vertices
+ * \brief Sets a numeric vertex attribute for all vertices.
  *
  * This is a shorthand for \ref igraph_cattribute_VAN_setv().
  * \param graph The graph.
@@ -814,7 +814,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETVANV(graph,n,v) (igraph_cattribute_VAN_setv((graph),(n),(v)))
 /**
  * \define SETVABV
- *  Set a boolean vertex attribute for all vertices
+ * \brief Sets a boolean vertex attribute for all vertices.
  *
  * This is a shorthand for \ref igraph_cattribute_VAB_setv().
  * \param graph The graph.
@@ -825,7 +825,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETVABV(graph,n,v) (igraph_cattribute_VAB_setv((graph),(n),(v)))
 /**
  * \define SETVASV
- *  Set a string vertex attribute for all vertices
+ * \brief Sets a string vertex attribute for all vertices.
  *
  * This is a shorthand for \ref igraph_cattribute_VAS_setv().
  * \param graph The graph.
@@ -836,7 +836,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETVASV(graph,n,v) (igraph_cattribute_VAS_setv((graph),(n),(v)))
 /**
  * \define SETEANV
- *  Set a numeric edge attribute for all edges
+ * \brief Sets a numeric edge attribute for all edges.
  *
  * This is a shorthand for \ref igraph_cattribute_EAN_setv().
  * \param graph The graph.
@@ -846,7 +846,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETEANV(graph,n,v) (igraph_cattribute_EAN_setv((graph),(n),(v)))
 /**
  * \define SETEABV
- *  Set a boolean edge attribute for all edges
+ * \brief Sets a boolean edge attribute for all edges.
  *
  * This is a shorthand for \ref igraph_cattribute_EAB_setv().
  * \param graph The graph.
@@ -856,7 +856,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETEABV(graph,n,v) (igraph_cattribute_EAB_setv((graph),(n),(v)))
 /**
  * \define SETEASV
- *  Set a string edge attribute for all edges
+ * \brief Sets a string edge attribute for all edges.
  *
  * This is a shorthand for \ref igraph_cattribute_EAS_setv().
  * \param graph The graph.
@@ -867,7 +867,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 
 /**
  * \define DELGA
- * Remove a graph attribute.
+ * \brief Removes a graph attribute.
  *
  * A shorthand for \ref igraph_cattribute_remove_g().
  * \param graph The graph.
@@ -876,7 +876,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define DELGA(graph,n) (igraph_cattribute_remove_g((graph),(n)))
 /**
  * \define DELVA
- * Remove a vertex attribute.
+ * \brief Removes a vertex attribute.
  *
  * A shorthand for \ref igraph_cattribute_remove_v().
  * \param graph The graph.
@@ -885,7 +885,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define DELVA(graph,n) (igraph_cattribute_remove_v((graph),(n)))
 /**
  * \define DELEA
- * Remove an edge attribute.
+ * \brief Removes an edge attribute.
  *
  * A shorthand for \ref igraph_cattribute_remove_e().
  * \param graph The graph.
@@ -894,7 +894,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define DELEA(graph,n) (igraph_cattribute_remove_e((graph),(n)))
 /**
  * \define DELGAS
- * Remove all graph attributes.
+ * \brief Removes all graph attributes.
  *
  * Calls \ref igraph_cattribute_remove_all().
  * \param graph The graph.
@@ -902,7 +902,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define DELGAS(graph) (igraph_cattribute_remove_all((graph),1,0,0))
 /**
  * \define DELVAS
- * Remove all vertex attributes.
+ * \brief Removes all vertex attributes.
  *
  * Calls \ref igraph_cattribute_remove_all().
  * \param graph The graph.
@@ -910,7 +910,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define DELVAS(graph) (igraph_cattribute_remove_all((graph),0,1,0))
 /**
  * \define DELEAS
- * Remove all edge attributes.
+ * \brief Removes all edge attributes.
  *
  * Calls \ref igraph_cattribute_remove_all().
  * \param graph The graph.
@@ -918,9 +918,9 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define DELEAS(graph) (igraph_cattribute_remove_all((graph),0,0,1))
 /**
  * \define DELALL
- * Remove all attributes.
+ * \brief Removes all attributes.
  *
- * All graph, vertex and edges attributes will be removed.
+ * All graph, vertex and edge attributes will be removed.
  * Calls \ref igraph_cattribute_remove_all().
  * \param graph The graph.
  */

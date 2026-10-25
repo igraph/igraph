@@ -66,7 +66,7 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
 
 /**
  * \function igraph_is_loop
- * \brief Find the loop edges in a graph.
+ * \brief Finds the loop edges in a graph.
  *
  * A loop edge, also called a self-loop, is an edge from a vertex to itself.
  *

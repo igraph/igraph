@@ -40,7 +40,7 @@
  * between the corresponding pair of vertices. Thus, in a weighted graph, increasing
  * the weight between two vertices pushes them apart. The Young modulus of springs
  * is inversely proportional to the graph distance, ensuring that springs between
- * far-apart veritces will have a smaller effect on the layout.
+ * far-apart vertices will have a smaller effect on the layout.
  *
  * </para><para>
  * Disconnected graphs are handled by assuming that the graph distance between
@@ -373,7 +373,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  *        through three) and will be resized if needed.
  * \param use_seed Boolean, whether to use the values supplied in the
  *        \p res argument as the initial configuration. If zero and there
- *        are any limits on the z, y or z coordinates, then a random initial
+ *        are any limits on the x, y or z coordinates, then a random initial
  *        configuration is used. Otherwise the vertices are placed uniformly
  *        on a sphere of radius 1 as the initial configuration.
  * \param maxiter The maximum number of iterations to perform. A reasonable

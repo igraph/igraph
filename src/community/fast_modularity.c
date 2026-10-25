@@ -555,7 +555,7 @@ static igraph_bool_t igraph_i_fastgreedy_community_update_dq(
 
 /**
  * \function igraph_community_fastgreedy
- * \brief Finding community structure by greedy optimization of modularity.
+ * \brief Finds community structure by greedy optimization of modularity.
  *
  * This function implements the fast greedy modularity optimization
  * algorithm for finding community structure, see
@@ -576,8 +576,8 @@ static igraph_bool_t igraph_i_fastgreedy_community_update_dq(
  *    weights are expected to be non-negative.
  * \param merges Pointer to an initialized matrix or \c NULL, the result of the
  *    computation is stored here as a merges matrix representing a dendrogram.
- *    The matrix has two columns and each merge corresponds to one merge, the
- *    IDs of the two merged components are stored. The component IDs are numbered
+ *    The matrix has two columns and each row corresponds to one merge, with the
+ *    IDs of the two merged components stored in that row. The component IDs are numbered
  *    from zero and the first \c n components are the individual vertices, \c n is
  *    the number of vertices in the graph. Component \c n is created
  *    in the first merge, component <code>n+1</code> in the second merge, etc.

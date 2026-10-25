@@ -31,7 +31,7 @@
  * \brief Calculates which vertices are reachable from each vertex in the graph.
  *
  * The resulting list will contain one bitset for each strongly connected component.
- * The bitset for component i will have its j-th bit set, if vertex j is reachable
+ * The bitset for component i will have its j-th bit set if vertex j is reachable
  * from some vertex in component i in 0 or more steps.
  * In particular, a vertex is always reachable from itself.
  *
@@ -56,15 +56,15 @@
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
- * \sa \ref igraph_connected_components() to find the connnected components
+ * \sa \ref igraph_connected_components() to find the connected components
  * of a graph; \ref igraph_count_reachable() to count how many vertices
  * are reachable from each vertex; \ref igraph_subcomponent() to find
- * which vertices are rechable from a single vertex.
+ * which vertices are reachable from a single vertex.
  *
  * Time complexity: O(|C||V|/w + |V| + |E|), where
  * |C| is the number of strongly connected components (at most |V|),
  * |V| is the number of vertices, and
- * |E| is the number of edges respectively,
+ * |E| is the number of edges,
  * and w is the bit width of \type igraph_int_t, typically the
  * word size of the machine (32 or 64).
  */
@@ -166,12 +166,12 @@ igraph_error_t igraph_reachability(
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
- * \sa \ref igraph_connected_components(), \ref igraph_transitive_closure()
+ * \sa \ref igraph_connected_components(), \ref igraph_transitive_closure().
  *
  * Time complexity: O(|C||V|/w + |V| + |E|), where
  * |C| is the number of strongly connected components (at most |V|),
  * |V| is the number of vertices, and
- * |E| is the number of edges respectively,
+ * |E| is the number of edges,
  * and w is the bit width of \type igraph_int_t, typically the
  * word size of the machine (32 or 64).
  */
@@ -214,7 +214,7 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
  * \function igraph_transitive_closure
  * \brief Computes the transitive closure of a graph.
  *
- * The transitive closure of a graph has an from vertex \c i to vertex \c j
+ * The transitive closure of a graph has an edge from vertex \c i to vertex \c j
  * if \c j is reachable from \c i. This function always produces the closure
  * as a simple graph, i.e. self-loops and multi-edges will not be present,
  * regardless of whether they appeared in the original graph.
@@ -226,7 +226,7 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
- * \sa \ref igraph_connected_components(), \ref igraph_count_reachable()
+ * \sa \ref igraph_connected_components(), \ref igraph_count_reachable().
  *
  * Time complexity: O(|V|^2 + |E|), where
  * |V| is the number of vertices, and

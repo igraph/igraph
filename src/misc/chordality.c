@@ -50,7 +50,7 @@
  * \param graph The input graph. Edge directions will be ignored.
  * \param alpha Pointer to an initialized vector, the result is stored here.
  *   It will be resized, as needed. Upon return it contains
- *   the rank of the each vertex in the range 0 to <code>n - 1</code>,
+ *   the rank of each vertex in the range 0 to <code>n - 1</code>,
  *   where \c n is the number of vertices.
  * \param alpham1 Pointer to an initialized vector or a \c NULL
  *   pointer. If not \c NULL, then the inverse of \p alpha is stored
@@ -240,7 +240,7 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
  * chordless cycles have at most three nodes.
  *
  * If either \p alpha or \p alpham1 is given, then the other is
- * calculated by taking simply the inverse. If neither are given,
+ * calculated by taking simply the inverse. If neither is given,
  * then \ref igraph_maximum_cardinality_search() is called to calculate
  * them.
  *

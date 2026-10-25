@@ -318,14 +318,14 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
  *          constraints are generated incrementally, iteratively adding some cycles
  *          that do not intersect with the current edge set \c b, then solving for
  *          \c b again, until finally no unbroken cycles remain. This approach is
- *          similar to that described by Baharev et al (though with a simpler
- *          cycle generation scheme), and to what is implemented by SageMath's.
+ *          similar to that described by Baharev et al. (though with a simpler
+ *          cycle generation scheme), and to what is implemented by SageMath's
  *          \c feedback_edge_set function.
  *        \cli IGRAPH_FAS_EXACT_IP_TI
  *          This is another integer programming approach based on finding a
  *          maximum (largest weight) edge set that adheres to a topological
  *          order. It uses the common formulation through triangle inequalities
- *          (TI), see Section 3.1 of Baharev et al (2021) for an overview. This
+ *          (TI), see Section 3.1 of Baharev et al. (2021) for an overview. This
  *          method was used before igraph 0.10.14, and is typically much slower
  *          than \c IGRAPH_FAS_EXACT_IP_CG.
  *        \cli IGRAPH_FAS_APPROX_EADES
@@ -393,7 +393,7 @@ igraph_error_t igraph_feedback_arc_set(
  * \param algo Algorithm to use. Possible values:
  *        \clist
  *        \cli IGRAPH_FVS_EXACT_IP
- *         Finds a \em miniumum feedback vertex set using integer programming
+ *         Finds a \em minimum feedback vertex set using integer programming
  *         (IP). The complexity is of course at least exponential. Currently
  *         this method uses an approach analogous to that of the
  *         \c IGRAPH_FAS_EXACT_IP_CG algorithm of \ref  igraph_feedback_arc_set().

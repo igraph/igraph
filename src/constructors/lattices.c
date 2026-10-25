@@ -64,14 +64,14 @@
  *
  * \param graph An uninitialized graph object.
  * \param directed Boolean, whether to create a directed graph.
- *        If the \c mutual argument is not set to true,
+ *        If the \p mutual argument is not set to true,
  *        edges will be directed from lower-index vertices towards
  *        higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether
  *        to create all connections as mutual.
  * \param lex_ordering Boolean, set to true if the vertices of the resulting graph are ordered
  *        lexicographically with the 1st coordinate being more significant. Use only when all the
- *        rows have the number of vertices.
+ *        rows have the same number of vertices.
  * \param row_lengths_vector Integer vector, defines the number of vertices with
  *        the second coordinate equal to the index. The length of this vector must match
  *        the length of \p row_start_vector. All coordinates must be non-negative.
@@ -82,7 +82,7 @@
  *         \c IGRAPH_EINVAL: invalid (negative) length of row_lengths_vector does not match the length of the
  *         row_start_vector.
  *
- * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
+ * Time complexity: O(|V|), where |V| is the number of vertices in the generated graph.
  */
 static igraph_error_t triangular_lattice(
     igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t lex_ordering,
@@ -105,7 +105,7 @@ static igraph_error_t triangular_lattice(
 
     if (row_count > 0 && lex_ordering && !igraph_vector_int_isininterval(row_lengths_vector, VECTOR(*row_lengths_vector)[0], VECTOR(*row_lengths_vector)[0])) {
         IGRAPH_ERROR(
-            "row_lengths_vector must have all the coordinates the same", IGRAPH_EINVAL);
+            "All row lengths must be equal when using lexicographic ordering.", IGRAPH_EINVAL);
     }
 
     for (i = 0; i < row_count; i++) {
@@ -252,7 +252,7 @@ static igraph_error_t triangular_lattice_hex_shape(
  * Creates a triangular lattice whose vertices have the form (i, j) for non-negative
  * integers i and j and (i, j) is generally connected with (i + 1, j), (i, j + 1),
  * and (i - 1, j + 1). The function constructs a planar dual of the graph
- * constructed by \ref igraph_hexagonal_lattice(). In particular, there a one-to-one
+ * constructed by \ref igraph_hexagonal_lattice(). In particular, there is a one-to-one
  * correspondence between the vertices in the constructed graph and the cycles of
  * length 6 in the graph constructed by \ref igraph_hexagonal_lattice()
  * with the same \p dims parameter.
@@ -260,20 +260,20 @@ static igraph_error_t triangular_lattice_hex_shape(
  * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd
  * coordinate being more significant, e.g., (i, j) &lt; (i + 1, j) and
- * (i + 1, j) &lt; (i, j + 1)
+ * (i + 1, j) &lt; (i, j + 1).
  *
  * \param graph An uninitialized graph object.
  * \param dims Integer vector, defines the shape of the lattice.
  *    If \p dims is of length 1, the resulting lattice has a triangular shape
  *    where each side of the triangle contains <code>dims[0]</code> vertices.
  *    If \p dims is of length 2, the resulting lattice has a
- *    "quasi rectangular" shape with the sides containing <code>dims[0]</code> and
+ *    "quasi-rectangular" shape with the sides containing <code>dims[0]</code> and
  *    <code>dims[1]</code> vertices, respectively.
  *    If \p dims is of length 3, the resulting lattice has a hexagonal shape
  *    where the sides of the hexagon contain <code>dims[0]</code>, <code>dims[1]</code>
  *    and <code>dims[2]</code> vertices. All dimensions must be non-negative.
  * \param directed Boolean, whether to create a directed graph.
- *    If the \c mutual argument is not set to true, edges will be directed from
+ *    If the \p mutual argument is not set to true, edges will be directed from
  *    lower-index vertices towards higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether
  *    to create all connections as mutual.
@@ -284,7 +284,7 @@ static igraph_error_t triangular_lattice_hex_shape(
  * \sa \ref igraph_hexagonal_lattice() and \ref igraph_square_lattice() for creating
  * other types of lattices; \ref igraph_regular_tree() to create a Bethe lattice.
  *
- * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
+ * Time complexity: O(|V|), where |V| is the number of vertices in the generated graph.
  *
  */
 igraph_error_t igraph_triangular_lattice(
@@ -330,7 +330,7 @@ igraph_error_t igraph_triangular_lattice(
  *
  * \param graph An uninitialized graph object.
  * \param directed Boolean, whether to create a directed graph.
- *        If the \c mutual argument is not set to true,
+ *        If the \p mutual argument is not set to true,
  *        edges will be directed from lower-index vertices towards
  *        higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether
@@ -345,7 +345,7 @@ igraph_error_t igraph_triangular_lattice(
  *         \c IGRAPH_EINVAL: invalid (negative) length of row_lengths_vector does not match the length of the
  *         row_start_vector.
  *
- * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
+ * Time complexity: O(|V|), where |V| is the number of vertices in the generated graph.
  */
 static igraph_error_t hexagonal_lattice(
     igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual,
@@ -535,7 +535,7 @@ static igraph_error_t hexagonal_lattice_hex_shape(
  * Creates a hexagonal lattice whose vertices have the form (i, j) for non-negative
  * integers i and j and (i, j) is generally connected with (i + 1, j), and if i is
  * odd also with (i - 1, j + 1). The function constructs a planar dual of the graph
- * constructed by \ref igraph_triangular_lattice(). In particular, there a one-to-one
+ * constructed by \ref igraph_triangular_lattice(). In particular, there is a one-to-one
  * correspondence between the cycles of length 6 in the constructed graph and the
  * vertices of the graph constructed by \ref igraph_triangular_lattice() function
  * with the same \p dims parameter.
@@ -543,20 +543,20 @@ static igraph_error_t hexagonal_lattice_hex_shape(
  * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd
  * coordinate being more significant, e.g., (i, j) &lt; (i + 1, j) and
- * (i + 1, j) &lt; (i, j + 1)
+ * (i + 1, j) &lt; (i, j + 1).
  *
  * \param graph An uninitialized graph object.
  * \param dims Integer vector, defines the shape of the lattice.
  *   If \p dims is of length 1, the resulting lattice has a triangular shape
  *   where each side of the triangle contains <code>dims[0]</code> vertices.
- *   If \p dims is of length 2, the resulting lattice has a "quasi rectangular"
+ *   If \p dims is of length 2, the resulting lattice has a "quasi-rectangular"
  *   shape with the sides containing <code>dims[0]</code> and <code>dims[1]</code>
  *   vertices, respectively. If \p dims is of length 3, the resulting lattice has
  *   a hexagonal shape where the sides of the hexagon contain <code>dims[0]</code>,
  *   <code>dims[1]</code> and <code>dims[2]</code> vertices. All coordinates must
  *   be non-negative.
  * \param directed Boolean, whether to create a directed graph.
- *   If the \c mutual argument is not set to true, edges will be directed from
+ *   If the \p mutual argument is not set to true, edges will be directed from
  *   lower-index vertices towards higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether to create
  *   all connections as mutual.
@@ -565,9 +565,9 @@ static igraph_error_t hexagonal_lattice_hex_shape(
  *   the components at least 1.
  *
  * \sa \ref igraph_triangular_lattice() and \ref igraph_square_lattice() for creating
- * other types of lattices; ; \ref igraph_regular_tree() to create a Bethe lattice.
+ * other types of lattices; \ref igraph_regular_tree() to create a Bethe lattice.
  *
- * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
+ * Time complexity: O(|V|), where |V| is the number of vertices in the generated graph.
  */
 igraph_error_t igraph_hexagonal_lattice(
         igraph_t *graph, const igraph_vector_int_t *dims,

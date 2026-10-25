@@ -46,7 +46,7 @@ static void igraph_indheap_i_switch(igraph_indheap_t* h, igraph_int_t e1, igraph
  * \brief Initializes an indexed heap (constructor).
  *
  * \return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ *         - <b>IGRAPH_ENOMEM</b>: out of memory.
  */
 
 igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_int_t alloc_size) {
@@ -78,10 +78,10 @@ void igraph_indheap_clear(igraph_indheap_t *h) {
 
 /**
  * \ingroup indheap
- * \brief Initializes and build an indexed heap from a C array (constructor).
+ * \brief Initializes and builds an indexed heap from a C array (constructor).
  *
  * \return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ *         - <b>IGRAPH_ENOMEM</b>: out of memory.
  */
 
 igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, const igraph_real_t *data, igraph_int_t len) {
@@ -279,7 +279,7 @@ igraph_int_t igraph_indheap_size(const igraph_indheap_t* h) {
  * \brief Reserves more memory for an indexed heap.
  *
  * \return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ *         - <b>IGRAPH_ENOMEM</b>: out of memory.
  */
 
 igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, igraph_int_t size) {
@@ -428,7 +428,7 @@ static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, igraph_int_t e1, ig
  * \brief Initializes an empty doubly indexed heap object (constructor).
  *
  * \return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ *         - <b>IGRAPH_ENOMEM</b>: out of memory.
  */
 
 igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_int_t alloc_size) {
@@ -574,7 +574,7 @@ igraph_int_t igraph_d_indheap_size(const igraph_d_indheap_t* h) {
  * \brief Allocates memory for a heap.
  *
  * \return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ *         - <b>IGRAPH_ENOMEM</b>: out of memory.
  */
 
 igraph_error_t igraph_d_indheap_reserve(igraph_d_indheap_t* h, igraph_int_t size) {

@@ -129,7 +129,10 @@ igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * explicitly before invoking this function using \ref igraph_simplify().
  *
  * </para><para>
- * See the following paper for more details: Lada A. Adamic and Eytan Adar:
+ * See the following paper for more details:
+ *
+ * </para><para>
+ * Lada A. Adamic and Eytan Adar:
  * Friends and neighbors on the Web. Social Networks, 25(3):211-230, 2003.
  * https://doi.org/10.1016/S0378-8733(03)00009-1
  *

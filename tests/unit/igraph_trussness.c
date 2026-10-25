@@ -108,5 +108,7 @@ int main(void) {
     igraph_vector_int_destroy(&trussness);
     igraph_destroy(&graph);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

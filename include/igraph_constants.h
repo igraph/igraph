@@ -87,7 +87,7 @@ typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
  *
  * These "neighbor mode" constants are typically used to specify the treatment
  * of edge directions in directed graphs, or which vertices to consider as
- * adjacent to (i.e. neighbor of) a vertex. It is typically ignored in undirected
+ * adjacent to (i.e. neighbor of) a vertex. These are typically ignored in undirected
  * graphs.
  *
  * \enumval IGRAPH_OUT Follow edge directions in directed graphs, or consider
@@ -95,7 +95,7 @@ typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
  * \enumval IGRAPH_IN Follow edges in the reverse direction in directed graphs,
  *    or consider in-neighbors of vertices.
  * \enumval IGRAPH_ALL Ignore edge directions in directed graphs, or consider
- *    all neighbours (both out and in-neighbors) of vertices.
+ *    all neighbors (both out and in-neighbors) of vertices.
  */
 typedef enum {
     IGRAPH_OUT = 1,
@@ -260,12 +260,12 @@ typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
 
 /**
  * \typedef igraph_lpa_variant_t
- * \brief Label propagation algorithm variants of implementation
+ * \brief Label propagation algorithm variants.
  *
  * Variants to run the label propagation algorithm.
- * \enumval IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after each iteration
- * \enumval IGRAPH_LPA_RETENTION Keep current label if among dominant labels, only check if labels changed
- * \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors
+ * \enumval IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after each iteration.
+ * \enumval IGRAPH_LPA_RETENTION Keep current label if among dominant labels, only check if labels changed.
+ * \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors.
  */
 typedef enum {
     IGRAPH_LPA_DOMINANCE = 0, /* Sample from dominant labels, check for dominance after each iteration. */

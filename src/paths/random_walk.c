@@ -37,7 +37,7 @@
  * and only vertex IDs of the vertices on the walk are needed (edge IDs are not needed).
  * \param vertices An allocated vector, the result is stored here as
  *   a list of vertex IDs. It will be resized as needed.
- *   It includes the starting vertex id as well.
+ *   It includes the starting vertex ID as well.
  */
 static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
                                     igraph_vector_int_t *vertices,
@@ -108,7 +108,7 @@ static void vec_destr(igraph_vector_t *vec) {
  *   is a NULL pointer, all edges are considered to have equal weight.
  * \param vertices An allocated vector, the result is stored here as
  *   a list of vertex IDs. It will be resized as needed.
- *   It includes the starting vertex id as well.
+ *   It includes the starting vertex ID as well.
  * \param edges An initialized vector, the indices of traversed
  *   edges are stored here. It will be resized as needed.
  */
@@ -304,7 +304,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
     if (start < 0 || start >= vc) {
         IGRAPH_ERRORF("Starting vertex must be between 0 and the "
                       "number of vertices in the graph (%" IGRAPH_PRId
-                      "), got %" IGRAPH_PRId ".", IGRAPH_EINVAL,
+                      "), got %" IGRAPH_PRId ".", IGRAPH_EINVVID,
                       vc, start);
     }
     if (steps < 0) {

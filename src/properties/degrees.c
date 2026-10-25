@@ -219,7 +219,7 @@ static igraph_error_t avg_nearest_neighbor_degree_weighted(const igraph_t *graph
  * </para><para>
  * When only the <code>k_nn(k)</code> degree correlation function is needed,
  * \ref igraph_degree_correlation_vector() can be used as well. This function provides
- * more flexible control over how degree at each end of directed edges are computed.
+ * more flexible control over how degrees at each end of directed edges are computed.
  *
  * </para><para>
  * Reference:
@@ -420,7 +420,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *    Ignored in undirected graphs.
  * \return Error code.
  *
- * \sa \ref igraph_avg_nearest_neighbor_degree() for computing the average neighbour
+ * \sa \ref igraph_avg_nearest_neighbor_degree() for computing the average neighbor
  * degree of a set of vertices, \ref igraph_joint_degree_distribution() to get the
  * complete joint degree distribution, and \ref igraph_assortativity_degree()
  * to compute the degree assortativity.
@@ -608,7 +608,7 @@ static igraph_error_t strength_all(
  *   calculation.
  * \return Error code.
  *
- * Time complexity: O(|V|+|E|), linear in the number vertices and
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  *
  * \sa \ref igraph_degree() for the traditional, non-weighted version.
@@ -676,7 +676,7 @@ igraph_error_t igraph_strength(
 
 /**
  * \function igraph_sort_vertex_ids_by_degree
- * \brief Calculate a list of vertex IDs sorted by degree of the corresponding vertex.
+ * \brief Calculates a list of vertex IDs sorted by degree of the corresponding vertex.
  *
  * The list of vertex IDs is returned in a vector that is sorted
  * in ascending or descending order of vertex degree.

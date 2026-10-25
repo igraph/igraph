@@ -227,7 +227,7 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
  * https://doi.org/10.26493/1855-3974.2467.497
  *
  * \param graph The graph object.
- * \param res An intialized matrix, the distances will be stored here.
+ * \param res An initialized matrix, the distances will be stored here.
  * \param from The source vertices.
  * \param to The target vertices.
  * \param weights The edge weights. If \c NULL, all weights are assumed to be 1.
@@ -264,7 +264,7 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
  * Time complexity:
  * The original variant has complexity O(|V|^3 + |E|).
  * The "Tree" variant has expected-case complexity of O(|V|^2 log^2 |V|)
- * according to Brodnik et al., while its worst-time complexity remains O(|V|^3).
+ * according to Brodnik et al., while its worst-case complexity remains O(|V|^3).
  * Here |V| denotes the number of vertices and |E| is the number of edges.
  */
 igraph_error_t igraph_distances_floyd_warshall(
@@ -341,10 +341,11 @@ igraph_error_t igraph_i_distances_floyd_warshall(
         }
     }
 
-    /* If there are zero or one vertices, nothing needs to be done.
+    /* With zero or one vertices, no path calculation is needed, but the
+     * source and target selectors must still be applied.
      * This is special-cased so that at later stages we can rely on no_of_nodes - 1 >= 0. */
     if (no_of_nodes <= 1) {
-        return IGRAPH_SUCCESS;
+        return igraph_i_matrix_subset_vertices(res, graph, from, to);
     }
 
     switch (method) {

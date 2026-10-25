@@ -176,7 +176,7 @@ inline igraph_error_t bliss_info_to_igraph(igraph_bliss_info_t *info, const Stat
         group_size_strlen = mpz_sizeinbase(group_size, /* base */ 10) + 2;
         info->group_size = IGRAPH_CALLOC(group_size_strlen, char);
         if (! info->group_size) {
-            IGRAPH_ERROR("Insufficient memory to retrieve automotphism group size.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Insufficient memory to retrieve automorphism group size.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         mpz_get_str(info->group_size, /* base */ 10, group_size);
         mpz_clear(group_size);
@@ -247,7 +247,7 @@ public:
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
- *   null pointer is the graph is not colored.
+ *   null pointer if the graph is not colored.
  * \param labeling Pointer to a vector, the result is stored here. The
  *    permutation takes vertex 0 to the first element of the vector,
  *    vertex 1 to the second, etc. The vector will be resized as
@@ -286,7 +286,7 @@ static igraph_error_t igraph_i_canonical_permutation_bliss(
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
- *   null pointer is the graph is not colored.
+ *   null pointer if the graph is not colored.
  * \param labeling Pointer to a vector, the result is stored here. The
  *    permutation takes vertex 0 to the first element of the vector,
  *    vertex 1 to the second, etc. The vector will be resized as
@@ -294,7 +294,7 @@ static igraph_error_t igraph_i_canonical_permutation_bliss(
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info If not \c NULL then information on Bliss internals is
- *    stored here. The memory used by this structure must to be freed
+ *    stored here. The memory used by this structure must be freed
  *    when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
  *
@@ -366,7 +366,7 @@ static igraph_error_t igraph_i_canonical_permutation_bliss(
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
- *   null pointer is the graph is not colored.
+ *   null pointer if the graph is not colored.
  * \param result Pointer to an \c igraph_real_t, the number of automorphisms
  *   will be returned here.
  * \return Error code. \c IGRAPH_EOVERFLOW if the number of automorphisms is
@@ -410,7 +410,7 @@ igraph_error_t igraph_count_automorphisms(
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
- *   null pointer is the graph is not colored.
+ *   null pointer if the graph is not colored.
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info The result is stored here, in particular in the \c
@@ -464,8 +464,8 @@ igraph_error_t igraph_count_automorphisms_bliss(
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
- *   null pointer is the graph is not colored.
- * \param generators Must be an initialized interger vector list.
+ *   null pointer if the graph is not colored.
+ * \param generators Must be an initialized integer vector list.
  *   The generators of the automorphism group will be stored here.
  * \return Error code.
  *
@@ -492,13 +492,13 @@ igraph_error_t igraph_automorphism_group(
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
- *   null pointer is the graph is not colored.
- * \param generators Must be an initialized interger vector list.
+ *   null pointer if the graph is not colored.
+ * \param generators Must be an initialized integer vector list.
  *   The generators of the automorphism group will be stored here.
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info If not \c NULL then information on Bliss internals is
- *    stored here. The memory used by this structure must to be freed
+ *    stored here. The memory used by this structure must be freed
  *    when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
  *
@@ -588,7 +588,7 @@ igraph_error_t igraph_automorphism_group_bliss(
  *   \ref igraph_bliss_sh_t.
  * \param info1 If not \c NULL, information about the canonization of
  *    the first input graph is stored here. Note that if the two graphs
- *    have different number of vertices or edges, then this is only
+ *    have different numbers of vertices or edges, then this is only
  *    partially filled. The memory used by this structure should be
  *    released when no longer needed, see \ref igraph_bliss_info_t
  *    for details.

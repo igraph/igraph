@@ -1,6 +1,12 @@
 name: CIFuzz
 on: [pull_request]
 permissions: {}
+
+# Stop fuzzing an older revision when a new commit is pushed to the same PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
  Fuzzing:
    runs-on: ubuntu-latest
@@ -28,7 +34,7 @@ jobs:
        path: ./out/artifacts
    - name: Upload Sarif
      if: always() && steps.build.outcome == 'success'
-     uses: github/codeql-action/upload-sarif@v4.38.3
+     uses: github/codeql-action/upload-sarif@v4.39.0
      with:
       # Path to SARIF file relative to the root of the repository
       sarif_file: cifuzz-sarif/results.sarif

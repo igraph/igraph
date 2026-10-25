@@ -68,7 +68,7 @@
  * \param from The original real vector object.
  * \param to Pointer to an initialized integer vector. The result will be stored here.
  * \return Error code:
- *         \c IGRAPH_ENOMEM: out of memory
+ *         \c IGRAPH_ENOMEM: out of memory.
  *
  * Time complexity: O(n), where n is the number of elements in the vector.
  */
@@ -109,7 +109,7 @@ igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_in
  *    be stored here.
  * \param nodes Hint, the largest element in \p v.
  * \return Error code:
- *         \c IGRAPH_ENOMEM: out of memory
+ *         \c IGRAPH_ENOMEM: out of memory.
  *
  * Time complexity: O()
  */
@@ -373,7 +373,7 @@ igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
                                  const igraph_vector_t *imag) {
     igraph_int_t i, n = igraph_vector_size(real);
     if (n != igraph_vector_size(imag)) {
-        IGRAPH_ERROR("Real and imag vector sizes don't match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Real and imaginary vector sizes don't match.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vector_complex_init(v, n));
@@ -404,7 +404,7 @@ igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
                                        const igraph_vector_t *theta) {
     igraph_int_t i, n = igraph_vector_size(r);
     if (n != igraph_vector_size(theta)) {
-        IGRAPH_ERROR("'r' and 'theta' vector sizes don't match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("'r' and 'theta' vector sizes don't match.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vector_complex_init(v, n));
@@ -572,7 +572,7 @@ igraph_error_t igraph_vector_complex_zapsmall(igraph_vector_complex_t *v, igraph
 /**
  * \ingroup vector
  * \function igraph_vector_is_nan
- * \brief Check for each element if it is NaN.
+ * \brief Checks for each element if it is NaN.
  *
  * \param v The \type igraph_vector_t object to check.
  * \param is_nan The resulting boolean vector indicating for each element
@@ -602,7 +602,7 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
 /**
  * \ingroup vector
  * \function igraph_vector_is_any_nan
- * \brief Check if any element is NaN.
+ * \brief Checks if any element is NaN.
  *
  * \param v The \type igraph_vector_t object to check.
  * \return True if any element is NaN, false otherwise.
@@ -628,7 +628,7 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
 /**
  * \ingroup vector
  * \function igraph_vector_is_all_finite
- * \brief Check if all elements are finite.
+ * \brief Checks if all elements are finite.
  *
  * \param v The \type igraph_vector_t object to check.
  * \return True if none of the elements are infinite or NaN.

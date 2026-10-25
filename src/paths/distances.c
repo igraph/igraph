@@ -120,11 +120,11 @@ static igraph_error_t igraph_i_eccentricity_unweighted(
 /**
  * This function finds the weighted eccentricity and returns it via \p ecc.
  * It's used for igraph_pseudo_diameter() and igraph_eccentricity().
- * \p vid_ecc returns the vertex id of the ecc with the greatest
+ * \p vid_ecc returns the vertex ID of the ecc with the greatest
  * distance from \p vid_start. If two vertices have the same greatest distance,
  * the one with the lowest degree is chosen.
  * When the graph is not (strongly) connected and \p unconn is false, then \p ecc
- * wil be set to infinity, and \p vid_ecc to -1;
+ * will be set to infinity, and \p vid_ecc to -1;
  */
 static igraph_error_t igraph_i_eccentricity_dijkstra(
     const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc,
@@ -316,7 +316,7 @@ igraph_error_t igraph_eccentricity(
  * \function igraph_radius
  * \brief Radius of a graph, using weighted edges.
  *
- * The radius of a graph is the defined as the minimum eccentricity of
+ * The radius of a graph is defined as the minimum eccentricity of
  * its vertices, see \ref igraph_eccentricity().
  *
  * \param graph The input graph, it can be directed or undirected.
@@ -376,7 +376,7 @@ static igraph_error_t igraph_i_pseudo_diameter_unweighted(
     igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
 
     /* We will reach here when vid_start < 0 and the graph has no vertices. */
@@ -572,7 +572,7 @@ static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
     igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
 
     IGRAPH_ASSERT(weights != 0);
@@ -761,7 +761,7 @@ static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
  *        unweighted graph. All weights should be non-negative. Edges with
  *        positive infinite weights are ignored.
  * \param diameter This will contain the pseudo-diameter.
- * \param vid_start Id of the starting vertex. If this is negative, a
+ * \param vid_start ID of the starting vertex. If this is negative, a
  *        random starting vertex is chosen.
  * \param from If not \c NULL this will be set to the
  *        source vertex of the diameter path. If the graph has no diameter path,

@@ -54,7 +54,7 @@
  * be called on each item in the pointer vector when it is destroyed by
  * \ref igraph_vector_ptr_destroy() or \ref igraph_vector_ptr_destroy_all(),
  * or when its elements are freed by \ref igraph_vector_ptr_free_all().
- * Note that the semantics of an item destructor does not coincide with
+ * Note that the semantics of an item destructor do not coincide with
  * C++ destructors; for instance, when a pointer vector is resized to a
  * smaller size, the extra items will \em not be destroyed automatically!
  * Nevertheless, item destructors may become handy in many cases; for
@@ -67,7 +67,7 @@
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_init
- * \brief Initialize a pointer vector (constructor).
+ * \brief Initializes a pointer vector (constructor).
  *
  * </para><para>
  * This is the constructor of the pointer vector data type. All
@@ -77,7 +77,7 @@
  *        <type>igraph_vector_ptr_t</type> object, to be created.
  * \param size Integer, the size of the pointer vector.
  * \return Error code:
- *         \c IGRAPH_ENOMEM if out of memory
+ *         \c IGRAPH_ENOMEM if out of memory.
  *
  * Time complexity: operating system dependent, the amount of \quote
  * time \endquote required to allocate \p size elements.
@@ -91,7 +91,7 @@ igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_int_t size)
     }
     v->stor_begin = IGRAPH_CALLOC(alloc_size, void*);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("vector ptr init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for initializing a pointer vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -236,7 +236,7 @@ igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_int_t ca
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_resize_min
- * \brief Deallocate the unused memory of a pointer vector.
+ * \brief Deallocates the unused memory of a pointer vector.
  *
  * This function attempts to deallocate the unused reserved storage
  * of a pointer vector. If it succeeds, \ref igraph_vector_ptr_size() and
@@ -317,7 +317,7 @@ igraph_int_t igraph_vector_ptr_capacity(const igraph_vector_ptr_t* v) {
  * \brief Removes all elements from a pointer vector.
  *
  * </para><para>
- * This function resizes a pointer to vector to zero length. Note that
+ * This function resizes a pointer vector to zero length. Note that
  * the pointed objects are \em not deallocated, you should call
  * \ref igraph_free() on them, or make sure that their allocated memory is freed
  * in some other way, you'll get memory leaks otherwise. If you have
@@ -427,7 +427,7 @@ igraph_error_t igraph_vector_ptr_insert(igraph_vector_ptr_t* v, igraph_int_t pos
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_get
- * \brief Access an element of a pointer vector.
+ * \brief Accesses an element of a pointer vector.
  *
  * \param v Pointer to a pointer vector.
  * \param pos The index of the pointer to return.
@@ -445,7 +445,7 @@ void *igraph_vector_ptr_get(const igraph_vector_ptr_t* v, igraph_int_t pos) {
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_set
- * \brief Assign to an element of a pointer vector.
+ * \brief Assigns to an element of a pointer vector.
  *
  * \param v Pointer to a pointer vector.
  * \param pos The index of the pointer to update.
@@ -480,7 +480,7 @@ void igraph_vector_ptr_null(igraph_vector_ptr_t* v) {
  * \brief Resizes a pointer vector.
  *
  * </para><para>
- * Note that if a vector is made smaller the pointed object are not
+ * Note that if a vector is made smaller the pointed-to objects are not
  * deallocated by this function and the item destructor is not called
  * on the extra elements.
  *
@@ -488,7 +488,7 @@ void igraph_vector_ptr_null(igraph_vector_ptr_t* v) {
  * \param newsize The new size of the pointer vector.
  * \return Error code.
  *
- * Time complexity: O(1) if the vector if made smaller. Operating
+ * Time complexity: O(1) if the vector is made smaller. Operating
  * system dependent otherwise, the amount of \quote time \endquote
  * needed to allocate the memory for the vector elements.
  */
@@ -509,13 +509,13 @@ igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_int_t new
  *        pointer vector.
  * \param length Integer, the length of the array.
  * \return Error code:
- *         \c IGRAPH_ENOMEM if out of memory
+ *         \c IGRAPH_ENOMEM if out of memory.
  */
 
 igraph_error_t igraph_vector_ptr_init_array(igraph_vector_ptr_t *v, void *const *data, igraph_int_t length) {
     v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("Cannot initialize pointer vector from array", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot initialize pointer vector from array.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + length;
     v->end = v->stor_end;
@@ -546,7 +546,7 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  *
  * </para><para>
  * This function creates a pointer vector by copying another one. This
- * is shallow copy, only the pointers in the vector will be copied.
+ * is a shallow copy; only the pointers in the vector will be copied.
  *
  * </para><para>
  * It is potentially dangerous to copy a pointer vector with an associated
@@ -559,7 +559,7 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  * \param to Pointer to an uninitialized pointer vector object.
  * \param from A pointer vector object.
  * \return Error code:
- *         \c IGRAPH_ENOMEM if out of memory
+ *         \c IGRAPH_ENOMEM if out of memory.
  *
  * Time complexity: O(n) if allocating memory for n elements can be
  * done in O(n) time.
@@ -575,7 +575,7 @@ igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *to, const igraph
 
     to->stor_begin = IGRAPH_CALLOC(from_size, void*);
     if (to->stor_begin == 0) {
-        IGRAPH_ERROR("Cannot copy pointer vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot copy pointer vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     to->stor_end = to->stor_begin + igraph_vector_ptr_size(from);
     to->end = to->stor_end;
@@ -588,7 +588,7 @@ igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *to, const igraph
 
 /**
  * \ingroup vectorptr
- * \brief Remove an element from a pointer vector.
+ * \brief Removes an element from a pointer vector.
  */
 
 void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_int_t pos) {
@@ -749,7 +749,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
 
     vind = IGRAPH_CALLOC(n, uintptr_t);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_ptr_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for igraph_vector_ptr_sort_ind.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     for (i = 0; i < n; i++) {

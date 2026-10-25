@@ -34,7 +34,7 @@
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the average local transitivity,
  * this probability is calculated for each vertex and then the average
- * is taken. Vertices with less than two neighbors require special treatment,
+ * is taken. Vertices with fewer than two neighbors require special treatment,
  * they will either be left out from the calculation or they will be considered
  * as having zero transitivity, depending on the \c mode argument.
  * Edge directions and edge multiplicities are ignored.
@@ -53,8 +53,9 @@
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
+ * https://doi.org/10.1038/30918
  *
- * \param graph The input graph. Edge directions and multiplicites are ignored.
+ * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat vertices with degree less than two.
  *    \c IGRAPH_TRANSITIVITY_NAN leaves them out from averaging,
@@ -348,6 +349,7 @@ static igraph_error_t transitivity_local_undirected4(const igraph_t *graph,
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
+ * https://doi.org/10.1038/30918
  *
  * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Pointer to an initialized vector, the result will be
@@ -484,7 +486,7 @@ static igraph_error_t count_triangles_and_triples(
  * vertex triples, in a graph. Edge directions, edge multiplicities, and self-loops
  * are ignored.
  *
- * \param graph The graph object. Edge directions and multiplicites are ignored.
+ * \param graph The graph object. Edge directions and multiplicities are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \return Error code:
  *         \c IGRAPH_ENOMEM: not enough memory for
@@ -505,12 +507,12 @@ igraph_error_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res)
 
 /**
  * \function igraph_count_adjacent_triangles
- * \brief Count the number of triangles a vertex is part of.
+ * \brief Counts the number of triangles a vertex is part of.
  *
  * \param graph The input graph. Edge directions and multiplicities are ignored.
- * \param res Initiliazed vector, the results are stored here.
+ * \param res Initialized vector, the results are stored here.
  * \param vids The vertices to perform the calculation for.
- * \return Error mode.
+ * \return Error code.
  *
  * \sa \ref igraph_list_triangles() to list triangles,
  * \ref igraph_count_triangles() to count all triangles at once.
@@ -532,7 +534,7 @@ igraph_error_t igraph_count_adjacent_triangles(const igraph_t *graph,
 
 /**
  * \function igraph_list_triangles
- * \brief Find all triangles in a graph.
+ * \brief Finds all triangles in a graph.
  *
  * </para><para>
  * The triangles are reported as a long list of vertex ID triplets. Use
@@ -594,7 +596,7 @@ igraph_error_t igraph_list_triangles(const igraph_t *graph,
  * S. Wasserman and K. Faust: Social Network Analysis: Methods and
  * Applications. Cambridge: Cambridge University Press, 1994.
  *
- * \param graph The graph object. Edge directions and multiplicites are ignored.
+ * \param graph The graph object. Edge directions and multiplicities are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat graphs with no connected triples.
  *   \c IGRAPH_TRANSITIVITY_NAN returns \c NaN in this case,
@@ -953,11 +955,10 @@ igraph_error_t igraph_is_triangle_free(const igraph_t *graph, igraph_bool_t *res
 
     /* Attempt using Mantel's theorem:
      *
-     * If ecount > vcount^2 / 4, the graph has a triangle.
-     *
-     * This calculation needs to be made with care to avoid integer overflow
-     * or false positives due to rounding errors. Note that in igraph, 2*ecount
-     * never overflows.
+     * If ecount > floor(vcount^2 / 4), the graph has a triangle.
+     * The bound equals floor(vcount / 2) * ceil(vcount / 2), which we compute
+     * using integer arithmetic. If the product would overflow, ecount cannot
+     * exceed it, so we skip this shortcut.
      *
      * However, Mantel's condition is valid only for simple graphs. If it holds,
      * we will check if the graph is already known to be simple from the property
@@ -968,8 +969,10 @@ igraph_error_t igraph_is_triangle_free(const igraph_t *graph, igraph_bool_t *res
      * so dense that starting to look for triangles directly is likely to
      * short-circuit quickly.
      */
-    if (IGRAPH_INTEGER_MAX / vcount >= vcount/2 && /* avoid overflow */
-        2*ecount > (vcount / 2) * vcount /* Mantel */) {
+    const igraph_int_t half_lo = vcount / 2;
+    const igraph_int_t half_hi = vcount - half_lo;
+    if (IGRAPH_INTEGER_MAX / half_hi >= half_lo && /* avoid overflow */
+        ecount > half_lo * half_hi /* Mantel */) {
         igraph_bool_t known_simple = true;
 
         if (! igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP)) {

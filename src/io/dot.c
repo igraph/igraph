@@ -134,12 +134,12 @@ static igraph_error_t fprint_integral_or_precise(FILE *file, igraph_real_t x, ig
  * \brief Write the graph to a stream in DOT format.
  *
  * </para><para>
- * DOT is the format used by the widely known GraphViz software, see
+ * DOT is the format used by the widely known Graphviz software, see
  * http://www.graphviz.org for details. The grammar of the DOT format
  * can be found here: http://www.graphviz.org/doc/info/lang.html
  *
  * </para><para>
- * This is only a preliminary implementation, no visualization
+ * This is only a preliminary implementation; no visualization
  * information is written.
  *
  * </para><para>
@@ -289,7 +289,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                     CHECK(fprintf(outstream, "    %s=%d\n", VECTOR(buf), VECTOR(boolv)[0] ? 1 : 0));
                     IGRAPH_WARNING("A boolean edge attribute was converted to numeric.");
                 } else {
-                    IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored.");
+                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored.");
                 }
             }
             CHECK(fprintf(outstream, "  ];\n"));

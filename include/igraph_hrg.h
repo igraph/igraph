@@ -47,7 +47,7 @@ IGRAPH_BEGIN_C_DECLS
  *    the first element of the vector is the left child of the root
  *    vertex. Internal vertices are denoted with negative numbers,
  *    starting from -1 and going down, i.e. the root vertex is
- *    -1. Leaf vertices are denoted by non-negative number, starting
+ *    -1. Leaf vertices are denoted by non-negative numbers, starting
  *    from zero and up.
  * \member right Vector that contains the right children of the
  *    vertices, with the same encoding as the \c left vector.

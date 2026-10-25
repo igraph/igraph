@@ -73,7 +73,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The input graph. Its edges are ignored by this function.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param center The id of the vertex to put in the center. You can set it to
+ * \param center The ID of the vertex to put in the center. You can set it to
  *        any arbitrary value for the special case when the input graph has no
  *        vertices; otherwise it must be between 0 and the number of vertices
  *        minus 1.
@@ -92,7 +92,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     const igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes > 0 && (center < 0 || center >= no_of_nodes)) {
-        IGRAPH_ERROR("The given center is not a vertex of the graph.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The given center is not a vertex of the graph.", IGRAPH_EINVVID);
     }
     if (order && igraph_vector_int_size(order) != no_of_nodes) {
         IGRAPH_ERROR("Invalid order vector length.", IGRAPH_EINVAL);

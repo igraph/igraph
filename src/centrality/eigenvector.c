@@ -535,7 +535,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *
  * </para><para>
  * In the weighted case, the eigenvector centrality of a vertex is proportional
- * to the weighted sum of centralities of its neighbours, i.e.
+ * to the weighted sum of centralities of its neighbors, i.e.
  * <code>c_j = sum_i w_ij c_i</code>, where <code>w_ij</code> is the weight
  * of the edge connecting vertex \c i to \c j. The weights of parallel edges
  * are added up.
@@ -554,11 +554,11 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *
  * </para><para>
  * Also note that the adjacency matrix of a directed acyclic graph or the
- * adjacency matrix of an empty graph does not possess positive eigenvalues,
+ * adjacency matrix of an empty graph does not possess positive eigenvalues;
  * therefore the eigenvector centrality is not meaningful for these graphs.
  * igraph will return an eigenvalue of zero in such cases. The returned
  * eigenvector centralities will all be equal for vertices with zero out-degree
- * or zero in-degrees (depending on whether \p mode is \c IGRAPH_OUT or \c IGRAPH_IN)
+ * or zero in-degree (depending on whether \p mode is \c IGRAPH_OUT or \c IGRAPH_IN)
  * and zeros for other vertices. Such pathological cases can be detected
  * by asking igraph to calculate the eigenvalue as well (using the \p value
  * parameter, see below) and checking whether the eigenvalue is very close
@@ -571,14 +571,14 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *
  * </para><para>
  * When working with directed graphs, consider using hub and authority
- * scores instead, see \ref igraph_hub_and_authority_scores().
+ * scores instead; see \ref igraph_hub_and_authority_scores().
  *
  * \param graph The input graph. It may be directed.
  * \param vector Pointer to an initialized vector, it will be resized
  *     as needed. The result of the computation is stored here. It can
- *     be a null pointer, then it is ignored.
+ *     be a null pointer, in which case it is ignored.
  * \param value If not a null pointer, then the eigenvalue
- *     corresponding to the found eigenvector is stored here.
+ *     corresponding to the calculated eigenvector is stored here.
  * \param mode How to consider edge directions in directed graphs.
  *     It is ignored for undirected graphs. Possible values:
  *        \clist
@@ -598,7 +598,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * \param weights A null pointer (indicating no edge weights), or a vector
  *     giving the weights of the edges. Weights should be positive to guarantee
  *     a meaningful result. The algorithm might produce complex numbers when some
- *     weights are negative and the graph is directed. In this case only
+ *     weights are negative and the graph is directed. In this case, only
  *     the real part is reported.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Supply \c NULL here to use the defaults. Note that the
@@ -607,9 +607,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *    calculated based on the degree of the vertices.
  * \return Error code.
  *
- * Time complexity: depends on the input graph, usually it is O(|V|+|E|).
+ * Time complexity: depends on the input graph; usually it is O(|V|+|E|).
  *
- * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for
+ * \sa \ref igraph_pagerank() and \ref igraph_personalized_pagerank() for
  *   modifications of eigenvector centrality.
  * \ref igraph_hub_and_authority_scores() for a similar pair of measures
  * intended for directed graphs.

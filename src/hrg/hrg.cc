@@ -43,7 +43,7 @@ using namespace fitHRG;
  *
  * <para>A hierarchical random graph is an ensemble of undirected
  * graphs with \c n vertices. It is defined via a binary tree with \c
- * n leaf and \c n-1 internal vertices, where the
+ * n leaves and \c n-1 internal vertices, where the
  * internal vertices are labeled with probabilities.
  * The probability that two vertices are connected in the random graph
  * is given by the probability label at their closest common
@@ -51,19 +51,26 @@ using namespace fitHRG;
  * </para>
  *
  * <para>Please read the following two articles for more about
- * hierarchical random graphs: A. Clauset, C. Moore, and M.E.J. Newman.
+ * hierarchical random graphs:
+ *
+ * </para><para>
+ * A. Clauset, C. Moore, and M.E.J. Newman.
  * Hierarchical structure and the prediction of missing links in networks.
- * Nature 453, 98 - 101 (2008); and A. Clauset, C. Moore, and M.E.J. Newman.
+ * Nature 453, 98 - 101 (2008).
+ * https://doi.org/10.1038/nature06830
+ * </para><para>
+ * A. Clauset, C. Moore, and M.E.J. Newman.
  * Structural Inference of Hierarchies in Networks. In E. M. Airoldi
  * et al. (Eds.): ICML 2006 Ws, Lecture Notes in Computer Science
  * 4503, 1-13. Springer-Verlag, Berlin Heidelberg (2007).
+ * https://doi.org/10.1007/978-3-540-73133-7_1
  * </para>
  *
  * <para>
  * igraph contains functions for fitting HRG models to a given network
  * (\ref igraph_hrg_fit), for generating networks from a given HRG
  * ensemble (\ref igraph_hrg_game, \ref igraph_hrg_sample), converting
- * an igraph graph to a HRG and back (\ref igraph_hrg_create, \ref
+ * an igraph graph to an HRG and back (\ref igraph_hrg_create, \ref
  * igraph_hrg_dendrogram), for calculating a consensus tree from a
  * set of sampled HRGs (\ref igraph_hrg_consensus) and for predicting
  * missing edges in a network based on its HRG models (\ref
@@ -200,7 +207,8 @@ igraph_error_t dendro::setGraph(const igraph_t *igraph) {
     // TODO: Can this be relaxed? buildDendrogram() creates a tree with n-2 internal edges,
     // i.e. zero internal edges for a 2-vertex graph. This is not handled at the moment.
     if (no_of_nodes < 3) {
-        IGRAPH_ERROR("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.",
+                      IGRAPH_EINVAL, no_of_nodes);
     }
 
     // Create graph
@@ -279,7 +287,7 @@ static std::unique_ptr<simpleGraph> igraph_i_hrg_getsimplegraph(const igraph_t *
 
 /**
  * \function igraph_hrg_init
- * \brief Allocate memory for a HRG.
+ * \brief Allocates memory for an HRG.
  *
  * This function must be called before passing an \ref igraph_hrg_t to
  * an igraph function.
@@ -310,7 +318,7 @@ igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_int_t n) {
 
 /**
  * \function igraph_hrg_destroy
- * \brief Deallocate memory for an HRG.
+ * \brief Deallocates memory for an HRG.
  *
  * The HRG data structure can be reinitialized again with an \ref
  * igraph_hrg_destroy call.
@@ -344,7 +352,7 @@ igraph_int_t igraph_hrg_size(const igraph_hrg_t *hrg) {
 
 /**
  * \function igraph_hrg_resize
- * \brief Resize a HRG.
+ * \brief Resizes an HRG.
  *
  * \param hrg Pointer to an initialized (see \ref igraph_hrg_init)
  *   HRG.
@@ -390,19 +398,19 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_int_t newsize) {
 
 /**
  * \function igraph_hrg_fit
- * \brief Fit a hierarchical random graph model to a network.
+ * \brief Fits a hierarchical random graph model to a network.
  *
  * \param graph The igraph graph to fit the model to. Edge directions
  *   are ignored in directed graphs.
  * \param hrg Pointer to an initialized HRG, the result of the fitting
- *   is stored here. It can also be used to pass a HRG to the
+ *   is stored here. It can also be used to pass an HRG to the
  *   function, that can be used as the starting point of the Markov
  *   Chain Monte Carlo fitting, if the \p start argument is true.
  * \param start Whether to start the fitting from the given
  *   HRG model.
  * \param steps Integer, the number of MCMC steps to take in the
  *   fitting procedure. If this is zero, then the fitting stops if a
- *   convergence criteria is fulfilled.
+ *   convergence criterion is fulfilled.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -448,11 +456,11 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
 
 /**
  * \function igraph_hrg_sample
- * \brief Sample from a hierarchical random graph model.
+ * \brief Samples from a hierarchical random graph model.
  *
  * This function draws a single sample from a hierarchical random graph model.
  *
- * \param hrg A HRG model to sample from
+ * \param hrg An HRG model to sample from
  * \param sample Pointer to an uninitialized graph; the sample is stored here.
  * \return Error code.
  *
@@ -476,12 +484,12 @@ igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
 
 /**
  * \function igraph_hrg_sample_many
- * \brief Draw multiple samples from a hierarchical random graph model.
+ * \brief Draws multiple samples from a hierarchical random graph model.
  *
  * This function draws multiple samples from the hierarchical random graph
  * ensemble \p hrg.
  *
- * \param hrg A HRG model to sample from
+ * \param hrg An HRG model to sample from
  * \param samples An initialized graph list that will contain the sampled
  *   graphs. Note that existing graphs in the graph list are \em not removed
  *   so make sure you supply an empty list if you do not need the old contents
@@ -524,7 +532,7 @@ igraph_error_t igraph_hrg_sample_many(
 
 /**
  * \function igraph_hrg_game
- * \brief Generate a hierarchical random graph.
+ * \brief Generates a hierarchical random graph.
  *
  * This function is a simple shortcut to \ref igraph_hrg_sample.
  * It creates a single graph from the given HRG.
@@ -544,7 +552,7 @@ igraph_error_t igraph_hrg_game(igraph_t *graph,
 
 /**
  * \function igraph_from_hrg_dendrogram
- * \brief Create a graph representation of the dendrogram of a hierarchical random graph model.
+ * \brief Creates a graph representation of the dendrogram of a hierarchical random graph model.
  *
  * Creates the igraph graph equivalent of the dendrogram encoded in an
  * \ref igraph_hrg_t data structure. The probabilities associated to the
@@ -608,7 +616,7 @@ igraph_error_t igraph_from_hrg_dendrogram(
 
 /**
  * \function igraph_hrg_dendrogram
- * \brief Create a dendrogram from a hierarchical random graph.
+ * \brief Creates a dendrogram from a hierarchical random graph.
  *
  * Creates the igraph graph equivalent of an \ref igraph_hrg_t data
  * structure.
@@ -675,20 +683,20 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
 
 /**
  * \function igraph_hrg_consensus
- * \brief Calculate a consensus tree for a HRG.
+ * \brief Calculates a consensus tree for an HRG.
  *
  * The calculation can be started from the given HRG (\p hrg), or (if
- * \p start is false), a HRG is first fitted to the given graph.
+ * \p start is false), an HRG is first fitted to the given graph.
  *
  * \param graph The input graph.
  * \param parents An initialized vector, the results are stored
- *   here. For each vertex, the id of its parent vertex is stored, or
+ *   here. For each vertex, the ID of its parent vertex is stored, or
  *   -1, if the vertex is the root vertex in the tree. The first n
  *   vertex IDs (from 0) refer to the original vertices of the graph,
  *   the other IDs refer to vertex groups.
  * \param weights Numeric vector, counts the number of times a given
- *   tree split occured in the generated network samples, for each
- *   internal vertices. The order is the same as in \p parents.
+ *   tree split occurred in the generated network samples, for each
+ *   internal vertex. The order is the same as in \p parents.
  * \param hrg A hierarchical random graph. It is used as a starting
  *   point for the sampling, if the \p start argument is true. It is
  *   modified along the MCMC.
@@ -831,21 +839,21 @@ static igraph_error_t recordPredictions(const pblock *br_list, igraph_vector_int
  * \function igraph_hrg_predict
  * \brief Predict missing edges in a graph, based on HRG models.
  *
- * Samples HRG models for a network, and estimated the probability
+ * Samples HRG models for a network, and estimates the probability
  * that an edge was falsely observed as non-existent in the network.
  *
  * \param graph The input graph.
  * \param edges The list of missing edges is stored here, the first
  *   two elements are the first edge, the next two the second edge,
  *   etc.
- * \param prob Vector of probabilies for the existence of missing
+ * \param prob Vector of probabilities for the existence of missing
  *   edges, in the order corresponding to \c edges.
- * \param hrg A HRG, it is used as a starting point if \c start is
+ * \param hrg An HRG, it is used as a starting point if \c start is
  *   true. It is also modified during the MCMC sampling.
  * \param start Whether to start the MCMC from the given HRG.
  * \param num_samples The number of samples to generate.
  * \param num_bins Controls the resolution of the edge
- *   probabilities. Higher numbers result higher resolution.
+ *   probabilities. Higher numbers result in higher resolution.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -897,7 +905,7 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
 
 /**
  * \function igraph_hrg_create
- * \brief Create a HRG from an igraph graph.
+ * \brief Creates an HRG from an igraph graph.
  *
  * \param hrg Pointer to an initialized \ref igraph_hrg_t. The result
  *    is stored here.
@@ -955,7 +963,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
 
     // Number of nodes must be odd
     if (no_of_nodes % 2 == 0) {
-        IGRAPH_ERROR("Complete HRG graph must have odd number of vertices.",
+        IGRAPH_ERROR("Complete HRG graph must have an odd number of vertices.",
                      IGRAPH_EINVAL);
     }
 

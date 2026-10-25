@@ -320,7 +320,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices_or_edges_inner(
                 break;
             default:
                 IGRAPH_WARNINGF(
-                    "Attribute '%s' with unknown type %d ignored",
+                    "Attribute '%s' with unknown type %d ignored.",
                     oldrec->name, (int) oldrec->type
                 );
                 break;
@@ -534,7 +534,7 @@ static igraph_error_t igraph_i_cattribute_permute_attribute_record_list(
             break;
         default:
             IGRAPH_WARNINGF(
-                "Attribute '%s' with unknown type %d ignored",
+                "Attribute '%s' with unknown type %d ignored.",
                 oldrec->name, (int) oldrec->type
             );
         }
@@ -589,7 +589,7 @@ static igraph_error_t igraph_i_cattribute_permute_attribute_record_list_in_place
 
         default:
             IGRAPH_WARNINGF(
-                "Vertex attribute '%s' with unknown type %d ignored",
+                "Attribute '%s' with unknown type %d ignored.",
                 oldrec->name, (int) oldrec->type
             );
         }
@@ -1229,7 +1229,7 @@ static igraph_error_t igraph_i_cattributes_cs_func(const igraph_attribute_record
  *
  * <para>
  * The C attribute handler supports combining the attributes of multiple
- * vertices of edges into a single attribute during a vertex or edge contraction
+ * vertices or edges into a single attribute during a vertex or edge contraction
  * operation via a user-defined function. This is achieved by setting the
  * type of the attribute combination to \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION
  * and passing in a pointer to the custom combination function when specifying
@@ -1249,7 +1249,7 @@ static igraph_error_t igraph_i_cattributes_cs_func(const igraph_attribute_record
  * In case of strings, all strings in the input vector are \em owned by igraph
  * and must not be modified or freed in the combination handler. The string
  * returned to the caller in \p output remains owned by the caller; igraph will
- * make a copy it and store the copy in the appropriate part of the data
+ * make a copy of it and store the copy in the appropriate part of the data
  * structure holding the vertex or edge attributes.
  * </para>
  */
@@ -1846,7 +1846,7 @@ const igraph_attribute_table_t igraph_cattribute_table = {
  * the attribute handler must be attached before you call any other
  * igraph functions, otherwise you might end up with graphs without
  * attributes and an active attribute handler, which might cause
- * unexpected program behaviour. The rule is that you attach the
+ * unexpected program behavior. The rule is that you attach the
  * attribute handler in the beginning of your
  * <function>main()</function> and never touch it again. Detaching
  * the attribute handler might lead to memory leaks.</para>
@@ -1874,7 +1874,7 @@ const igraph_attribute_table_t igraph_cattribute_table = {
 
 /**
  * \function igraph_cattribute_GAN
- * \brief Query a numeric graph attribute.
+ * \brief Queries a numeric graph attribute.
  *
  * Returns the value of the given numeric graph attribute.
  * If the attribute does not exist, a warning is issued
@@ -1905,7 +1905,7 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_GAB
- * \brief Query a boolean graph attribute.
+ * \brief Queries a boolean graph attribute.
  *
  * Returns the value of the given boolean graph attribute.
  * If the attribute does not exist, a warning is issued
@@ -1936,7 +1936,7 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_GAS
- * \brief Query a string graph attribute.
+ * \brief Queries a string graph attribute.
  *
  * Returns a <type>const</type> pointer to the string graph attribute
  * specified in \p name. The value must not be modified.
@@ -1968,7 +1968,7 @@ const char *igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_VAN
- * \brief Query a numeric vertex attribute.
+ * \brief Queries a numeric vertex attribute.
  *
  * If the attribute does not exist, a warning is issued and
  * NaN is returned. See \ref igraph_cattribute_VANV() for
@@ -1976,7 +1976,7 @@ const char *igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param vid The id of the queried vertex.
+ * \param vid The ID of the queried vertex.
  * \return The value of the attribute.
  *
  * \sa \ref VAN macro for a simpler interface.
@@ -2001,7 +2001,7 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAB
- * \brief Query a boolean vertex attribute.
+ * \brief Queries a boolean vertex attribute.
  *
  * If the vertex attribute does not exist, a warning is issued
  * and false is returned. See \ref igraph_cattribute_VABV() for
@@ -2009,7 +2009,7 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param vid The id of the queried vertex.
+ * \param vid The ID of the queried vertex.
  * \return The value of the attribute.
  *
  * \sa \ref VAB macro for a simpler interface.
@@ -2034,7 +2034,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAS
- * \brief Query a string vertex attribute.
+ * \brief Queries a string vertex attribute.
  *
  * Returns a <type>const</type> pointer to the string vertex attribute
  * specified in \p name. The value must not be modified.
@@ -2044,7 +2044,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param vid The id of the queried vertex.
+ * \param vid The ID of the queried vertex.
  * \return The value of the attribute.
  *
  * \sa The macro \ref VAS for a simpler interface.
@@ -2069,7 +2069,7 @@ const char *igraph_cattribute_VAS(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAN
- * \brief Query a numeric edge attribute.
+ * \brief Queries a numeric edge attribute.
  *
  * If the attribute does not exist, a warning is issued and
  * NaN is returned. See \ref igraph_cattribute_EANV() for
@@ -2077,7 +2077,7 @@ const char *igraph_cattribute_VAS(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param eid The id of the queried edge.
+ * \param eid The ID of the queried edge.
  * \return The value of the attribute.
  *
  * \sa \ref EAN for an easier interface.
@@ -2102,7 +2102,7 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAB
- * \brief Query a boolean edge attribute.
+ * \brief Queries a boolean edge attribute.
  *
  * If the edge attribute does not exist, a warning is issued and
  * false is returned. See \ref igraph_cattribute_EABV() for
@@ -2110,7 +2110,7 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param eid The id of the queried edge.
+ * \param eid The ID of the queried edge.
  * \return The value of the attribute.
  *
  * \sa \ref EAB for an easier interface.
@@ -2135,7 +2135,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAS
- * \brief Query a string edge attribute.
+ * \brief Queries a string edge attribute.
  *
  * Returns a <type>const</type> pointer to the string edge attribute
  * specified in \p name. The value must not be modified.
@@ -2145,10 +2145,10 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param eid The id of the queried edge.
+ * \param eid The ID of the queried edge.
  * \return The value of the attribute.
  *
- * \se \ref EAS if you want to type less.
+ * \sa \ref EAS if you want to type less.
  *
  * Time complexity: O(Ae), the number of edge attributes.
  */
@@ -2170,7 +2170,7 @@ const char *igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VANV
- * \brief Query a numeric vertex attribute for many vertices.
+ * \brief Queries a numeric vertex attribute for many vertices.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -2190,7 +2190,7 @@ igraph_error_t igraph_cattribute_VANV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VABV
- * \brief Query a boolean vertex attribute for many vertices.
+ * \brief Queries a boolean vertex attribute for many vertices.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -2210,7 +2210,7 @@ igraph_error_t igraph_cattribute_VABV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EANV
- * \brief Query a numeric edge attribute for many edges.
+ * \brief Queries a numeric edge attribute for many edges.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -2230,7 +2230,7 @@ igraph_error_t igraph_cattribute_EANV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EABV
- * \brief Query a boolean edge attribute for many edges.
+ * \brief Queries a boolean edge attribute for many edges.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -2250,7 +2250,7 @@ igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VASV
- * \brief Query a string vertex attribute for many vertices.
+ * \brief Queries a string vertex attribute for many vertices.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -2271,7 +2271,7 @@ igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EASV
- * \brief Query a string edge attribute for many edges.
+ * \brief Queries a string edge attribute for many edges.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -2292,7 +2292,7 @@ igraph_error_t igraph_cattribute_EASV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_list
- * \brief List all attributes.
+ * \brief Lists all attributes.
  *
  * See \ref igraph_attribute_type_t for the various attribute types.
  * \param graph The input graph.
@@ -2347,7 +2347,7 @@ igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
  * \param value The (new) value of the graph attribute.
  * \return Error code.
  *
- * \se \ref SETGAN if you want to type less.
+ * \sa \ref SETGAN if you want to type less.
  *
  * Time complexity: O(1).
  */
@@ -2377,7 +2377,7 @@ igraph_error_t igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
  * \param value The (new) value of the graph attribute.
  * \return Error code.
  *
- * \se \ref SETGAN if you want to type less.
+ * \sa \ref SETGAB if you want to type less.
  *
  * Time complexity: O(1).
  */
@@ -2408,7 +2408,7 @@ igraph_error_t igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
  *   copied.
  * \return Error code.
  *
- * \se \ref SETGAS if you want to type less.
+ * \sa \ref SETGAS if you want to type less.
  *
  * Time complexity: O(1).
  */
@@ -2506,7 +2506,7 @@ igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
  * \sa \ref SETVAS for a simpler way.
  *
  * Time complexity: O(n*l), n is the number of vertices, l is the
- * length of the string to set. If the attribute if not new then only
+ * length of the string to set. If the attribute is not new then only
  * O(|vid|*l).
  */
 igraph_error_t igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
@@ -2600,7 +2600,7 @@ igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
  * \sa \ref SETEAS for a simpler way.
  *
  * Time complexity: O(e*l), n is the number of edges, l is the
- * length of the string to set. If the attribute if not new then only
+ * length of the string to set. If the attribute is not new then only
  * O(|eid|*l).
  */
 igraph_error_t igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
@@ -2814,7 +2814,7 @@ igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_remove_g
- * \brief Remove a graph attribute.
+ * \brief Removes a graph attribute.
  *
  * \param graph The graph object.
  * \param name Name of the graph attribute to remove.
@@ -2831,13 +2831,13 @@ void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(gal, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent graph attribute.");
     }
 }
 
 /**
  * \function igraph_cattribute_remove_v
- * \brief Remove a vertex attribute.
+ * \brief Removes a vertex attribute.
  *
  * \param graph The graph object.
  * \param name Name of the vertex attribute to remove.
@@ -2854,13 +2854,13 @@ void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(val, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent vertex attribute.");
     }
 }
 
 /**
  * \function igraph_cattribute_remove_e
- * \brief Remove an edge attribute.
+ * \brief Removes an edge attribute.
  *
  * \param graph The graph object.
  * \param name Name of the edge attribute to remove.
@@ -2876,13 +2876,13 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(eal, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent edge attribute.");
     }
 }
 
 /**
  * \function igraph_cattribute_remove_all
- * \brief Remove all graph/vertex/edge attributes.
+ * \brief Removes all graph/vertex/edge attributes.
  *
  * \param graph The graph object.
  * \param g Boolean, whether to remove graph attributes.

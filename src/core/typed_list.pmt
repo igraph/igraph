@@ -156,7 +156,7 @@ igraph_error_t FUNCTION(init_copy)(TYPE* to, const TYPE* from) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_destroy
- * \brief Destroys a list of vectors object.
+ * \brief Destroys a list of vectors.
  *
  * </para><para>
  * All lists initialized by \ref igraph_vector_list_init() should be properly
@@ -219,7 +219,7 @@ igraph_int_t FUNCTION(capacity)(const TYPE *v) {
  * Note that this function does \em not change the size of the list, neither
  * does it initialize any new vectors. Let us see a small example to clarify
  * things: if you reserve space for 100 elements and the size of your
- * list was (and still is) 60, then you can surely add additional 40
+ * list was (and still is) 60, then you can surely add an additional 40
  * new vectors to your list before it will be copied.
  * \param v The list object.
  * \param capacity The new \em allocated size of the list.
@@ -278,7 +278,7 @@ igraph_bool_t FUNCTION(empty)(const TYPE *v) {
  *
  * Returns the number of vectors stored in the list.
  *
- * \param v The list object
+ * \param v The list object.
  * \return The size of the list.
  *
  * Time complexity: O(1).
@@ -307,7 +307,7 @@ igraph_int_t FUNCTION(size)(const TYPE *v) {
  * size is smaller than the current size, the vectors that were removed
  * from the end of the list are destroyed automatically.
  *
- * \param v The list object
+ * \param v The list object.
  * \param new_size The new size of the list.
  * \return Error code,
  *         \c IGRAPH_ENOMEM if there is not enough
@@ -451,7 +451,7 @@ void FUNCTION(swap)(TYPE *v1, TYPE *v2) {
 
 /**
  * \function igraph_vector_list_swap_elements
- * \brief Swap two elements in a vector list.
+ * \brief Swaps two elements in a vector list.
  *
  * Note that currently no range checking is performed.
  *
@@ -599,7 +599,7 @@ igraph_error_t FUNCTION(push_back)(TYPE *v, ITEM_TYPE *e) {
  * This function resizes the list to be one element longer, and copies the
  * specified vector given as an argument to the last element. The newly added
  * element is owned by the list, but the ownership of the original vector is
- * retained at the caller.
+ * retained by the caller.
  *
  * \param v The list object.
  * \param e Pointer to the vector to copy to the end of the list.
@@ -681,12 +681,12 @@ igraph_error_t FUNCTION(insert)(TYPE *v, igraph_int_t pos, ITEM_TYPE *e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_insert_copy
- * \brief Inserts the copy of a vector to the list.
+ * \brief Inserts a copy of a vector into the list.
  *
  * This function inserts a copy of \p e into the list at the given index, moving
  * other items towards the end of the list as needed. The newly added
  * element is owned by the list, but the ownership of the original vector is
- * retained at the caller.
+ * retained by the caller.
  *
  * \param v The list object.
  * \param pos The position where the new element is to be inserted.
@@ -741,7 +741,7 @@ igraph_error_t FUNCTION(insert_new)(TYPE *v, igraph_int_t pos, ITEM_TYPE** e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_remove
- * \brief Removes the item at the given index from the vector list and transfer ownership to the caller.
+ * \brief Removes the item at the given index from the vector list and transfers ownership to the caller.
  *
  * This function removes the vector at the given index from the list, and
  * moves all subsequent items in the list by one slot to the left to fill
@@ -766,7 +766,7 @@ igraph_error_t FUNCTION(remove)(TYPE *v, igraph_int_t index, ITEM_TYPE *result) 
     IGRAPH_ASSERT(result != 0);
 
     if (index < 0 || index >= size) {
-        IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid index when removing item.", IGRAPH_EINVAL);
     }
 
     *result = *(FUNCTION(get_ptr)(v, index));
@@ -780,7 +780,7 @@ igraph_error_t FUNCTION(remove)(TYPE *v, igraph_int_t index, ITEM_TYPE *result) 
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_pop_back
- * \brief Removes the last item from the vector list and transfer ownership to the caller.
+ * \brief Removes the last item from the vector list and transfers ownership to the caller.
  *
  * This function removes the last vector from the list. The vector that was
  * removed from the list is returned and its ownership is passed back to the
@@ -806,7 +806,7 @@ ITEM_TYPE FUNCTION(pop_back)(TYPE *v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_remove_fast
- * \brief Removes the item at the given index in the vector list, move the last item to its place and transfer ownership to the caller.
+ * \brief Removes the item at the given index in the vector list, moves the last item to its place and transfers ownership to the caller.
  *
  * This function removes the vector at the given index from the list,
  * moves the last item in the list to \p index to fill the gap, and then
@@ -831,7 +831,7 @@ igraph_error_t FUNCTION(remove_fast)(TYPE *v, igraph_int_t index, ITEM_TYPE *res
     IGRAPH_ASSERT(result != 0);
 
     if (index < 0 || index >= size) {
-        IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid index when removing item.", IGRAPH_EINVAL);
     }
 
     *result = *(FUNCTION(get_ptr)(v, index));
@@ -956,7 +956,7 @@ igraph_error_t FUNCTION(sort_ind)(
 
     vind = IGRAPH_CALLOC(n, ITEM_TYPE*);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_list_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for igraph_vector_list_sort_ind.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < n; i++) {
         vind[i] = v->stor_begin + i;
@@ -992,10 +992,10 @@ igraph_error_t FUNCTION(sort_ind)(
  * \param eq A comparison function that takes pointers to two vectors and
  *    returns true if they are equivalent. It is assumed that it implements
  *    a transitive, but not necessarily symmetric relation.
- *    Use \ref igraph_vector_all_e() to consider vector equivalent only
+ *    Use \ref igraph_vector_all_e() to consider vectors equivalent only
  *    when their contents are identical.
  *
- * \sa \ref igraph_vector_list_sort()
+ * \sa \ref igraph_vector_list_sort().
  *
  * Time complexity: O(n), the number of items in the list.
  */

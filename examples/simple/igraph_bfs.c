@@ -58,7 +58,7 @@ int main(void) {
     igraph_vector_int_print(&succ);
     igraph_vector_int_print(&dist);
 
-    /* Cleam up after ourselves */
+    /* Clean up after ourselves */
     igraph_vector_int_destroy(&order);
     igraph_vector_int_destroy(&rank);
     igraph_vector_int_destroy(&father);

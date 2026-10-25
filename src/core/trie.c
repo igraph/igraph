@@ -387,7 +387,7 @@ igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_int_t
 
 /**
  * \ingroup igraphtrie
- * \brief Get an element of a trie based on its index.
+ * \brief Gets an element of a trie based on its index.
  *
  * \param t The trie.
  * \param idx The index of the string. It is not checked that it is within range.

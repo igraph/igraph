@@ -228,10 +228,14 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
  * n is the number of vertices in the graph.
  *
  * </para><para>
- * References: Cherkassky BV, Goldberg AV, Martin P, Setubal JC and Stolfi J:
+ * References:
+ *
+ * </para><para>
+ * Cherkassky BV, Goldberg AV, Martin P, Setubal JC and Stolfi J:
  * Augment or push: A computational study of bipartite matching and
  * unit-capacity flow algorithms. ACM Journal of Experimental Algorithmics 3,
  * 1998.
+ * https://doi.org/10.1145/297096.297140
  *
  * </para><para>
  * Kaya K, Langguth J, Manne F and Ucar B: Experiments on push-relabel-based
@@ -521,7 +525,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * graph.
  *
  * The algorithm works reliably only if the weights are integers. The
- * \c eps parameter should specity a very small number; if the slack on
+ * \c eps parameter should specify a very small number; if the slack on
  * an edge falls below \c eps, it will be considered tight. If all your
  * weights are integers, you can safely set \c eps to zero.
  */

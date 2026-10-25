@@ -46,7 +46,7 @@
  *        step if the \p outseq parameter is a null pointer or a
  *        zero-length vector.
  * \param outseq The number of edges to add in each time step. This
- *        argument is ignored if it is a null pointer or a zero length
+ *        argument is ignored if it is a null pointer or a zero-length
  *        vector. In this case the constant \p m parameter is used.
  * \param outpref Boolean constant, if true the edges originated by a
  *        vertex also count as recent incident edges.
@@ -192,12 +192,12 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_int_t nodes,
  * </para><para>
  * This game is very similar to \ref igraph_barabasi_aging_game(),
  * except that instead of the total number of incident edges the
- * number of edges gained in the last \p time_window time steps are
+ * number of edges gained in the last \p time_window time steps is
  * counted.
  *
- * </para><para>The degree dependent part of the attractiveness is
+ * </para><para>The degree-dependent part of the attractiveness is
  * given by k to the power of \p pa_exp plus \p zero_appeal; the age
- * dependent part is l to the power to \p aging_exp.
+ * dependent part is l to the power of \p aging_exp.
  * k is the number of edges gained in the last \p time_window time
  * steps, l is the age of the vertex.
  * \param graph Pointer to an uninitialized graph object.
@@ -216,8 +216,8 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_int_t nodes,
  * \param aging_bins Integer constant, the number of age bins to use.
  * \param time_window The time window to use to count the number of
  *        incident edges for the vertices.
- * \param zero_appeal The degree dependent part of the attractiveness
- *        for zero degree vertices.
+ * \param zero_appeal The degree-dependent part of the attractiveness
+ *        for zero-degree vertices.
  * \param directed Boolean constant, whether to create a directed
  *        graph.
  * \return Error code.
@@ -256,7 +256,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
                       IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
     if (!outseq && m < 0) {
-        IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
+        IGRAPH_ERRORF("Number of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
     if (aging_bins <= 0) {
         IGRAPH_ERRORF("Aging bins should be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);

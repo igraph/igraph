@@ -44,7 +44,7 @@
  * \param repeats The number of repeats for the shifts.
  * \return Error code.
  *
- * \sa \ref igraph_lcf_small(), \ref igraph_extended_chordal_ring()
+ * \sa \ref igraph_lcf_small(), \ref igraph_extended_chordal_ring().
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
@@ -113,7 +113,7 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_int_t n,
  * \return Error code.
  *
  * \sa See \ref igraph_lcf() for a similar function using an
- * \ref igraph_vector_t instead of the variable length argument list;
+ * \ref igraph_vector_t instead of the variable-length argument list;
  * \ref igraph_circulant() to create circulant graphs.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number

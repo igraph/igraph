@@ -34,3 +34,5 @@ Directed graph with loops and multi-edges, IGRAPH_IN:
        Inf      Inf      Inf      Inf      Inf        0 ]
 Checking error for directed graph with loops and multi-edges with negative loop.
 Directed graph with loops and multi-edges, IGRAPH_ALL:
+Single negative edge, IGRAPH_IN, select 1 -> 0:
+[       -1 ]

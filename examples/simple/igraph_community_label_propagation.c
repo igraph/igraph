@@ -32,7 +32,7 @@ int main(void) {
     /* Label propagation is a stochastic method; the result will depend on the random seed. */
     igraph_rng_seed(igraph_rng_default(), 123);
 
-    /* All igraph functions that returns their result in an igraph_vector_t must be given
+    /* All igraph functions that return their result in an igraph_vector_t must be given
        an already initialized vector. */
     igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(

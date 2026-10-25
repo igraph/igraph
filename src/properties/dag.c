@@ -22,7 +22,7 @@
 
 /**
  * \function igraph_topological_sorting
- * \brief Calculate a possible topological sorting of the graph.
+ * \brief Calculates a possible topological sorting of the graph.
  *
  * </para><para>
  * A topological sorting of a directed acyclic graph (DAG) is a linear ordering

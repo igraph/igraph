@@ -322,10 +322,10 @@ static igraph_error_t igraph_layout_i_grid_fr(
  *        of movement allowed along one axis, within one step, for a
  *        vertex. Currently it is decreased linearly to zero during
  *        the iteration.
- * \param grid Whether to use the (fast but less accurate) grid based
+ * \param grid Whether to use the (fast but less accurate) grid-based
  *        version of the algorithm. Possible values: \c
  *        IGRAPH_LAYOUT_GRID, \c IGRAPH_LAYOUT_NOGRID, \c
- *        IGRAPH_LAYOUT_AUTOGRID. The last one uses the grid based
+ *        IGRAPH_LAYOUT_AUTOGRID. The last one uses the grid-based
  *        version only for large graphs, currently the ones with
  *        more than 1000 vertices.
  * \param weights Pointer to a vector containing edge weights. Weights must
@@ -423,7 +423,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \function igraph_layout_fruchterman_reingold_3d
  * \brief 3D Fruchterman-Reingold algorithm.
  *
- * This is the 3D version of the force based Fruchterman-Reingold layout.
+ * This is the 3D version of the force-based Fruchterman-Reingold layout.
  * See \ref igraph_layout_fruchterman_reingold() for the 2D version.
  *
  * \param graph Pointer to an initialized graph object.
@@ -435,7 +435,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param start_temp Start temperature. This is the maximum amount
- *        of movement alloved along one axis, within one step, for a
+ *        of movement allowed along one axis, within one step, for a
  *        vertex. Currently it is decreased linearly to zero during
  *        the iteration.
  * \param weights Pointer to a vector containing edge weights. Weights must
@@ -491,48 +491,48 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
-                     "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+                     "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (use_seed && (igraph_matrix_nrow(res) != vcount ||
                      igraph_matrix_ncol(res) != 3)) {
         IGRAPH_ERROR("Invalid start position matrix size in "
-                     "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+                     "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
     if (weights && ecount > 0 && igraph_vector_min(weights) <= 0) {
         IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != vcount) {
-        IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
     }
     if (maxx && igraph_vector_size(maxx) != vcount) {
-        IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxx vector length.", IGRAPH_EINVAL);
     }
     if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
-        IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minx must not be greater than maxx.", IGRAPH_EINVAL);
     }
     if (miny && igraph_vector_size(miny) != vcount) {
-        IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid miny vector length.", IGRAPH_EINVAL);
     }
     if (maxy && igraph_vector_size(maxy) != vcount) {
-        IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxy vector length.", IGRAPH_EINVAL);
     }
     if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
-        IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+        IGRAPH_ERROR("miny must not be greater than maxy.", IGRAPH_EINVAL);
     }
     if (minz && igraph_vector_size(minz) != vcount) {
-        IGRAPH_ERROR("Invalid minz vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid minz vector length.", IGRAPH_EINVAL);
     }
     if (maxz && igraph_vector_size(maxz) != vcount) {
-        IGRAPH_ERROR("Invalid maxz vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxz vector length.", IGRAPH_EINVAL);
     }
     if (minz && maxz && !igraph_vector_all_le(minz, maxz)) {
-        IGRAPH_ERROR("minz must not be greater than maxz", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minz must not be greater than maxz.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));

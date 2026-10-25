@@ -1,46 +1,47 @@
 /*
-    igraph library.
-    Copyright (C) 2006-2022  The igraph development team
+   igraph library.
+   Copyright (C) 2006-2026  The igraph development team <igraph@igraph.org>
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-    02110-1301 USA
-
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
+#include <stdio.h>
 
 #include "test_utilities.h"
 
-//TODO make public?
-igraph_error_t igraph_is_same_graph_weighted(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res, igraph_vector_t *weights1, igraph_vector_t *weights2) {
+/* TODO: Make public? */
+void igraph_is_same_graph_weighted(const igraph_t *graph1,
+                                   const igraph_t *graph2, igraph_bool_t *res,
+                                   igraph_vector_t *weights1,
+                                   igraph_vector_t *weights2) {
     igraph_int_t nv1 = igraph_vcount(graph1);
     igraph_int_t nv2 = igraph_vcount(graph2);
     igraph_int_t ne1 = igraph_ecount(graph1);
     igraph_int_t ne2 = igraph_ecount(graph2);
     igraph_int_t i, eid1, eid2;
 
-    *res = 0; /* Assume that the graphs differ */
+    *res = false; /* Assume that the graphs differ */
 
     /* Check for same number of vertices/edges */
     if ((nv1 != nv2) || (ne1 != ne2)) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     /* Check for same directedness */
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     for (i = 0; i < ne1; i++) {
@@ -49,25 +50,26 @@ igraph_error_t igraph_is_same_graph_weighted(const igraph_t *graph1, const igrap
 
         /* Check they have the same source */
         if (IGRAPH_FROM(graph1, eid1) != IGRAPH_FROM(graph2, eid2)) {
-            return IGRAPH_SUCCESS;
+            return;
         }
 
         /* Check they have the same target */
         if (IGRAPH_TO(graph1, eid1) != IGRAPH_TO(graph2, eid2)) {
-            return IGRAPH_SUCCESS;
+            return;
         }
 
         /* Check they have the same weight */
         if (VECTOR(*weights1)[eid1] != VECTOR(*weights2)[eid2]) {
-            return IGRAPH_SUCCESS;
+            return;
         }
     }
 
-    *res = 1; /* No difference was found, graphs are the same */
-    return IGRAPH_SUCCESS;
+    *res = true; /* No difference was found, graphs are the same */
 }
 
-void check_sparsemat(igraph_t *g, igraph_adjacency_t mode, igraph_loops_t loops, igraph_matrix_t *adjmatrix, igraph_vector_t *other_weights) {
+void check_sparsemat(igraph_t *g, igraph_adjacency_t mode, igraph_loops_t loops,
+                     igraph_matrix_t *adjmatrix,
+                     igraph_vector_t *other_weights) {
     igraph_t g_sparse;
     igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
     igraph_bool_t same;
@@ -82,7 +84,8 @@ void check_sparsemat(igraph_t *g, igraph_adjacency_t mode, igraph_loops_t loops,
     if (!same) {
         printf("Sparse graph differs from non-sparse:\n");
         print_weighted_graph_canon(&g_sparse, &weights);
-        exit(1);
+        fflush(stdout);
+        IGRAPH_ASSERT(same);
     }
     igraph_sparsemat_destroy(&sparse_adjmatrix);
     igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
@@ -90,7 +93,7 @@ void check_sparsemat(igraph_t *g, igraph_adjacency_t mode, igraph_loops_t loops,
     igraph_vector_destroy(&weights);
 }
 
-void test_single_matrix(igraph_matrix_t* mat, igraph_adjacency_t mode) {
+void test_single_matrix(igraph_matrix_t *mat, igraph_adjacency_t mode) {
     igraph_t g;
     igraph_vector_t weights;
 
@@ -124,7 +127,8 @@ void test_single_matrix(igraph_matrix_t* mat, igraph_adjacency_t mode) {
     VERIFY_FINALLY_STACK();
 }
 
-void check_error(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops, igraph_error_t error) {
+void check_error(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
+                 igraph_loops_t loops, igraph_error_t error) {
     igraph_t g;
     igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
     igraph_vector_t weights;
@@ -134,7 +138,8 @@ void check_error(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igra
     igraph_sparsemat_compress(&sparse_adjmatrix, &sparse_adjmatrix_comp);
 
     CHECK_ERROR(igraph_weighted_adjacency(&g, adjmatrix, mode, &weights, loops), error);
-    CHECK_ERROR(igraph_sparse_adjacency(&g, &sparse_adjmatrix_comp, mode, loops), error);
+    CHECK_ERROR(igraph_sparse_weighted_adjacency(&g, &sparse_adjmatrix_comp,
+                                               mode, &weights, loops), error);
 
     igraph_sparsemat_destroy(&sparse_adjmatrix);
     igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
@@ -155,12 +160,16 @@ int main(void) {
     igraph_matrix_destroy(&mat);
 
     igraph_matrix_init(&mat, 4, 4);
-    for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) {
-        MATRIX(mat, i, j) = m[i][j];
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            MATRIX(mat, i, j) = m[i][j];
+        }
     }
     igraph_matrix_init(&mat_sym, 4, 4);
-    for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) {
-        MATRIX(mat_sym, i, j) = m_sym[i][j];
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            MATRIX(mat_sym, i, j) = m_sym[i][j];
+        }
     }
 
     /* [ 0 1 2 0 ]
@@ -282,7 +291,7 @@ int main(void) {
 
         matrix_init_real_row_major(&am, 3, 3, elem_sym);
 
-        /* Must detect that the matrix is symmetric (desite the NaNs) and succeed. */
+        /* Must detect that the matrix is symmetric (despite the NaNs) and succeed. */
         printf("\nIGRAPH_ADJ_UNDIRECTED (symmetric)\n");
         igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_UNDIRECTED, &weights, IGRAPH_LOOPS_TWICE);
         print_weighted_graph_canon(&graph, &weights);

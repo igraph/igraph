@@ -46,7 +46,7 @@
  * </para><para>
  * In other words, this function generates a graph according to a
  * block-model. Vertices are divided into groups (or blocks), and
- * the probability the two vertices are connected depends on their
+ * the probability that two vertices are connected depends on their
  * groups only.
  *
  * \param graph Pointer to an uninitialized graph.
@@ -347,7 +347,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_int_t nodes,
  * </para><para>
  * This is the asymmetric variant of \ref igraph_preference_game().
  * A given number of vertices are generated. Every vertex is assigned to an
- * "outgoing" and an "incoming " vertex type according to the given joint
+ * "outgoing" and an "incoming" vertex type according to the given joint
  * type probabilities. Finally, every vertex pair is evaluated and a
  * directed edge is created between them with a probability depending on the
  * "outgoing" type of the source vertex and the "incoming" type of the target

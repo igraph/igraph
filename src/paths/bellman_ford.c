@@ -228,7 +228,7 @@ igraph_error_t igraph_i_distances_bellman_ford(
  * \brief Weighted shortest paths from a vertex, allowing negative weights.
  *
  * This function calculates weighted shortest paths from or to a single vertex
- * using the Bellman-Ford algorithm, whihc can handle negative weights. When
+ * using the Bellman-Ford algorithm, which can handle negative weights. When
  * there is more than one shortest path between two vertices, only one of them
  * is returned. When there are no negative weights,
  * \ref igraph_get_shortest_paths_dijkstra() is likely to be faster.
@@ -242,7 +242,7 @@ igraph_error_t igraph_i_distances_bellman_ford(
  *        This is a list of integer vectors where each element is an
  *        \ref igraph_vector_int_t object. The list will be resized as needed.
  *        Supply a null pointer here if you don't need these vectors.
- * \param from The id of the vertex from/to which the geodesics are
+ * \param from The ID of the vertex from/to which the geodesics are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
@@ -279,11 +279,11 @@ igraph_error_t igraph_i_distances_bellman_ford(
  *         \cli IGRAPH_ENOMEM
  *           Not enough memory for temporary data.
  *         \cli IGRAPH_EINVAL
- *           The weight vector doesn't math the number of edges.
+ *           The weight vector doesn't match the number of edges.
  *         \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID
+ *           \p from is an invalid vertex ID
  *         \cli IGRAPH_ENEGCYCLE
- *           Bellman-ford algorithm encounted a negative cycle.
+ *           Bellman-Ford algorithm encountered a negative cycle.
  *         \endclist
  *
  * Time complexity: O(|E|*|V|), where |V| is the number of

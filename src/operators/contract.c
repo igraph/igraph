@@ -28,7 +28,7 @@
 
 /**
  * \function igraph_contract_vertices
- * \brief Replace multiple vertices with a single one.
+ * \brief Replaces multiple vertices with a single one.
  *
  * This function modifies the graph by merging several vertices
  * into one. The vertices in the modified graph correspond
@@ -54,7 +54,7 @@
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number
- * or vertices plus edges.
+ * of vertices plus edges.
  *
  * \example examples/simple/igraph_contract_vertices.c
  */

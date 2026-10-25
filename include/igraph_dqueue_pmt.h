@@ -17,7 +17,7 @@
 */
 
 /**
- * Double ended queue data type.
+ * Double-ended queue data type.
  * \ingroup internal
  */
 

@@ -36,7 +36,7 @@
  *
  * Calculates the widest paths from a single vertex to all other specified
  * vertices, using a modified Dijkstra's algorithm. The width of a path is
- * defined as the width of the narrowest edge in the path.If there is more than
+ * defined as the width of the narrowest edge in the path. If there is more than
  * one path with the largest width between two vertices, this function gives
  * only one of them.
  *
@@ -414,7 +414,7 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  *
  * </para><para>
  * This algorithm is primarily useful for all-pairs path widths in very dense
- * graphs, as its running time is manily determined by the vertex count, and
+ * graphs, as its running time is mainly determined by the vertex count, and
  * is not sensitive to the graph density. In sparse graphs, other methods such
  * as Dijkstra's algorithm, implemented in
  * \ref igraph_widest_path_widths_dijkstra() will perform better.
@@ -499,7 +499,7 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
         in = true;
         break;
     default:
-        IGRAPH_ERROR("Invalid mode for Floyd-Warshall shortest path calculation.", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode for Floyd-Warshall widest path calculation.", IGRAPH_EINVMODE);
     }
 
     /* Fill out adjacency matrix */

@@ -28,21 +28,21 @@
 
 /**
  * \function igraph_de_bruijn
- * \brief Generate a de Bruijn graph.
+ * \brief Generates a de Bruijn graph.
  *
  * A de Bruijn graph represents relationships between strings. An alphabet
- * of \c m letters are used and strings of length \c n are considered.
+ * of \p m letters is used and strings of length \c n are considered.
  * A vertex corresponds to every possible string and there is a directed edge
  * from vertex \c v to vertex \c w if the string of \c v can be transformed into
  * the string of \c w by removing its first letter and appending a letter to it.
  *
  * </para><para>
  * Please note that the graph will have \c m to the power \c n vertices and
- * even more edges, so probably you don't want to supply too big numbers for
+ * even more edges, so probably you don't want to supply overly large values for
  * \c m and \c n.
  *
  * </para><para>
- * De Bruijn graphs have some interesting properties, please see another source,
+ * De Bruijn graphs have some interesting properties; please see another source,
  * e.g. Wikipedia for details.
  *
  * \param graph Pointer to an uninitialized graph object, the result will be
@@ -66,7 +66,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_int_t m, igraph_int_t n)
     int iter = 0;
 
     if (m < 0 || n < 0) {
-        IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph",
+        IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph.",
                      IGRAPH_EINVAL);
     }
 

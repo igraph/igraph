@@ -68,7 +68,7 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_int_t ca
 /**
  * \ingroup heap
  * \function igraph_heap_init_array
- * \brief Build a heap from an array.
+ * \brief Builds a heap from an array.
  *
  * Initializes a heap object from an array. The heap is also
  * built of course (constructor).
@@ -118,7 +118,7 @@ void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h) {
  * \param h The heap object.
  * \return \c true if the heap is empty, \c false otherwise.
  *
- * TIme complexity: O(1).
+ * Time complexity: O(1).
  */
 
 igraph_bool_t FUNCTION(igraph_heap, empty)(const TYPE(igraph_heap)* h) {
@@ -150,7 +150,7 @@ void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h) {
 /**
  * \ingroup heap
  * \function igraph_heap_push
- * \brief Add an element.
+ * \brief Adds an element.
  *
  * Adds an element to the heap.
  *
@@ -300,7 +300,7 @@ igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_int_t
 
 /**
  * \ingroup heap
- * \brief Build a heap, this should not be called directly.
+ * \brief Builds a heap; this should not be called directly.
  */
 
 void FUNCTION(igraph_heap, i_build)(BASE* arr,

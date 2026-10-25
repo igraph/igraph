@@ -75,7 +75,7 @@ static void sort_edges(igraph_vector_int_t *edges, const igraph_t *graph) {
  * \param corr A value in the unit interval [0,1], the target Pearson
  *        correlation between the adjacency matrices of the original and the
  *        generated graph (the adjacency matrix being used as a vector).
- * \param p The probability of an edge between two vertices. It must in the
+ * \param p The probability of an edge between two vertices. It must be in the
  *        open (0,1) interval. Typically, the density of \p old_graph.
  * \param permutation A permutation to apply to the vertices of the
  *        generated graph. The i-th element of the vector specifies the index
@@ -312,10 +312,10 @@ igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_g
  * \param graph2 The second graph will be stored here.
  * \param n The number of vertices in both graphs.
  * \param corr A scalar in the unit interval, the target Pearson
- *        correlation between the adjacency matrices of the original the
+ *        correlation between the adjacency matrices of the original and the
  *        generated graph (the adjacency matrix being used as a vector).
  * \param p A numeric scalar, the probability of an edge between two
- *        vertices, it must in the open (0,1) interval.
+ *        vertices, it must be in the open (0,1) interval.
  * \param directed Whether to generate directed graphs.
  * \param permutation A permutation to apply to the vertices of the
  *        generated graph. The i-th element of the vector specifies the index

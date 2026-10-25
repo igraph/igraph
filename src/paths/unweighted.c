@@ -45,7 +45,7 @@
  *        vertices in the \p to argument. One row of the matrix shows the
  *        distances from/to a given vertex to the ones in \p to.
  *        For the unreachable vertices \c IGRAPH_INFINITY is returned.
- * \param from The source vertices._d
+ * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
  * \param mode The type of shortest paths to be used for the
@@ -523,7 +523,7 @@ igraph_error_t igraph_i_get_shortest_paths_unweighted(
     }
 
     if (reached < to_reach) {
-        IGRAPH_WARNING("Couldn't reach some vertices");
+        IGRAPH_WARNING("Couldn't reach some vertices.");
     }
 
     /* Create `parents' if needed */

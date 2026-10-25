@@ -414,7 +414,7 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * \brief Maximum network flow between a pair of vertices.
  *
  * This function implements the Goldberg-Tarjan algorithm for
- * calculating value of the maximum flow in a directed or undirected
+ * calculating the value of the maximum flow in a directed or undirected
  * graph. The algorithm was given in Andrew V. Goldberg, Robert
  * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
  * the ACM, 35(4), 921-940, 1988
@@ -439,7 +439,7 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * \param flow If not a null pointer, then it must be a pointer to an
  *        initialized vector. The vector will be resized, and the flow
  *        on each edge will be placed in it, in the order of the edge
- *        IDs. For undirected graphs this argument is bit trickier,
+ *        IDs. For undirected graphs this argument is a bit trickier,
  *        since for these the flow direction is not predetermined by
  *        the edge direction. For these graphs the elements of the
  *        \p flow vector can be negative, this means that the flow
@@ -460,8 +460,8 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  *        the minimum cut that corresponds to the maximum flow will be
  *        placed here. The second partition is always the one that
  *        contains the target vertex.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \param capacity Vector containing the capacity of the edges. If \c NULL, then
  *        every edge is considered to have capacity 1.0.
  * \param stats Counts of the number of different operations
@@ -475,6 +475,7 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * B. V. Cherkassky and A. V. Goldberg: On implementing the
  * push-relabel method for the maximum flow problem, (Algorithmica,
  * 19:390--410, 1997) on all the graph classes I've tried.
+ * https://doi.org/10.1007/PL00009180
  *
  * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for
@@ -1035,7 +1036,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * \brief Maximum flow in a network with the push/relabel algorithm.
  *
  * This function implements the Goldberg-Tarjan algorithm for
- * calculating value of the maximum flow in a directed or undirected
+ * calculating the value of the maximum flow in a directed or undirected
  * graph. The algorithm was given in Andrew V. Goldberg, Robert
  * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
  * the ACM, 35(4), 921-940, 1988
@@ -1062,6 +1063,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * minimum cut between them (also called the minimum s-t cut). So \ref
  * igraph_st_mincut_value() gives the same result in all cases as \ref
  * igraph_maxflow_value().
+ * https://doi.org/10.4153/CJM-1956-045-5
  *
  * </para><para>
  * Note that the value of the maximum flow is the same as the
@@ -1069,12 +1071,12 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  *
  * \param graph The input graph, either directed or undirected.
  * \param value Pointer to a real number, the result will be placed here.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \param capacity Vector containing the capacity of the edges. If NULL, then
  *        every edge is considered to have capacity 1.0.
  * \param stats Counts of the number of different operations
- *        preformed by the algorithm are stored here.
+ *        performed by the algorithm are stored here.
  * \return Error code.
  *
  * Time complexity: O(|V|^3).
@@ -1105,17 +1107,17 @@ igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
  * another vertex (\p target). Directed paths are considered in
  * directed graphs, and undirected paths in undirected graphs.  </para>
  *
- * <para> The minimum s-t cut between two vertices is known to be same
+ * <para> The minimum s-t cut between two vertices is known to be the same
  * as the maximum flow between these two vertices. So this function
  * calls \ref igraph_maxflow_value() to do the calculation.
  *
  * \param graph The input graph.
  * \param value Pointer to a real variable, the result will be stored
  *        here.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \param capacity Pointer to the capacity vector, it should contain
- *        non-negative numbers and its length should be the same the
+ *        non-negative numbers and its length should be the same as
  *        the number of edges in the graph. It can be a null pointer, then
  *        every edge has unit capacity.
  * \return Error code.
@@ -1128,9 +1130,8 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
                                       igraph_int_t source, igraph_int_t target,
                                       const igraph_vector_t *capacity) {
 
-    if (source == target) {
-        IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
-    }
+    /* igraph_maxflow_value() validates source and target
+     * and checks that source != target. */
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity, NULL));
 
@@ -1161,8 +1162,8 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
  *        vertices in the second partition of the cut are stored here.
  *        The second partition is always the one that contains the
  *        target vertex. This argument is ignored if it is a null pointer.
- * \param source Integer, the id of the source vertex.
- * \param target Integer, the id of the target vertex.
+ * \param source Integer, the ID of the source vertex.
+ * \param target Integer, the ID of the target vertex.
  * \param capacity Vector containing the capacity of the edges. If a
  *        null pointer, then every edge is considered to have capacity
  *        1.0.
@@ -1588,6 +1589,7 @@ static igraph_error_t igraph_i_mincut_directed(
  * For undirected graphs we use the Stoer-Wagner
  * algorithm, as described in M. Stoer and F. Wagner: A simple min-cut
  * algorithm, Journal of the ACM, 44 585-591, 1997.
+ * https://doi.org/10.1145/263867.263872
  *
  * </para><para>
  * The first implementation of the actual cut calculation for
@@ -1596,11 +1598,11 @@ static igraph_error_t igraph_i_mincut_directed(
  * \param graph The input graph.
  * \param value Pointer to a float, the value of the cut will be
  *    stored here.
- * \param partition Pointer to an initialized vector, the ids
+ * \param partition Pointer to an initialized vector, the IDs
  *    of the vertices in the first partition after separating the
  *    graph will be stored here. The vector will be resized as
  *    needed. This argument is ignored if it is a NULL pointer.
- * \param partition2 Pointer to an initialized vector the ids
+ * \param partition2 Pointer to an initialized vector the IDs
  *    of the vertices in the second partition will be stored here.
  *    The vector will be resized as needed. This argument is ignored
  *    if it is a NULL pointer.
@@ -1668,6 +1670,7 @@ static igraph_error_t igraph_i_mincut_value_undirected(
  * directed graphs and a separate non-flow based implementation is
  * used for undirected graphs. See Mechthild Stoer and Frank Wagner: A
  * simple min-cut algorithm, Journal of the ACM 44 585--591, 1997.
+ * https://doi.org/10.1145/263867.263872
  * For directed graphs
  * the maximum flow is calculated between a fixed vertex and all the
  * other vertices in the graph and this is done in both
@@ -1744,12 +1747,12 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(
     *done = true;
     *no_conn = 0;
 
-    if (source == target) {
-        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
+    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
+        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVVID);
     }
 
-    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVAL);
+    if (source == target) {
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
     }
 
     switch (neighbors) {
@@ -1898,8 +1901,8 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \param neighbors A constant giving what to do if the two vertices
  *     are connected. Possible values:
  *     \c IGRAPH_VCONN_NEI_ERROR, stop with an error message,
@@ -2128,14 +2131,20 @@ static igraph_error_t igraph_i_connectivity_checks(
  * \brief The vertex connectivity of a graph.
  *
  * </para><para> The vertex connectivity of a graph is the minimum
- * vertex connectivity along each pairs of vertices in the graph.
+ * vertex connectivity over all pairs of vertices in the graph.
  * </para>
  *
  * <para> The vertex connectivity of a graph is the same as group
- * cohesion as defined in Douglas R. White and Frank Harary: The
- * cohesiveness of blocks in social networks: node connectivity and
- * conditional density, Sociological Methodology 31:305--359, 2001
- * https://doi.org/10.1111/0081-1750.00098.
+ * cohesion as defined by White and Harary.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2204,8 +2213,8 @@ igraph_error_t igraph_vertex_connectivity(
  *
  * \param graph The input graph, it has to be directed.
  * \param res Pointer to an integer, the result will be stored here.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|^3).
@@ -2223,9 +2232,8 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph,
 
     igraph_real_t flow;
 
-    if (source == target) {
-        IGRAPH_ERROR("The source and target vertices must be different.", IGRAPH_EINVAL);
-    }
+    /* igraph_maxflow_value() validates source and target
+     * and checks that source != target. */
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, NULL, NULL));
     *res = (igraph_int_t) flow;
@@ -2243,10 +2251,16 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph,
  *
  * <para>
  * The edge connectivity of a graph is the same as group adhesion as
- * defined in Douglas R. White and Frank Harary: The cohesiveness of
- * blocks in social networks: node connectivity and conditional
- * density, Sociological Methodology 31:305--359, 2001
- * https://doi.org/10.1111/0081-1750.00098.
+ * defined by White and Harary.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2302,7 +2316,7 @@ igraph_error_t igraph_edge_connectivity(const igraph_t *graph,
  * \brief The maximum number of edge-disjoint paths between two vertices.
  *
  * A set of paths between two vertices is called edge-disjoint if they do not
- * share any edges. The maximum number of edge-disjoint paths are calculated
+ * share any edges. The maximum number of edge-disjoint paths is calculated
  * by this function using maximum flow techniques. Directed paths are
  * considered in directed graphs.
  *
@@ -2312,8 +2326,8 @@ igraph_error_t igraph_edge_connectivity(const igraph_t *graph,
  * \param graph The input graph, can be directed or undirected.
  * \param res Pointer to an integer variable, the result will be
  *        stored here.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|^3), but see the discussion at \ref
@@ -2361,8 +2375,8 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph,
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be
  *        stored here.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|^3).
@@ -2408,11 +2422,18 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph,
  * \function igraph_adhesion
  * \brief Graph adhesion, this is (almost) the same as edge connectivity.
  *
- * </para><para> This quantity is defined by White and Harary in
- * The cohesiveness of blocks in social networks: node connectivity and
- * conditional density, (Sociological Methodology 31:305--359, 2001)
- * and basically it is the edge connectivity of the graph
+ * </para><para> This quantity is defined by White and Harary
+ * and is basically the edge connectivity of the graph
  * with uniform edge weights.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph, either directed or undirected.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2443,10 +2464,17 @@ igraph_error_t igraph_adhesion(const igraph_t *graph,
  * \function igraph_cohesion
  * \brief Graph cohesion, this is the same as vertex connectivity.
  *
- * </para><para> This quantity was defined by White and Harary in <quote>The
- * cohesiveness of blocks in social networks: node connectivity and
- * conditional density</quote>, (Sociological Methodology 31:305--359, 2001)
- * and it is the same as the vertex connectivity of a graph.
+ * </para><para> This quantity was defined by White and Harary
+ * and is the same as the vertex connectivity of a graph.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be

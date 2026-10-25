@@ -234,7 +234,7 @@ cmake --build . --target check --config Release
           support.
         </para>
         <para>
-          In order to use vcpkg integrate it in the build environment by executing
+          In order to use vcpkg, integrate it in the build environment by executing
           <literal>vcpkg.exe integrate install</literal> on the command line.
           When configuring igraph, point CMake to the correct
           <literal>vcpkg.cmake</literal> file using <literal>-DCMAKE_TOOLCHAIN_FILE=...</literal>,
@@ -244,7 +244,7 @@ cmake --build . --target check --config Release
           Additionally, it might be that you need to set the appropriate
           so-called triplet using
           <literal>-DVCPKG_TARGET_TRIPLET</literal> when running
-          <literal>cmake</literal>, for exampling, setting it to
+          <literal>cmake</literal>, for example, setting it to
           <literal>x64-windows</literal> when using shared builds of packages or
           <literal>x64-windows-static</literal> when using static builds.
           Similarly, you also need to specify this target triplet when
@@ -310,7 +310,7 @@ cmake --build . --target check --config Release
         </listitem>
       </itemizedlist>
       <para>
-        The following command will install of these at once:
+        The following command will install all of these at once:
       </para>
 <programlisting>
 pacman -S \
@@ -547,7 +547,7 @@ $ cmake .. \
     <para>
       When building igraph with an internal ARPACK, LAPACK or BLAS, it
       makes use of f2c, which compiles and runs the <literal>arithchk</literal>
-      program at build time to detect the floating point characteristics of the
+      program at build time to detect the floating-point characteristics of the
       current system. It writes the results into the <literal>arith.h</literal>
       header. However, running this program is not possible when cross-compiling
       without providing a userspace emulator that can run executables of the

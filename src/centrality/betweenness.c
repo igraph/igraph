@@ -43,10 +43,10 @@
  */
 
 /**
- * Internal function to calculate the single source shortest paths for the
+ * Internal function to calculate the single-source shortest paths for the
  * vertex unweighted case.
  *
- * \param  graph   the graph to calculate the single source shortest paths on
+ * \param  graph   the graph to calculate the single-source shortest paths on
  * \param  source  the source node
  * \param  dist    distance of each node from the source node \em plus one;
  *                 must be filled with zeros initially
@@ -54,7 +54,7 @@
  *                 to each node; must be filled with zeros initially
  * \param  stack   stack in which the nodes are pushed in the order they are
  *                 discovered during the traversal
- * \param  parents adjacent list that starts empty and that stores the IDs
+ * \param  parents adjacency list that starts empty and that stores the IDs
  *                 of the vertices that lead to a given node during the traversal
  * \param  adjlist the adjacency list of the graph
  * \param  cutoff  cutoff length of shortest paths
@@ -123,10 +123,10 @@ static igraph_error_t sspf(
 }
 
 /**
- * Internal function to calculate the single source shortest paths for the
+ * Internal function to calculate the single-source shortest paths for the
  * edge unweighted case.
  *
- * \param  graph   the graph to calculate the single source shortest paths on
+ * \param  graph   the graph to calculate the single-source shortest paths on
  * \param  source  the source node
  * \param  dist    distance of each node from the source node \em plus one;
  *                 must be filled with zeros initially
@@ -205,10 +205,10 @@ static igraph_error_t sspf_edge(
 }
 
 /**
- * Internal function to calculate the single source shortest paths for the vertex
+ * Internal function to calculate the single-source shortest paths for the vertex
  * weighted case.
  *
- * \param  graph   the graph to calculate the single source shortest paths on
+ * \param  graph   the graph to calculate the single-source shortest paths on
  * \param  weights the weights of the edges
  * \param  source  the source node
  * \param  dist    distance of each node from the source node \em plus one;
@@ -314,10 +314,10 @@ static igraph_error_t sspf_weighted(
 }
 
 /**
- * Internal function to calculate the single source shortest paths for the edge
+ * Internal function to calculate the single-source shortest paths for the edge
  * weighted case.
  *
- * \param  graph   the graph to calculate the single source shortest paths on
+ * \param  graph   the graph to calculate the single-source shortest paths on
  * \param  weights the weights of the edges
  * \param  source  the source node
  * \param  dist    distance of each node from the source node \em plus one;
@@ -439,7 +439,7 @@ static igraph_error_t betweenness_check_weights(
                 IGRAPH_ERROR("Edge weights must not contain NaN values.", IGRAPH_EINVAL);
             } else if (minweight <= IGRAPH_SHORTEST_PATH_EPSILON) {
                 IGRAPH_WARNINGF(
-                    "Some weights are smaller than the path length comparison tolerance (%g), "
+                    "Some weights are smaller than the path length comparison tolerance (%g); "
                     "betweenness calculations may suffer from numerical precision issues.",
                     IGRAPH_SHORTEST_PATH_EPSILON
                 );
@@ -476,14 +476,15 @@ static igraph_error_t betweenness_check_weights(
  * \param res The result of the computation, a vector containing the
  *        betweenness scores for the specified vertices.
  * \param vids The vertices for which the range-limited betweenness centrality
- *        scores will be returned. This paramerer is for convenience only and
- *        does not affect performance. Internally, the betewenness of all
+ *        scores will be returned. This parameter is for convenience only and
+ *        does not affect performance. Internally, the betweenness of all
  *        vertices is calculated.
- * \param directed If true directed paths will be considered
+ * \param directed If true, directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
- *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
- *        in undirected graphs the number of unordered vertex pairs is used.
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs
+ *        is used; in undirected graphs, the number of unordered vertex pairs
+ *        is used.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids.
@@ -515,7 +516,7 @@ igraph_error_t igraph_betweenness(
  *
  * This function computes a range-limited version of betweenness centrality
  * by considering only those shortest paths whose length is no greater
- * then the given cutoff value.
+ * than the given cutoff value.
  *
  * \param graph The graph object.
  * \param weights An optional vector containing edge weights for
@@ -524,14 +525,15 @@ igraph_error_t igraph_betweenness(
  * \param res The result of the computation, a vector containing the
  *        range-limited betweenness scores for the specified vertices.
  * \param vids The vertices for which the range-limited betweenness centrality
- *        scores will be returned. This paramerer is for convenience only and
- *        does not affect performance. Internally, the betewenness of all
+ *        scores will be returned. This parameter is for convenience only and
+ *        does not affect performance. Internally, the betweenness of all
  *        vertices is calculated.
- * \param directed If true directed paths will be considered
+ * \param directed If true, directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
- *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
- *        in undirected graphs the number of unordered vertex pairs is used.
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs
+ *        is used; in undirected graphs, the number of unordered vertex pairs
+ *        is used.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative or \ref IGRAPH_UNLIMITED, the exact betweenness will be
  *        calculated, and there will be no upper limit on path lengths.
@@ -737,17 +739,18 @@ igraph_error_t igraph_betweenness_cutoff(
  * \param weights An optional weight vector for weighted edge
  *        betweenness. No edge weight may be NaN. Supply a null
  *        pointer here for the unweighted version.
- * \param res The result of the computation, vector containing the
+ * \param res The result of the computation, a vector containing the
  *        betweenness scores for the edges.
  * \param eids The edges for which the betweenness centrality will be returned.
- *        This parameter is for convenience only, and does not affect
- *        performance. Internally, the betweenness is be calculated for all
+ *        This parameter is for convenience only and does not affect
+ *        performance. Internally, the betweenness is calculated for all
  *        edges.
- * \param directed If true directed paths will be considered
+ * \param directed If true, directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
- *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
- *        in undirected graphs the number of unordered vertex pairs is used.
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs
+ *        is used; in undirected graphs, the number of unordered vertex pairs
+ *        is used.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
@@ -781,25 +784,26 @@ igraph_error_t igraph_edge_betweenness(
  *
  * This function computes a range-limited version of edge betweenness centrality
  * by considering only those shortest paths whose length is no greater
- * then the given cutoff value.
+ * than the given cutoff value.
  *
  * \param graph The graph object.
  * \param weights An optional weight vector for weighted
  *        betweenness. No edge weight may be NaN. Supply a null
  *        pointer here for unweighted betweenness.
- * \param res The result of the computation, vector containing the
+ * \param res The result of the computation, a vector containing the
  *        betweenness scores for the edges.
  * \param eids The edges for which the betweenness centrality will be returned.
- *        This parameter is for convenience only, and does not affect
- *        performance. Internally, the betweenness is be calculated for all
+ *        This parameter is for convenience only and does not affect
+ *        performance. Internally, the betweenness is calculated for all
  *        edges.
- * \param directed If true directed paths will be considered
+ * \param directed If true, directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
- *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
- *        in undirected graphs the number of unordered vertex pairs is used.
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs
+ *        is used; in undirected graphs, the number of unordered vertex pairs
+ *        is used.
  * \param cutoff The maximal length of paths that will be considered.
- *        If negative of \ref IGRAPH_UNLIMITED, the exact betweenness will be
+ *        If negative or \ref IGRAPH_UNLIMITED, the exact betweenness will be
  *        calculated (no upper limit on path lengths).
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
@@ -975,19 +979,19 @@ igraph_error_t igraph_edge_betweenness_cutoff(
  * \param res The result of the computation, a vector containing the
  *         betweenness score for the subset of vertices.
  * \param sources A vertex selector for the sources of the shortest paths taken
- *        into considuration in the betweenness calculation.
+ *        into consideration in the betweenness calculation.
  * \param targets A vertex selector for the targets of the shortest paths taken
- *        into considuration in the betweenness calculation.
+ *        into consideration in the betweenness calculation.
  * \param vids The vertices for which the subset-limited betweenness centrality
  *        scores will be computed.
- * \param directed If true directed paths will be considered
+ * \param directed If true, directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores. Normalization is
  *        currently unimplemented, and setting this to \c true raises an error.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids,
- *        \p sources or \p targets
+ *        \p sources or \p targets.
  *
  * Time complexity: O(|S||E|), where
  * |S| is the number of vertices in the subset and
@@ -1200,22 +1204,22 @@ igraph_error_t igraph_betweenness_subset(
  * \param weights An optional weight vector for weighted
  *        betweenness. No edge weight may be NaN. Supply a null
  *        pointer here for unweighted betweenness.
- * \param res The result of the computation, vector containing the
+ * \param res The result of the computation, a vector containing the
  *        betweenness scores for the edges.
  * \param sources A vertex selector for the sources of the shortest paths taken
- *        into considuration in the betweenness calculation.
+ *        into consideration in the betweenness calculation.
  * \param targets A vertex selector for the targets of the shortest paths taken
- *        into considuration in the betweenness calculation.
+ *        into consideration in the betweenness calculation.
  * \param eids The edges for which the subset-limited betweenness centrality
  *        scores will be returned. This parameter is for convenience only.
  *        Internally, the betweenness will be calculated for all edges.
- * \param directed If true directed paths will be considered
+ * \param directed If true, directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores. Normalization is
  *        currently unimplemented, and setting this to \c true raises an error.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
- *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p sources or \p targets
+ *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p sources or \p targets.
  *
  * Time complexity: O(|S||E|), where
  * |S| is the number of vertices in the subset and

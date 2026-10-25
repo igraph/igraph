@@ -608,7 +608,7 @@ static igraph_error_t configuration_simple_directed(
 
     IGRAPH_CHECK(igraph_is_graphical(out_deg, in_deg, IGRAPH_SIMPLE_SW, &graphical));
     if (!graphical) {
-        IGRAPH_ERROR("No simple directed graph can realize the given degree sequence", IGRAPH_EINVAL);
+        IGRAPH_ERROR("No simple directed graph can realize the given degree sequence.", IGRAPH_EINVAL);
     }
 
     ecount = igraph_vector_int_sum(out_deg);
@@ -769,7 +769,7 @@ igraph_error_t edge_switching(
  *          where \c A denotes the adjacency matrix and <code>!!</code> denotes
  *          the double factorial. Here \c A is assumed to have twice the number of
  *          self-loops on its diagonal.
- *          The corresponding  expression for directed graphs is
+ *          The corresponding expression for directed graphs is
  *          <code>(\prod_{i,j} A_{ij}!)^{-1}</code>.
  *          Thus the probability of all simple graphs (which only have 0s and 1s
  *          in the adjacency matrix) is the same, while that of

@@ -59,7 +59,7 @@ igraph_error_t igraph_invert_permutation(const igraph_vector_int_t *permutation,
 
 /**
  * \function igraph_permute_vertices
- * \brief Permute the vertices.
+ * \brief Permutes the vertices.
  *
  * This function creates a new graph from the input graph by permuting
  * its vertices according to the specified mapping. Call this function

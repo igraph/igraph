@@ -27,7 +27,7 @@
 
 /**
  * \function igraph_mycielskian
- * \brief Generate the Mycielskian of a graph with \p k iterations.
+ * \brief Generates the Mycielskian of a graph with \p k iterations.
  *
  * \experimental
  *
@@ -67,12 +67,12 @@
  * \endilist
  *
  * This ensures that iterative applications of the construction, starting from
- * the null or singleton graph, always yields connected graphs. In fact these
+ * the null or singleton graph, always yield connected graphs. In fact, these
  * are the Mycielski graphs that \ref igraph_mycielski_graph() produces.
  *
  * </para><para>
  * igraph extends the construction to directed graphs, as well as to non-simple
- * graphs, by following the above constructions rules literally.
+ * graphs, by following the above construction rules literally.
  *
  * </para><para>
  * This function can apply the Mycielski transformation an arbitrary number of
@@ -80,7 +80,7 @@
  * <code>n_k = (n + 1) * 2^k - 1</code>
  * vertices and
  * <code>m_k = ((2m + 2n + 1) * 3^k - n_{k+1}) / 2</code>
- * edges, where \c n and \c m are the vertex and edge count of the original
+ * edges, where \c n and \c m are the vertex and edge counts of the original
  * graph, respectively.
  *
  * \param graph Pointer to the input graph.

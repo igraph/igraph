@@ -58,7 +58,7 @@ igraph_i_fundamental_cycles_bfs(
     igraph_vector_int_t u_back, v_back;
 
     if (start_vid < 0 || start_vid >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid starting vertex id.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid starting vertex ID.", IGRAPH_EINVVID);
     }
 
     if (mark > IGRAPH_INTEGER_MAX - 2) {
@@ -218,7 +218,7 @@ igraph_error_t igraph_fundamental_cycles(
     IGRAPH_UNUSED(weights);
 
     if (start_vid >= no_of_nodes) {
-        IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Vertex ID out of range.", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
@@ -397,11 +397,11 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  *   are of size <code>2*bfs_cutoff + 1</code> or smaller. Cycles longer than this limit
  *   may not be of the smallest possible size.
  *   \p bfs_cutoff is used to limit the depth of the BFS tree when computing candidate
- *   cycles. Specifying a bfs_cutoff can speed up the computation substantially.
+ *   cycles. Specifying a \p bfs_cutoff can speed up the computation substantially.
  * \param complete Boolean value. Used only when \p bfs_cutoff was given.
  *   If true, a complete basis is returned. If false, only cycles not greater
  *   than <code>2*bfs_cutoff + 1</code> are returned. This may save computation
- *   time, however, the result will not span the entire cycle space.
+ *   time; however, the result will not span the entire cycle space.
  * \param use_cycle_order If true, each cycle is returned in natural order:
  *   the edge IDs will appear ordered along the cycle. This comes at a small
  *   performance cost. If false, no guarantees are given about the ordering

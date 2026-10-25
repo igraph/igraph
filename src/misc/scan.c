@@ -39,6 +39,7 @@
  * from the local neighborhood of each vertex. For details, see
  * Priebe, C. E., Conroy, J. M., Marchette, D. J., Park, Y. (2005).
  * Scan Statistics on Enron Graphs. Computational and Mathematical Organization Theory.
+ * https://doi.org/10.1007/s10588-005-5378-z
  * </para>
  */
 
@@ -207,7 +208,7 @@ static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
  * \function igraph_local_scan_1_ecount
  * Local scan-statistics, k=1, edge count and sum of weights
  *
- * Count the number of edges or the sum the edge weights in the
+ * Count the number of edges or the sum of the edge weights in the
  * 1-neighborhood of vertices.
  *
  * \param graph The input graph
@@ -284,7 +285,7 @@ static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igr
  * igraph_degree() and \ref igraph_strength().
  *
  * \param us The input graph, to use to extract the neighborhoods.
- * \param them The input graph to use for the actually counting.
+ * \param them The input graph to use for the actual counting.
  * \param res An initialized vector, the results are stored here.
  * \param weights_them Weight vector for weighted graphs, null pointer for
  *        unweighted graphs.
@@ -302,10 +303,10 @@ igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them
     igraph_t is;
 
     if (igraph_vcount(us) != igraph_vcount(them)) {
-        IGRAPH_ERROR("Number of vertices don't match in scan-0", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of vertices doesn't match in scan-0", IGRAPH_EINVAL);
     }
     if (igraph_is_directed(us) != igraph_is_directed(them)) {
-        IGRAPH_ERROR("Directedness don't match in scan-0", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Directedness doesn't match in scan-0", IGRAPH_EINVAL);
     }
 
     if (weights_them) {
@@ -327,7 +328,7 @@ igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them
  * \function igraph_local_scan_1_ecount_them
  * Local THEM scan-statistics, k=1, edge count and sum of weights
  *
- * Count the number of edges or the sum the edge weights in the
+ * Count the number of edges or the sum of the edge weights in the
  * 1-neighborhood of vertices.
  *
  * \param us The input graph to extract the neighborhoods.
@@ -433,7 +434,7 @@ igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_
 
 /**
  * \function igraph_local_scan_k_ecount
- * \brief Sum the number of edges or the weights in k-neighborhood of every vertex.
+ * \brief Sums the number of edges or the weights in the k-neighborhood of every vertex.
  *
  * \param graph The input graph.
  * \param k The size of the neighborhood, non-negative integer.
@@ -529,7 +530,7 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_int_t k,
  * \function igraph_local_scan_k_ecount_them
  * \brief Local THEM scan-statistics, edge count or sum of weights.
  *
- * Count the number of edges or the sum the edge weights in the
+ * Count the number of edges or the sum of the edge weights in the
  * k-neighborhood of vertices.
  *
  * \param us The input graph to extract the neighborhoods.

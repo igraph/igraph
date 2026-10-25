@@ -67,15 +67,15 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  * for all the vertices.</para>
  *
  * <para>The <type>igraph_adjlist_t</type> stores the adjacency lists
- * of a graph. After creation it is independent of the original graph,
- * it can be modified freely with the usual vector operations, the
+ * of a graph. After creation it is independent of the original graph.
+ * It can be modified freely with the usual vector operations; the
  * graph is not affected. E.g. the adjacency list can be used to
  * rewire the edges of a graph efficiently. If one used the
  * straightforward \ref igraph_delete_edges() and \ref
  * igraph_add_edges() combination for this that needs O(|V|+|E|) time
  * for every single deletion and insertion operation, it is thus very
  * slow if many edges are rewired. Extracting the graph into an
- * adjacency list, do all the rewiring operations on the vectors of
+ * adjacency list, doing all the rewiring operations on the vectors of
  * the adjacency list and then creating a new graph needs (depending
  * on how exactly the rewiring is done) typically O(|V|+|E|) time for
  * the whole rewiring process.</para>
@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  *
  * Creates a list of vectors containing the neighbors of all vertices
  * in a graph. The adjacency list is independent of the graph after
- * creation, e.g. the graph can be destroyed and modified, the
+ * creation, e.g. the graph can be destroyed and modified; the
  * adjacency list contains the state of the graph at the time of its
  * initialization.
  *
@@ -305,8 +305,8 @@ igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_int_t no_o
  *   complementer graph) to include in the adjacency list. It is
  *   ignored for undirected networks.
  * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS will not
- *   include loops edges in the returned adjacency list. \c IGRAPH_LOOPS_ONCE
- *   will include vertex \p i in the adjacency list of vetex \p i \em once if
+ *   include loop edges in the returned adjacency list. \c IGRAPH_LOOPS_ONCE
+ *   will include vertex \p i in the adjacency list of vertex \p i \em once if
  *   the original graph did not have a loop edge incident on vertex \p i,
  *   while \c IGRAPH_LOOPS_TWICE will include vertex \p i \em twice \em if
  *   \p mode is set to \c IGRAPH_ALL (otherwise it is treated the same way as
@@ -408,12 +408,12 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
  *
  * In some algorithms it is useful to have an adjacency list \em and an incidence
  * list representation of the same graph, and in many cases it is the most useful
- * if they are consistent with each other, i.e. if can be guaranteed that the
+ * if they are consistent with each other, i.e. if it can be guaranteed that the
  * vertex ID in the i-th entry of the adjacency list of vertex v is the
  * \em other endpoint of the edge in the i-th entry of the incidence list of the
  * same vertex. This function creates such an adjacency list from the corresponding
  * incidence list by looking up the endpoints of each edge in the incidence
- * list and constructing the corresponding adjacenecy vectors.
+ * list and constructing the corresponding adjacency vectors.
  *
  * </para><para>
  * The adjacency list is independent of the graph or the incidence list after
@@ -705,7 +705,7 @@ igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) 
  *
  * Creates a list of vectors containing the incident edges for all
  * vertices. The incidence list is independent of the graph after
- * creation, subsequent changes of the graph object do not update the
+ * creation; subsequent changes of the graph object do not update the
  * incidence list, and changes to the incidence list do not update the
  * graph.
  *
@@ -713,7 +713,7 @@ igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) 
  * When \p mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
  * in the incidence list \em once. When \p mode is \c IGRAPH_ALL, each edge ID
  * will appear in the incidence list \em twice, once for the source vertex
- * and once for the target edge. It also means that the edge IDs of loop edges
+ * and once for the target vertex. It also means that the edge IDs of loop edges
  * may potentially appear \em twice for the \em same vertex. Use the \p loops
  * argument to control whether this will be the case (\c IGRAPH_LOOPS_TWICE )
  * or not (\c IGRAPH_LOOPS_ONCE or \c IGRAPH_NO_LOOPS).
@@ -801,7 +801,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_int_t n) {
     il->length = n;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
@@ -988,7 +988,12 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 p++;
             } else {
-                *has_multiple = true;
+                /* In ALL mode, two equal loop entries are the two incidences
+                 * of one edge. Only a third entry establishes parallel loops. */
+                if (VECTOR(*v)[i] != index || mode != IGRAPH_ALL ||
+                    (i < n - 2 && VECTOR(*v)[i + 2] == index)) {
+                    *has_multiple = true;
+                }
                 /* Current item is the same as the next one, but if it is a
                  * loop edge, then the first one or two items are okay. We need
                  * to keep one if mode == IGRAPH_IN or mode == IGRAPH_OUT,
@@ -1116,7 +1121,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_adjlist_destroy
- * \brief Deallocate a lazy adjacency list.
+ * \brief Deallocates a lazy adjacency list.
  *
  * Free all allocated memory for a lazy adjacency list.
  * \param al The adjacency list to deallocate.
@@ -1199,7 +1204,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
  * When \p mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
  * in the incidence list \em once. When \p mode is \c IGRAPH_ALL, each edge ID
  * will appear in the incidence list \em twice, once for the source vertex
- * and once for the target edge. It also means that the edge IDs of loop edges
+ * and once for the target vertex. It also means that the edge IDs of loop edges
  * will appear \em twice for the \em same vertex.
  *
  * </para><para>
@@ -1232,7 +1237,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
                              igraph_loops_t loops) {
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Cannot create lazy incidence list view.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -1246,7 +1251,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
     il->length = igraph_vcount(graph);
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t*);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create lazy incidence list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     return IGRAPH_SUCCESS;

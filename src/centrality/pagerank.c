@@ -210,12 +210,12 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  * </para><para>
  * Starting from version 0.9, igraph has two PageRank implementations,
  * and the user can choose between them. The first implementation is
- * \c IGRAPH_PAGERANK_ALGO_ARPACK, which phrases the PageRank calculation
+ * \c IGRAPH_PAGERANK_ALGO_ARPACK, which formulates the PageRank calculation
  * as an eigenvalue problem, which is then solved using the ARPACK library.
  * This was the default before igraph version 0.7. The second and recommended
- * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This is using the
- * PRPACK package, see https://github.com/dgleich/prpack. PRPACK uses an
- * algebraic method, i.e. solves a linear system to obtain the PageRank
+ * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This uses the
+ * PRPACK package; see https://github.com/dgleich/prpack. PRPACK uses an
+ * algebraic method, i.e. it solves a linear system to obtain the PageRank
  * scores.
  *
  * </para><para>
@@ -264,7 +264,7 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *         \c IGRAPH_EINVVID, invalid vertex ID in \p vids.
  *
- * Time complexity: depends on the input graph, usually it is O(|E|),
+ * Time complexity: depends on the input graph; usually it is O(|E|),
  * the number of edges.
  *
  * \sa \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
@@ -299,14 +299,14 @@ igraph_error_t igraph_pagerank(
  * when the random walk is restarted, a new starting vertex is chosen according to
  * a specified distribution.
  * This distribution is used both when restarting randomly with probability
- * <code>1 - damping</code>, and when the walker is forced to restart due to being
+ * <code>1 - damping</code> and when the walker is forced to restart due to being
  * stuck in a sink vertex (a vertex with no outgoing edges).
  *
  * </para><para>
  * This simplified interface takes a vertex sequence and resets the random walk to
  * one of the vertices in the specified vertex sequence, chosen uniformly. A typical
  * application of personalized PageRank is when the random walk is reset to the same
- * vertex every time: this can easily be achieved using \ref igraph_vss_1() which
+ * vertex every time: this can easily be achieved using \ref igraph_vss_1(), which
  * generates a vertex sequence containing only a single vertex.
  *
  * </para><para>
@@ -317,8 +317,8 @@ igraph_error_t igraph_pagerank(
  * does not result in any performance increase at all.
  *
  * \param graph The graph object.
- * \param weights Optional edge weights, it is either a null pointer,
- *    then the edges are not weighted, or a vector of the same length
+ * \param weights Optional edge weights: either a null pointer,
+ *    indicating unweighted edges, or a vector of the same length
  *    as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
@@ -349,10 +349,11 @@ igraph_error_t igraph_pagerank(
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
  *         \c IGRAPH_EINVVID, invalid vertex ID in
- *         \p vids or an empty reset vertex sequence in
- *         \p vids_reset.
+ *         \p vids or \p reset_vids.
+ *         \c IGRAPH_EINVAL, empty reset vertex sequence in
+ *         \p reset_vids.
  *
- * Time complexity: depends on the input graph, usually it is O(|E|),
+ * Time complexity: depends on the input graph; usually it is O(|E|),
  * the number of edges.
  *
  * \sa \ref igraph_pagerank() for the non-personalized implementation.
@@ -402,7 +403,7 @@ igraph_error_t igraph_personalized_pagerank_vs(
  * according to the distribution specified in \p reset
  * (instead of the uniform distribution in the original PageRank measure).
  * The \p reset distribution is used both when restarting randomly with probability
- * <code>1 - damping</code>, and when the walker is forced to restart due to being
+ * <code>1 - damping</code> and when the walker is forced to restart due to being
  * stuck in a sink vertex (a vertex with no outgoing edges).
  *
  * </para><para>
@@ -445,10 +446,10 @@ igraph_error_t igraph_personalized_pagerank_vs(
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex ID in
- *         \p vids or an invalid reset vector in \p reset.
+ *         \c IGRAPH_EINVVID, invalid vertex ID in \p vids.
+ *         \c IGRAPH_EINVAL, invalid reset vector in \p reset.
  *
- * Time complexity: depends on the input graph, usually it is O(|E|),
+ * Time complexity: depends on the input graph; usually it is O(|E|),
  * the number of edges.
  *
  * \sa \ref igraph_pagerank() for the non-personalized implementation,
@@ -479,7 +480,7 @@ igraph_error_t igraph_personalized_pagerank(
                 weights);
     }
 
-    IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Unknown PageRank algorithm.", IGRAPH_EINVAL);
 }
 
 /*

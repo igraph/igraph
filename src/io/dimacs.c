@@ -94,7 +94,7 @@
  * \param target Pointer to an integer, the (igraph) ID of the target
  *    node will be stored here. It is ignored if \c NULL.
  * \param capacity Pointer to an initialized vector, the capacity of
- *    the edges will be stored here if not \ NULL.
+ *    the edges will be stored here if not \c NULL.
  * \param directed Boolean, whether to create a directed graph.
  * \return Error code.
  *
@@ -201,14 +201,14 @@ igraph_error_t igraph_read_graph_dimacs_flow(
                 EXPECT(read, 2);
                 if (str[0] == 's') {
                     if (tsource != -1) {
-                        IGRAPH_ERROR("Reading DIMACS file: multiple source vertex line.",
+                        IGRAPH_ERROR("Reading DIMACS file: multiple source vertex lines.",
                                      IGRAPH_PARSEERROR);
                     } else {
                         tsource = tmp;
                     }
                 } else if (str[0] == 't') {
                     if (ttarget != -1) {
-                        IGRAPH_ERROR("Reading DIMACS file: multiple target vertex line.",
+                        IGRAPH_ERROR("Reading DIMACS file: multiple target vertex lines.",
                                      IGRAPH_PARSEERROR);
                     } else {
                         ttarget = tmp;
@@ -300,9 +300,9 @@ igraph_error_t igraph_read_graph_dimacs_flow(
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream.
- * \param source Integer, the id of the source vertex for the maximum
+ * \param source Integer, the ID of the source vertex for the maximum
  *     flow.
- * \param target Integer, the id of the target vertex.
+ * \param target Integer, the ID of the target vertex.
  * \param capacity Pointer to an initialized vector containing the
  *     edge capacity values.
  * \return Error code.

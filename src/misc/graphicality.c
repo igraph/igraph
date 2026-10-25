@@ -60,15 +60,15 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  *
  * Determines whether a sequence of integers can be the degree sequence of some graph.
  * The classical concept of graphicality assumes simple graphs. This function can perform
- * the check also when either self-loops, multi-edge, or both are allowed in the graph.
+ * the check also when either self-loops, multi-edges, or both are allowed in the graph.
  *
  * </para><para>
  * For simple undirected graphs, the Erdős-Gallai conditions are checked using the linear-time
  * algorithm of Cloteaux. If both self-loops and multi-edges are allowed,
- * it is sufficient to chek that that sum of degrees is even. If only multi-edges are allowed, but
+ * it is sufficient to check that the sum of degrees is even. If only multi-edges are allowed, but
  * not self-loops, there is an additional condition that the sum of degrees be no smaller than twice
  * the maximum degree. If at most one self-loop is allowed per vertex, but no multi-edges, a modified
- * version of the Erdős-Gallai conditions are used (see Cairns &amp; Mendan).
+ * version of the Erdős-Gallai conditions is used (see Cairns &amp; Mendan).
  *
  * </para><para>
  * For simple directed graphs, the Fulkerson-Chen-Anstee theorem is used with the relaxation by Berger.
@@ -163,7 +163,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
     else
     {
         if (igraph_vector_int_size(in_degrees) != igraph_vector_int_size(out_degrees)) {
-            IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The lengths of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
         }
 
         if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) && (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW ) ) {
@@ -195,7 +195,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
  * \brief Is there a bipartite graph with the given bi-degree-sequence?
  *
  * Determines whether two sequences of integers can be the degree sequences of
- * a bipartite graph. Such a pair of degree sequence is called \em bigraphical.
+ * a bipartite graph. Such a pair of degree sequences is called \em bigraphical.
  *
  * </para><para>
  * When multi-edges are allowed, it is sufficient to check that the sum of degrees is the

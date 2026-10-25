@@ -34,7 +34,7 @@
  * Currently, this game simply uses \ref igraph_degree_sequence_game with
  * the \c IGRAPH_DEGSEQ_CONFIGURATION or the \c IGRAPH_DEGSEQ_FAST_SIMPLE
  * method and appropriately constructed degree sequences.
- * Thefore, it does not sample uniformly: while it can generate all k-regular
+ * Therefore, it does not sample uniformly: while it can generate all k-regular
  * graphs with the given number of vertices, it does not generate each one with
  * the same probability.
  *

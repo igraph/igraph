@@ -27,7 +27,7 @@
  * operations (in addition to _init() and _destroy():
  * - _add() adding an element to the given bucket.
  * - _popmax() removing an element from the bucket with the highest
- *   id.
+ *   ID.
  *   Currently buckets work as stacks, last-in-first-out mode.
  * - _empty() queries whether the buckets is empty.
  *
@@ -38,7 +38,7 @@
  * etc., until a zero is found.
  *
  * We also keep the total number of elements in the buckets and the
- * id of the non-empty bucket with the highest id, to facilitate the
+ * ID of the non-empty bucket with the highest ID, to facilitate the
  * _empty() and _popmax() operations.
  */
 

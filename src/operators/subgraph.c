@@ -268,7 +268,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
  * \brief Creates a subgraph induced by the specified vertices.
  *
  * This function collects the specified vertices and all edges between
- * them to a new graph. As vertex IDs are always contiguos integers starting
+ * them to a new graph. As vertex IDs are always contiguous integers starting
  * at zero, the IDs in the created subgraph will be different from the IDs in
  * the original graph. To get the mappings between them, use
  * \ref igraph_induced_subgraph_map()
@@ -285,7 +285,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
  *        vertices appear in the vertex selector is ignored; the returned
  *        subgraph will always contain the vertices of the original graph in
  *        increasing order of vertex IDs.
- * \param impl This parameter selects which implementation should we
+ * \param impl This parameter selects which implementation we should
  *        use when constructing the new graph. Basically there are two
  *        possibilities: \c IGRAPH_SUBGRAPH_COPY_AND_DELETE copies the
  *        existing graph and deletes the vertices that are not needed
@@ -367,17 +367,17 @@ igraph_error_t igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *re
                 invmap, /* map_is_prepared = */ map_is_prepared);
 
     default:
-        IGRAPH_ERROR("unknown subgraph implementation type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Unknown subgraph implementation type.", IGRAPH_EINVAL);
     }
 }
 
 /**
  * \ingroup structural
  * \function igraph_induced_subgraph_map
- * \brief Creates an induced subraph and returns the mapping from the original.
+ * \brief Creates an induced subgraph and returns the mapping from the original.
  *
  * This function collects the specified vertices and all edges between
- * them to a new graph. As vertex IDs are always contiguos integers starting
+ * them to a new graph. As vertex IDs are always contiguous integers starting
  * at zero, the IDs in the created subgraph will be different from the IDs in
  * the original graph. The mapping between the vertex IDs in the graph and the
  * extracted subgraphs are returned in \p map and \p invmap.
@@ -435,14 +435,14 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 
 /**
  * \function igraph_induced_subgraph_edges
- * \brief The edges contained within an induced sugraph.
+ * \brief The edges contained within an induced subgraph.
  *
  * This function finds the IDs of those edges which connect vertices from
  * a given list, passed in the \p vids parameter.
  *
  * \param graph The graph.
  * \param vids A vertex selector specifying the vertices that make up the subgraph.
- * \param edges Integer vector. The IDs of edges within the subgraph induces by
+ * \param edges Integer vector. The IDs of edges within the subgraph induced by
  *    \p vids will be stored here.
  * \return Error code.
  *

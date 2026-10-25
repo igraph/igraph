@@ -434,21 +434,21 @@ static igraph_error_t community_fast_label_propagation(
  * The algorithm works by iterating over nodes and updating the label of a node
  * based on the labels of its neighbors. The labels that are most frequent among
  * the neighbors are said to be dominant labels. The label of a node is always
- * updated to a dominant label. The algorithm guarantees that the label for each
+ * updated to a dominant label. The algorithm guarantees that the label for each node
  * is dominant when it terminates.
  *
  * </para><para>
  * There are several variants implemented, which work slightly differently with
  * the dominance of labels. Nodes with a dominant label might no longer have a
- * dominant label if one of their neighbors change label. In \c
+ * dominant label if one of their neighbors changes its label. In \c
  * IGRAPH_LPA_DOMINANCE an additional iteration over all nodes is made after
- * updating all labels to double check whether all nodes indeed have a dominant
+ * updating all labels to double-check whether all nodes indeed have a dominant
  * label. When updating the label of a node, labels are always sampled from
  * among all dominant labels. The algorithm stops when all nodes have dominant
  * labels. In \c IGRAPH_LPA_RETENTION instead labels are only updated when they
  * are not dominant. That is, they retain their current label whenever the
  * current label is already dominant. The algorithm does not make an additional
- * iteration to check for dominance. Instead, it simply keeps track whether a
+ * iteration to check for dominance. Instead, it simply keeps track of whether a
  * label has been updated, and terminates if no updates have been made. In \c
  * IGRAPH_LPA_FAST labels are sampled from among all dominant labels, similar to
  * \c IGRAPH_LPA_DOMINANCE. Instead of iterating over all nodes, it keeps track
@@ -461,7 +461,7 @@ static igraph_error_t community_fast_label_propagation(
  * </para><para>
  * Weights are taken into account as follows: when the new label of node
  * \c i is determined, the algorithm iterates over all edges incident on
- * node \c i and calculate the total weight of edges leading to other
+ * node \c i and calculates the total weight of edges leading to other
  * nodes with label 0, 1, 2, ..., \c k - 1 (where \c k is the number of possible
  * labels). The new label of node \c i will then be the label whose edges
  * (among the ones incident on node \c i) have the highest total weight.
@@ -541,7 +541,7 @@ static igraph_error_t community_fast_label_propagation(
  *   \endclist
  * \return Error code.
  *
- * Time complexity: O(m+n)
+ * Time complexity: O(m+n).
  *
  * \example examples/simple/igraph_community_label_propagation.c
  */

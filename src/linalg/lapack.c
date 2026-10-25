@@ -171,13 +171,13 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
  * \param transpose Boolean, whether to transpose the input
  *      matrix.
  * \param a A matrix containing the L and U factors from the
- *      factorization A = P*L*U. L is expected to be unitriangular,
+ *      factorization A = P*L*U. L is expected to be unit triangular,
  *      diagonal entries are those of U. If A is singular, no warning or
- *      error wil be given and random output will be returned.
+ *      error will be given and random output will be returned.
  * \param ipiv An integer vector, the pivot indices from
  *      \ref igraph_lapack_dgetrf() must be given here. Row \c i of A was
  *      interchanged with row <code>ipiv[i]</code>.
- * \param b The right hand side matrix must be given here. The solution
+ * \param b The right-hand side matrix must be given here. The solution
             will also be placed here.
  * \return Error code.
  *
@@ -289,7 +289,7 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
  *        pointer, then the pivot indices that define the permutation
  *        matrix P, are stored here. Row i of the matrix was
  *        interchanged with row IPIV(i).
- * \param b Matrix, on entry the right hand side matrix should be
+ * \param b Matrix, on entry the right-hand side matrix should be
  *        stored here. On exit, if there was no error, and the info
  *        argument is zero, then it contains the solution matrix X.
  * \param info The LAPACK info code. If it is positive, then
@@ -336,7 +336,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows/column.", IGRAPH_FAILURE);
+            IGRAPH_ERROR("Invalid number of rows/columns.", IGRAPH_FAILURE);
             break;
         case -2:
             IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_FAILURE);
@@ -410,9 +410,9 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        upper bound must be correct.
  * \param il The index of the smallest eigenvalue to return, if \p
  *        which is \c IGRAPH_LAPACK_DSYEV_SELECT.
- * \param iu The index of the largets eigenvalue to return, if \p
+ * \param iu The index of the largest eigenvalue to return, if \p
  *        which is \c IGRAPH_LAPACK_DSYEV_SELECT.
- * \param abstol The absolute error tolerance for the eigevalues. An
+ * \param abstol The absolute error tolerance for the eigenvalues. An
  *        approximate eigenvalue is accepted as converged when it is
  *        determined to lie in an interval <code>[a,b]</code> of width
  *        less than or equal to <code>abstol + EPS * max(|a|,|b|)</code>,
@@ -424,7 +424,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        are stored in its columns, unless it is a null pointer. It will be
  *        resized as needed.
  * \param support An integer vector. If not a null pointer, then it
- *        will be resized to (2*max(1,M)) (M is a the total number of
+ *        will be resized to (2*max(1,M)) (M is the total number of
  *        eigenvalues found). Then the support of the eigenvectors in
  *        \p vectors is stored here, i.e., the indices
  *        indicating the nonzero elements in \p vectors.
@@ -516,10 +516,8 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
     if (info < 0) {
-        IGRAPH_ERRORF("Invalid %d-%s argument to dsyevr in workspace query.",
-                      IGRAPH_EINVAL,
-                      -info,
-                      -info > 2 ? "th" : (-info == 2 ? "nd" : "st"));
+        IGRAPH_ERRORF("Invalid argument %d to dsyevr in workspace query.",
+                      IGRAPH_EINVAL, -info);
     } else if (info >0) {
         IGRAPH_ERROR("Internal error in dsyevr in workspace query.", IGRAPH_FAILURE);
     }
@@ -536,10 +534,8 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
     if (info < 0) {
-        IGRAPH_ERRORF("Invalid %d-%s argument to dsyevr in calculation.",
-                      IGRAPH_EINVAL,
-                      -info,
-                      -info > 2 ? "th" : (-info == 2 ? "nd" : "st"));
+        IGRAPH_ERRORF("Invalid argument %d to dsyevr in calculation.",
+                      IGRAPH_EINVAL, -info);
     } else if (info >0) {
         IGRAPH_ERROR("Internal error in dsyevr in calculation.", IGRAPH_FAILURE);
     }
@@ -616,9 +612,9 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
  *        generated, otherwise only a warning is given.
  *        On exit it contains the LAPACK error code.
  *        Zero means successful exit.
- *        A negative values means that some of the arguments had an
- *        illegal value, this always triggers an igraph error. An i
- *        positive  value means that the QR algorithm failed to
+ *        A negative value means that some of the arguments had an
+ *        illegal value, this always triggers an igraph error. A positive
+ *        value i means that the QR algorithm failed to
  *        compute all the eigenvalues, and no eigenvectors have been
  *        computed; element i+1:N of \p valuesreal and \p valuesimag
  *        contain eigenvalues which have converged. This case only
@@ -763,7 +759,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   Possible values:
  *   \clist
  *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_NONE
- *          no not diagonally scale or permute.
+ *          do not diagonally scale or permute.
  *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_PERM
  *          perform permutations to make the matrix more nearly upper
  *          triangular. Do not diagonally scale.
@@ -827,13 +823,13 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *        generated, otherwise only a warning is given.
  *        On exit it contains the LAPACK error code.
  *        Zero means successful exit.
- *        A negative values means that some of the arguments had an
- *        illegal value, this always triggers an igraph error. An i
- *        positive  value means that the QR algorithm failed to
+ *        A negative value means that some of the arguments had an
+ *        illegal value, this always triggers an igraph error. A positive
+ *        value i means that the QR algorithm failed to
  *        compute all the eigenvalues, and no eigenvectors have been
  *        computed; element i+1:N of \p valuesreal and \p valuesimag
  *        contain eigenvalues which have converged. This case only
- *        generated an igraph error, if \p info was non-zero on entry.
+ *        generates an igraph error, if \p info was non-zero on entry.
  * \return Error code.
  *
  * Time complexity: TODO

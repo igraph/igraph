@@ -75,7 +75,7 @@ static igraph_error_t handle_input_error(FILE *instream) {
  * first node of the graph has index 0.</para> \endblockquote
  *
  * <para>
- * As of igraph 0.10, only unlabelled graphs are implemented.
+ * As of igraph 0.10, only unlabeled graphs are implemented.
  * </para>
  *
  * <para>

@@ -521,14 +521,14 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                       igraph_gml_tree_line(node, j));
                     }
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERRORF("Non-integer node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                        IGRAPH_ERRORF("Non-integer node ID in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
                     id = igraph_gml_tree_get_integer(node, j);
                     IGRAPH_CHECK(igraph_trie_get(&trie, strid(id, ""), &trie_id));
                     if (trie_id != trie_size) {
                         /* This id has already been seen in a previous node. */
-                        IGRAPH_ERRORF("Duplicate node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                        IGRAPH_ERRORF("Duplicate node ID in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
                     hasid = true;
@@ -721,12 +721,12 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             to = igraph_gml_tree_get_integer(edge, toidx);
             IGRAPH_CHECK(igraph_trie_check(&trie, strid(from, ""), &from));
             if (from < 0) {
-                IGRAPH_ERRORF("Unknown source node id found in an edge in GML file, line %" IGRAPH_PRId ".",
+                IGRAPH_ERRORF("Unknown source node ID found in an edge in GML file, line %" IGRAPH_PRId ".",
                              IGRAPH_PARSEERROR, igraph_gml_tree_line(edge, fromidx));
             }
             IGRAPH_CHECK(igraph_trie_check(&trie, strid(to, ""), &to));
             if (to < 0) {
-                IGRAPH_ERRORF("Unknown target node id found in an edge in GML file, line %" IGRAPH_PRId ".",
+                IGRAPH_ERRORF("Unknown target node ID found in an edge in GML file, line %" IGRAPH_PRId ".",
                              IGRAPH_PARSEERROR, igraph_gml_tree_line(edge, toidx));
             }
             VECTOR(edges)[edgeptr++] = from;
@@ -856,24 +856,24 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
  * for details.
  *
  * </para><para>
- * The graph, vertex and edges attributes are written to the
+ * The graph, vertex and edge attributes are written to the
  * file as well, if they are numeric or string. Boolean attributes are converted
  * to numeric, with 0 and 1 used for false and true, respectively.
  * NaN values of numeric attributes are skipped, as NaN is not part of the GML
  * specification and other software may not be able to read files containing them.
  * This is consistent with \ref igraph_read_graph_gml(), which produces NaN
  * when an attribute value is missing. In contrast with NaN, infinite values
- * are retained. Ensure that none of the numeric attributes values are infinite
+ * are retained. Ensure that none of the numeric attribute values are infinite
  * to produce a conformant GML file that can be read by other software.
  *
  * </para><para>
  * As igraph is more forgiving about attribute names, it might
- * be necessary to simplify the them before writing to the GML file.
+ * be necessary to simplify them before writing to the GML file.
  * This way we'll have a syntactically correct GML file. The following
  * simple procedure is performed on each attribute name: first the alphanumeric
  * characters are extracted, the others are ignored. Then if the first character
  * is not a letter then the attribute name is prefixed with <quote>igraph</quote>.
- * Note that this might result identical names for two attributes, igraph
+ * Note that this might result in identical names for two attributes; igraph
  * does not check this.
  *
  * </para><para>
@@ -881,10 +881,10 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
  * If the <parameter>id</parameter> argument is not \c NULL then it should be a numeric
  * vector with the vertex IDs and the <quote>id</quote> vertex attribute is
  * ignored (if there is one). If <parameter>id</parameter> is \c NULL and there is a
- * numeric <quote>id</quote> vertex attribute, it will be used instead. If ids
+ * numeric <quote>id</quote> vertex attribute, it will be used instead. If IDs
  * are not specified in either way then the regular igraph vertex IDs are used.
- * If some of the supplied id values are invalid (non-integer or NaN), all supplied
- * id are ignored and igraph vertex IDs are used instead.
+ * If some of the supplied ID values are invalid (non-integer or NaN), all supplied
+ * IDs are ignored and igraph vertex IDs are used instead.
  *
  * </para><para>
  * Note that whichever way vertex IDs are specified, their uniqueness is not checked.
@@ -1024,13 +1024,13 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
      */
     if (myid) {
         if (igraph_vector_size(myid) != no_of_nodes) {
-            IGRAPH_ERROR("Size of id vector must match vertex count.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Size of ID vector must match vertex count.", IGRAPH_EINVAL);
         }
         for (i = 0; i < no_of_nodes; ++i) {
             igraph_real_t val = VECTOR(*myid)[i];
             igraph_real_t trunc_val = trunc(val);
             if (! (val == trunc_val && igraph_i_is_real_representable_as_integer(trunc_val))) {
-                IGRAPH_WARNINGF("%g is not a valid integer id for GML files, ignoring all supplied ids.", val);
+                IGRAPH_WARNINGF("%g is not a valid integer ID for GML files, ignoring all supplied IDs.", val);
                 if (myid == &v_myid) {
                     igraph_vector_destroy(&v_myid);
                     IGRAPH_FINALLY_CLEAN(1);
@@ -1045,7 +1045,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         igraph_bool_t duplicate_free;
         IGRAPH_CHECK(igraph_i_vector_is_duplicate_free(myid, &duplicate_free));
         if (! duplicate_free) {
-            IGRAPH_WARNING("Duplicate id values found, ignoring supplies ids.");
+            IGRAPH_WARNING("Duplicate ID values found, ignoring supplied IDs.");
             if (myid == &v_myid) {
                 igraph_vector_destroy(&v_myid);
                 IGRAPH_FINALLY_CLEAN(1);

@@ -206,7 +206,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
         igraph_real_t hgap, igraph_int_t no_of_real_nodes);
 
 /**
- * Calculated the median of four numbers (not necessarily sorted).
+ * Calculates the median of four numbers (not necessarily sorted).
  */
 static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
         igraph_real_t x2, igraph_real_t x3, igraph_real_t x4) {
@@ -227,7 +227,7 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  * vertex is assigned to a layer. Layers are indexed from zero, and vertices
  * of the same layer will be placed on the same horizontal line. The X coordinates
  * of vertices within each layer are decided by the heuristic proposed by
- * Sugiyama et al to minimize edge crossings.
+ * Sugiyama et al. to minimize edge crossings.
  *
  * </para><para>
  * You can also try to lay out undirected graphs, graphs containing cycles, or
@@ -247,8 +247,9 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *
  * </para><para>
  * For more details, see K. Sugiyama, S. Tagawa and M. Toda, "Methods for Visual
- * Understanding of Hierarchical Systems". IEEE Transactions on Systems, Man and
- * Cybernetics 11(2):109-125, 1981.
+ * Understanding of Hierarchical System Structures". IEEE Transactions on
+ * Systems, Man and Cybernetics 11(2):109-125, 1981.
+ * https://doi.org/10.1109/TSMC.1981.4308636
  *
  * \param graph Pointer to an initialized graph object.
  * \param res   Pointer to an initialized matrix object. This will contain

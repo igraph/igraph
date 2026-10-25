@@ -112,7 +112,7 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_int_t n
 
     bag = IGRAPH_CALLOC(bagsize, igraph_int_t);
     if (bag == 0) {
-        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for Barabasi game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bag);
 
@@ -499,7 +499,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *          works for any power and A values.
  *        \cli IGRAPH_BARABASI_PSUMTREE_MULTIPLE
  *          This algorithm also uses a partial prefix-sum tree to
- *          generate the graph. The difference is, that now multiple
+ *          generate the graph. The difference is that now multiple
  *          edges are allowed. This method was implemented under the
  *          name \c igraph_nonlinear_barabasi_game before version 0.6.
  *        \endclist
