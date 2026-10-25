@@ -1,0 +1,29 @@
+Null graph:
+( )
+
+All vertices, out, loops twice:
+( 1 1 3 1 )
+
+All vertices, all, no loops:
+( 1 2 4 3 )
+
+Single vertex 2, in, loops once:
+( 3 )
+
+Vertices 3, 2, 3, all, loops twice:
+( 3 6 3 )
+
+More vertices than the vertex count:
+( 1 2 6 3 6 2 1 )
+
+No vertices:
+( )
+
+Weighted, vertices 2, 0:
+( 24 1 )
+
+Invalid vertex:
+OK
+
+Invalid weight vector length:
+OK
