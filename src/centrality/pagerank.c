@@ -492,10 +492,10 @@ static igraph_error_t igraph_i_pagerank_select_result(igraph_vector_t *vector,
                                                       const igraph_matrix_t *vectors,
                                                       igraph_vit_t *vit) {
     igraph_int_t i;
-    igraph_int_t no_of_nodes = igraph_matrix_nrow(vectors);
+    igraph_int_t vcount = igraph_matrix_nrow(vectors);
     igraph_real_t sum = 0;
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (i = 0; i < vcount; i++) {
         sum += MATRIX(*vectors, i, 0);
     }
 
@@ -511,20 +511,20 @@ static igraph_error_t igraph_i_pagerank_select_result(igraph_vector_t *vector,
 /*
  * Handles the special case when the result is the same as the
  * personalization vector: graphs with no edges, or with all weights zero.
+ * 'vector', 'value' and 'reset' may be NULL.
  */
 static igraph_error_t igraph_i_pagerank_trivial_result(igraph_vector_t *vector,
                                                        igraph_real_t *value,
                                                        const igraph_vector_t *reset,
                                                        igraph_matrix_t *vectors,
                                                        igraph_vit_t *vit) {
-    igraph_int_t i;
-    igraph_int_t no_of_nodes = igraph_matrix_nrow(vectors);
+    igraph_int_t vcount = igraph_matrix_nrow(vectors);
 
     if (value) {
         *value = 1.0;
     }
     if (vector) {
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             MATRIX(*vectors, i, 0) = reset ? VECTOR(*reset)[i] : 1.0;
         }
         IGRAPH_CHECK(igraph_i_pagerank_select_result(vector, vectors, vit));
