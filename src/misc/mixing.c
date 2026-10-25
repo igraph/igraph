@@ -48,7 +48,7 @@
  * The normalized assortativity coefficient is obtained by dividing the
  * previous expression by
  * </para><para>
- * <code>1/m sum_ij (m - k^out_i k^in_j d(i,j) / m)</code>.
+ * <code>1/m sum_ij (A_ij - k^out_i k^in_j d(i,j) / m)</code>.
  * </para><para>
  * It can take any value within the interval [-1, 1].
  *
@@ -204,9 +204,9 @@ igraph_error_t igraph_assortativity_nominal(
  * the previous expression by
  * <code>sqrt(var(x_out)) sqrt(var(x_in))</code>, where
  * </para><para>
- * <code>var(x_out) = 1/m sum_i k^out_i x_i^2 - (1/m sum_i k^out_i x_i^2)^2</code>
+ * <code>var(x_out) = 1/m sum_i k^out_i x_i^2 - (1/m sum_i k^out_i x_i)^2</code>
  * </para><para>
- * <code>var(x_in)  = 1/m sum_j k^in_j x_j^2 - (1/m sum_j k^in_j x_j^2)^2</code>
+ * <code>var(x_in)  = 1/m sum_j k^in_j x_j^2 - (1/m sum_j k^in_j x_j)^2</code>
  *
  * </para><para>
  * Undirected graphs are effectively treated as directed graphs where all edges

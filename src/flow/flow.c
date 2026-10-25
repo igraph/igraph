@@ -1130,9 +1130,8 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
                                       igraph_int_t source, igraph_int_t target,
                                       const igraph_vector_t *capacity) {
 
-    if (source == target) {
-        IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
-    }
+    /* igraph_maxflow_value() validates source and target
+     * and checks that source != target. */
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity, NULL));
 
@@ -1748,12 +1747,12 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(
     *done = true;
     *no_conn = 0;
 
-    if (source == target) {
-        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
+    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
+        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVVID);
     }
 
-    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVAL);
+    if (source == target) {
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
     }
 
     switch (neighbors) {
@@ -2233,9 +2232,8 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph,
 
     igraph_real_t flow;
 
-    if (source == target) {
-        IGRAPH_ERROR("The source and target vertices must be different.", IGRAPH_EINVAL);
-    }
+    /* igraph_maxflow_value() validates source and target
+     * and checks that source != target. */
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, NULL, NULL));
     *res = (igraph_int_t) flow;

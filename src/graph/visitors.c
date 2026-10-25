@@ -495,7 +495,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_int_t root,
     igraph_int_t act_dist = 0;
 
     if (root < 0 || root >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid root vertex for DFS.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid root vertex for DFS.", IGRAPH_EINVVID);
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&

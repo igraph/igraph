@@ -320,7 +320,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices_or_edges_inner(
                 break;
             default:
                 IGRAPH_WARNINGF(
-                    "Attribute '%s' with unknown type %d ignored",
+                    "Attribute '%s' with unknown type %d ignored.",
                     oldrec->name, (int) oldrec->type
                 );
                 break;
@@ -534,7 +534,7 @@ static igraph_error_t igraph_i_cattribute_permute_attribute_record_list(
             break;
         default:
             IGRAPH_WARNINGF(
-                "Attribute '%s' with unknown type %d ignored",
+                "Attribute '%s' with unknown type %d ignored.",
                 oldrec->name, (int) oldrec->type
             );
         }
@@ -589,7 +589,7 @@ static igraph_error_t igraph_i_cattribute_permute_attribute_record_list_in_place
 
         default:
             IGRAPH_WARNINGF(
-                "Vertex attribute '%s' with unknown type %d ignored",
+                "Attribute '%s' with unknown type %d ignored.",
                 oldrec->name, (int) oldrec->type
             );
         }
@@ -2831,7 +2831,7 @@ void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(gal, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent graph attribute.");
     }
 }
 
@@ -2854,7 +2854,7 @@ void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(val, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent vertex attribute.");
     }
 }
 
@@ -2876,7 +2876,7 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(eal, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent edge attribute.");
     }
 }
 

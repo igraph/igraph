@@ -56,9 +56,9 @@
  *          graph.
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_EINVVID
- *           invalid number of vertices.
  *         \cli IGRAPH_EINVAL
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVVID
  *           invalid center vertex.
  *         \cli IGRAPH_EINVMODE
  *           invalid mode argument.
@@ -79,10 +79,10 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_int_t n, igraph_star_mode_t m
     igraph_int_t i;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
     if (center < 0 || center > n - 1) {
-        IGRAPH_ERROR("Invalid center vertex.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid center vertex.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_STAR_OUT && mode != IGRAPH_STAR_IN &&
         mode != IGRAPH_STAR_MUTUAL && mode != IGRAPH_STAR_UNDIRECTED) {
@@ -176,9 +176,9 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_int_t n, igraph_star_mode_t m
  *          graph.
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_EINVVID
- *           invalid number of vertices.
  *         \cli IGRAPH_EINVAL
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVVID
  *           invalid center vertex.
  *         \cli IGRAPH_EINVMODE
  *           invalid mode argument.
@@ -636,7 +636,7 @@ igraph_error_t igraph_cycle_graph(
  *        \endclist
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
- *         \c IGRAPH_INVMODE: invalid mode argument.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
@@ -728,7 +728,7 @@ igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_int_t n, igraph_int_t ch
  *          undirected tree.
  *        \endclist
  * \return Error code:
- *         \c IGRAPH_INVMODE: invalid mode argument.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
  *         \c IGRAPH_EINVAL: invalid number of children.
  *
  * Time complexity: O(|V|+|E|), the
@@ -1050,7 +1050,7 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  * </para><para>
  * If using the alphabet <code>0, 1, ..., q-1</code>, then the vertex
  * corresponding to the string <code>(x_0, x_1, ..., x_(n-1))</code>
- * will have a zero-based vertex ID of <code>sum_i x_i n^i</code>.
+ * will have a zero-based vertex ID of <code>sum_i x_i q^i</code>.
  *
  * </para><para>
  * <code>H(n, q)</code> has <code>q^n</code> vertices and

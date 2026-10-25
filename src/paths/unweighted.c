@@ -523,7 +523,7 @@ igraph_error_t igraph_i_get_shortest_paths_unweighted(
     }
 
     if (reached < to_reach) {
-        IGRAPH_WARNING("Couldn't reach some vertices");
+        IGRAPH_WARNING("Couldn't reach some vertices.");
     }
 
     /* Create `parents' if needed */

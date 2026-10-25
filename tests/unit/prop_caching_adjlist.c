@@ -19,6 +19,109 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+int test_single_loop(void) {
+    igraph_t graph;
+    igraph_adjlist_t adjlist;
+    igraph_bool_t has_multiple;
+
+    igraph_small(&graph, 1, IGRAPH_UNDIRECTED, 0, 0, -1);
+    igraph_adjlist_init(&graph, &adjlist, IGRAPH_ALL,
+                        IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
+    igraph_adjlist_destroy(&adjlist);
+
+    /* The two incidences of a single loop must not be cached as parallel edges. */
+    igraph_has_multiple(&graph, &has_multiple);
+    IGRAPH_ASSERT(!has_multiple);
+
+    igraph_destroy(&graph);
+    return 0;
+}
+
+int test_cache_consistency(void) {
+    const igraph_int_t edges[][8] = {
+        {0},
+        {0, 0},
+        {0, 0, 0, 0},
+        {0, 1, 0, 1},
+        {0, 0, 0, 1},
+        {0, 0, 0, 1, 0, 1},
+        {0, 0, 0, 0, 0, 1},
+        {0, 1, 1, 0},
+        {0, 1, 1, 1, 1, 2},
+        {0, 1, 1, 1, 1, 1, 1, 2}
+    };
+    const igraph_int_t lengths[] = {0, 2, 4, 4, 4, 6, 6, 4, 6, 8};
+    const igraph_bool_t has_loops[] = {false, true, true, false, true, true, true, false, true, true};
+    const igraph_bool_t has_parallel[] = {false, false, true, true, false, true, true, false, false, true};
+    const igraph_neimode_t modes[] = {IGRAPH_IN, IGRAPH_OUT, IGRAPH_ALL};
+    const igraph_loops_t loops[] = {IGRAPH_NO_LOOPS, IGRAPH_LOOPS_ONCE, IGRAPH_LOOPS_TWICE};
+    const igraph_bool_t multiple[] = {IGRAPH_NO_MULTIPLE, IGRAPH_MULTIPLE};
+    igraph_vector_int_t neighbors;
+
+    igraph_vector_int_init(&neighbors, 0);
+    for (int directed = 0; directed < 2; directed++) {
+        for (int g = 0; g < 10; g++) {
+            igraph_t graph;
+            igraph_vector_int_t edge_view = igraph_vector_int_view(edges[g], lengths[g]);
+            /* Reciprocal edges are parallel only when the graph is undirected. */
+            igraph_bool_t expected_multiple = has_parallel[g] || (!directed && g == 7);
+            igraph_create(&graph, &edge_view, 3, directed);
+
+            for (int mode = 0; mode < 3; mode++) {
+                for (int loop = 0; loop < 3; loop++) {
+                    for (int multi = 0; multi < 2; multi++) {
+                        for (int warm = 0; warm < 3; warm++) {
+                            igraph_adjlist_t adjlist;
+                            igraph_t copy;
+                            igraph_bool_t result;
+
+                            igraph_invalidate_cache(&graph);
+                            if (warm >= 1) {
+                                igraph_has_multiple(&graph, &result);
+                                IGRAPH_ASSERT(result == expected_multiple);
+                            }
+                            if (warm >= 2) {
+                                igraph_has_loop(&graph, &result);
+                                IGRAPH_ASSERT(result == has_loops[g]);
+                            }
+
+                            igraph_adjlist_init(&graph, &adjlist, modes[mode], loops[loop], multiple[multi]);
+                            for (igraph_int_t v = 0; v < 3; v++) {
+                                igraph_neighbors(&graph, &neighbors, v, modes[mode], loops[loop], multiple[multi]);
+                                IGRAPH_ASSERT(igraph_vector_int_all_e(igraph_adjlist_get(&adjlist, v), &neighbors));
+                            }
+                            igraph_adjlist_destroy(&adjlist);
+
+                            /* Check the graph and a copy before invalidating the cache. */
+                            igraph_copy(&copy, &graph);
+                            igraph_has_multiple(&copy, &result);
+                            IGRAPH_ASSERT(result == expected_multiple);
+                            igraph_destroy(&copy);
+                            igraph_has_multiple(&graph, &result);
+                            IGRAPH_ASSERT(result == expected_multiple);
+                            igraph_has_loop(&graph, &result);
+                            IGRAPH_ASSERT(result == has_loops[g]);
+
+                            /* This used to abort when the first call poisoned HAS_MULTI. */
+                            igraph_adjlist_init(&graph, &adjlist, modes[mode], IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+                            igraph_adjlist_destroy(&adjlist);
+                            igraph_has_multiple(&graph, &result);
+                            IGRAPH_ASSERT(result == expected_multiple);
+
+                            igraph_invalidate_cache(&graph);
+                            igraph_has_multiple(&graph, &result);
+                            IGRAPH_ASSERT(result == expected_multiple);
+                        }
+                    }
+                }
+            }
+            igraph_destroy(&graph);
+        }
+    }
+    igraph_vector_int_destroy(&neighbors);
+    return 0;
+}
+
 int test_caching(void) {
     igraph_t g_simple, g_loop, g_multiloop, g_multi, g_multi_and_loop;
     char *g_desc[] = {"simple", "loop", "multiloop", "multi", "multi and loop"};
@@ -80,6 +183,8 @@ int test_caching(void) {
 
 int main(void) {
 
+    RUN_TEST(test_single_loop);
+    RUN_TEST(test_cache_consistency);
     RUN_TEST(test_caching);
 
     VERIFY_FINALLY_STACK();

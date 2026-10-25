@@ -418,6 +418,7 @@ static igraph_error_t leiden_merge_vertices(
                 VECTOR(cluster_in_weights)[current_cluster] = 0.0;
             }
             VECTOR(nb_vertices_per_cluster)[current_cluster] = 0;
+            VECTOR(external_edge_weight_per_cluster_in_subset)[current_cluster] = 0.0;
 
             /* Find out neighboring clusters */
             edges = igraph_inclist_get(edges_per_vertex, v);
@@ -504,7 +505,7 @@ static igraph_error_t leiden_merge_vertices(
             for (igraph_int_t j = 0; j < degree; j++) {
                 igraph_int_t e = VECTOR(*edges)[j];
                 igraph_int_t u = IGRAPH_OTHER(graph, e, v);
-                if (VECTOR(*membership)[u] == cluster_subset) {
+                if (u != v && VECTOR(*membership)[u] == cluster_subset) {
                     if (VECTOR(*refined_membership)[u] == chosen_cluster) {
                         VECTOR(external_edge_weight_per_cluster_in_subset)[chosen_cluster] -= VECTOR(*edge_weights)[e];
                     } else {

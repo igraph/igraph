@@ -523,7 +523,7 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
     igraph_vector_int_t c1, c2;
 
     if (igraph_vector_int_size(comm1) != igraph_vector_int_size(comm2)) {
-        IGRAPH_ERROR("community membership vectors have different lengths", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Community membership vectors have different lengths.", IGRAPH_EINVAL);
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
@@ -559,7 +559,7 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
         break;
 
     default:
-        IGRAPH_ERROR("unknown community comparison method", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Unknown community comparison method.", IGRAPH_EINVAL);
     }
 
     /* Clean up everything */

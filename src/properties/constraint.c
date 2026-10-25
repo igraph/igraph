@@ -89,7 +89,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_int_t ineis_in, ineis_out, jneis_in, jneis_out;
 
     if (weights != 0 && igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid length of weight vector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid length of weight vector.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&contrib, no_of_nodes);

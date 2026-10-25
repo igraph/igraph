@@ -349,7 +349,8 @@ igraph_error_t igraph_pagerank(
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
  *         \c IGRAPH_EINVVID, invalid vertex ID in
- *         \p vids or an empty reset vertex sequence in
+ *         \p vids or \p reset_vids.
+ *         \c IGRAPH_EINVAL, empty reset vertex sequence in
  *         \p reset_vids.
  *
  * Time complexity: depends on the input graph; usually it is O(|E|),
@@ -445,8 +446,8 @@ igraph_error_t igraph_personalized_pagerank_vs(
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex ID in
- *         \p vids or an invalid reset vector in \p reset.
+ *         \c IGRAPH_EINVVID, invalid vertex ID in \p vids.
+ *         \c IGRAPH_EINVAL, invalid reset vector in \p reset.
  *
  * Time complexity: depends on the input graph; usually it is O(|E|),
  * the number of edges.
@@ -479,7 +480,7 @@ igraph_error_t igraph_personalized_pagerank(
                 weights);
     }
 
-    IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Unknown PageRank algorithm.", IGRAPH_EINVAL);
 }
 
 /*

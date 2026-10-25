@@ -801,7 +801,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_int_t n) {
     il->length = n;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
@@ -988,7 +988,12 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 p++;
             } else {
-                *has_multiple = true;
+                /* In ALL mode, two equal loop entries are the two incidences
+                 * of one edge. Only a third entry establishes parallel loops. */
+                if (VECTOR(*v)[i] != index || mode != IGRAPH_ALL ||
+                    (i < n - 2 && VECTOR(*v)[i + 2] == index)) {
+                    *has_multiple = true;
+                }
                 /* Current item is the same as the next one, but if it is a
                  * loop edge, then the first one or two items are okay. We need
                  * to keep one if mode == IGRAPH_IN or mode == IGRAPH_OUT,
@@ -1232,7 +1237,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
                              igraph_loops_t loops) {
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Cannot create lazy incidence list view.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -1246,7 +1251,7 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
     il->length = igraph_vcount(graph);
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t*);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create lazy incidence list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     return IGRAPH_SUCCESS;

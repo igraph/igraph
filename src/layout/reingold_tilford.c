@@ -148,7 +148,7 @@ static igraph_error_t layout_reingold_tilford(const igraph_t *graph,
 
     vdata = IGRAPH_CALLOC(no_of_nodes, struct reingold_tilford_vertex);
     if (vdata == 0) {
-        IGRAPH_ERROR("igraph_layout_reingold_tilford failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for Reingold-Tilford layout.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vdata);
 
@@ -741,7 +741,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
     if ( (!roots || igraph_vector_int_size(roots) == 0) &&
          rootlevel && igraph_vector_int_size(rootlevel) != 0 ) {
-        IGRAPH_WARNING("Reingold-Tilford layout: 'rootlevel' ignored");
+        IGRAPH_WARNING("Reingold-Tilford layout: 'rootlevel' ignored.");
     }
 
     /* ----------------------------------------------------------------------- */
@@ -764,7 +764,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         igraph_int_t plus_levels = 0;
 
         if (igraph_vector_int_size(roots) != igraph_vector_int_size(rootlevel)) {
-            IGRAPH_ERROR("Reingold-Tilford: 'roots' and 'rootlevel' lengths differ",
+            IGRAPH_ERROR("Reingold-Tilford: 'roots' and 'rootlevel' lengths differ.",
                          IGRAPH_EINVAL);
         }
 

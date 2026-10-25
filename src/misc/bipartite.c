@@ -366,7 +366,7 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
     }
 
     if (probe1 >= no_of_nodes) {
-        IGRAPH_ERROR("No such vertex to probe.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("No such vertex to probe.", IGRAPH_EINVVID);
     }
 
     if (probe1 >= 0 && !proj1) {

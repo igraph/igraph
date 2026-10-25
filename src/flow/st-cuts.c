@@ -1316,7 +1316,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * \param value Pointer to a real number or \c NULL. The value of the minimum cut
  *        is stored here, unless it is a null pointer.
  * \param cuts Pointer to an initialized list of integer vectors or \c NULL.
- *        The cuts are stored here as lists of vertex IDs.
+ *        The cuts are stored here as lists of edge IDs.
  * \param partition1s Pointer to an initialized list of integer vectors or \c NULL.
  *        The list of vertex sets, generating the actual edge cuts, are stored
  *        here. Each vector contains a set of vertex IDs. If X is such

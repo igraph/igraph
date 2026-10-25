@@ -49,8 +49,10 @@ static igraph_error_t igraph_i_connected_components_strong(
  * \brief Calculates the (weakly or strongly) connected components in a graph.
  *
  * When computing strongly connected components, the components will be
- * indexed in topological order. In other words, vertex \c v is reachable
- * from vertex \c u precisely when <code>membership[u] &lt;= membership[v]</code>.
+ * indexed in topological order. This means that if vertex \c v is reachable
+ * from vertex \c u, then <code>membership[u] &lt;= membership[v]</code>.
+ * The converse does not necessarily hold: the ordering of component IDs
+ * alone does not establish reachability.
  *
  * \param graph The graph object to analyze.
  * \param membership For every vertex the ID of its component is given.
