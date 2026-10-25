@@ -29,7 +29,7 @@
 - `igraph_community_spinglass_single()` failed to reject an invalid vertex ID equal to the vertex count.
 - `igraph_bipartite_projection()`, `igraph_community_spinglass_single()`, `igraph_dfs()`, `igraph_fundamental_cycles()`, `igraph_layout_star()`, `igraph_pseudo_diameter()`, `igraph_random_walk()`, `igraph_st_vertex_connectivity()`, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVVID` instead of `IGRAPH_EINVAL` when validating invalid scalar vertex IDs. Conversely, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVAL` instead of `IGRAPH_EINVVID` for an invalid vertex count.
 - `igraph_strength()` returned incorrect results when called without weights and with a vertex selection whose size differed from the vertex count. The result always had one entry per vertex of the graph: when fewer vertices were selected, it was padded with zeros; when more were selected (i.e. with repetitions), it was truncated. Results computed with weights were not affected. This bug was introduced in 0.10.0.
-- `igraph_degree_1()` did not validate its vertex ID argument, reading out of bounds for invalid IDs.
+- `igraph_degree_1()` and `igraph_get_widest_paths()` did not validate their vertex ID argument, reading out of bounds for invalid IDs. `igraph_get_widest_path()` was affected as well.
 
 ### Other
 

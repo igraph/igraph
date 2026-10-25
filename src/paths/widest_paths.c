@@ -148,6 +148,10 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
         IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
+    if (from < 0 || from >= vcount) {
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
+    }
+
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
