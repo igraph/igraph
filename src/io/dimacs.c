@@ -219,14 +219,14 @@ igraph_error_t igraph_read_graph_dimacs_flow(
                 }
             } else { /* PROBLEM_EDGE */
                 read = fscanf(instream, "%" IGRAPH_PRId " %" IGRAPH_PRId "", &tmp, &tmp2);
-                EXPECT(read, 1);
+                EXPECT(read, 2);
                 if (label) {
-                    if (tmp < 0 || tmp >= no_of_nodes) {
+                    if (tmp < 1 || tmp > no_of_nodes) {
                         IGRAPH_ERRORF("Invalid node index %" IGRAPH_PRId " in DIMACS file. "
                                       "Number of nodes was given as %" IGRAPH_PRId".",
                                       IGRAPH_PARSEERROR, tmp, no_of_nodes);
                     }
-                    VECTOR(*label)[tmp] = tmp2;
+                    VECTOR(*label)[tmp - 1] = tmp2;
                 }
             }
 

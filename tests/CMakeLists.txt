@@ -539,6 +539,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   foreign_empty
   gml
+  igraph_read_graph_dimacs_flow
   igraph_read_graph_graphdb
   igraph_read_graph_graphml
   igraph_write_graph_leda

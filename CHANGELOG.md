@@ -34,6 +34,7 @@
 - `igraph_adjlist_init()` and `igraph_lazy_adjlist_init()` now validate their `loops` argument.
 - `igraph_degree_1()`, `igraph_get_widest_paths()` and `igraph_bfs_simple()` did not validate their vertex ID argument, reading out of bounds for invalid IDs. `igraph_get_widest_path()` and `igraph_layout_lgl()` were affected as well.
 - `igraph_count_multiple_1()` did not validate its edge ID argument, reading out of bounds for invalid IDs.
+- `igraph_read_graph_dimacs_flow()` mishandled `n` (node label) lines in EDGE problem files: lines with a label were rejected, lines without a label were accepted and stored an uninitialized value as the label, and the 1-based node index from the file was used as a 0-based index, shifting labels by one.
 
 ### Other
 

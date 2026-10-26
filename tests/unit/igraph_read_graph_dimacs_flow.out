@@ -1,0 +1,7 @@
+directed: false
+vcount: 4
+edges: {
+1 0
+3 2
+}
+( 10 2 3 40 )

@@ -1,0 +1,6 @@
+c labelled EDGE problem
+p edge 4 2
+n 1 10
+n 4 40
+e 1 2
+e 3 4
