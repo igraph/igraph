@@ -102,6 +102,17 @@ int main(void) {
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
 
+    /* A negative root selects a random root vertex; an out-of-range root is an error */
+    igraph_kary_tree(&g, 10, 3, IGRAPH_TREE_UNDIRECTED);
+    igraph_matrix_init(&coords, 0, 0);
+    vc = igraph_vcount(&g);
+    igraph_layout_lgl(&g, &coords, 150, vc, vc * vc, 1.5, vc * vc * vc, sqrt(sqrt(vc)), -1);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&coords) == 10);
+    CHECK_ERROR(igraph_layout_lgl(&g, &coords, 150, vc, vc * vc, 1.5, vc * vc * vc, sqrt(sqrt(vc)), 10),
+                IGRAPH_EINVVID);
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

@@ -347,6 +347,10 @@ igraph_error_t igraph_bfs_simple(
         IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
+    if (root < 0 || root >= no_of_nodes) {
+        IGRAPH_ERROR("Invalid root vertex in BFS.", IGRAPH_EINVVID);
+    }
+
     /* temporary storage */
 
     IGRAPH_BITSET_INIT_FINALLY(&added, no_of_nodes);

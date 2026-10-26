@@ -29,6 +29,7 @@ void all_degs(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode
 int main(void) {
     igraph_vector_int_t v, v2, seq;
     igraph_t g;
+    igraph_int_t deg;
 
     igraph_vector_int_init(&seq, 3);
     igraph_vector_int_init(&v, 0);
@@ -118,6 +119,8 @@ int main(void) {
     /* Vertex does not exist */
     VECTOR(seq)[0] = 4;
     CHECK_ERROR(igraph_degree(&g, &v, igraph_vss_vector(&seq), IGRAPH_ALL, IGRAPH_LOOPS), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_degree_1(&g, &deg, -1, IGRAPH_ALL, IGRAPH_LOOPS), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_degree_1(&g, &deg, 4, IGRAPH_ALL, IGRAPH_LOOPS), IGRAPH_EINVVID);
 
     igraph_destroy(&g);
     igraph_vector_int_destroy(&v2);

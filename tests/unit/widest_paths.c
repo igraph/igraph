@@ -573,6 +573,19 @@ int main(void) {
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &parents, &inbound_edges,
                 &vertices2, &edges2);
 
+    /* ==================================================================== */
+    /* 17. Invalid source vertex                                            */
+
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
+    igraph_vector_init_real(&w, 2, 1.0, 2.0);
+
+    CHECK_ERROR(igraph_get_widest_paths(&g, NULL, NULL, -1, igraph_vss_all(), &w, IGRAPH_ALL, NULL, NULL), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_get_widest_paths(&g, NULL, NULL, 3, igraph_vss_all(), &w, IGRAPH_ALL, NULL, NULL), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_get_widest_path(&g, NULL, NULL, 3, 0, &w, IGRAPH_ALL), IGRAPH_EINVVID);
+
+    igraph_vector_destroy(&w);
+    igraph_destroy(&g);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

@@ -104,6 +104,11 @@ int main(void) {
     check(&g, &vs);
     CHECK_ERROR(igraph_vit_create(&g_no_vertices, vs, &vit), IGRAPH_EINVAL);
 
+    /* Single-vertex selector with out-of-range vertex ID should fail. */
+    CHECK_ERROR(igraph_vit_create(&g, igraph_vss_1(-1), &vit), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_vit_create(&g, igraph_vss_1(igraph_vcount(&g)), &vit), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_vit_create(&g, igraph_vss_1(IGRAPH_INTEGER_MAX), &vit), IGRAPH_EINVVID);
+
     igraph_destroy(&g);
     igraph_destroy(&g_no_vertices);
     igraph_destroy(&g_no_edges);

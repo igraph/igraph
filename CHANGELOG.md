@@ -9,6 +9,7 @@
 
 ### Fixed
 
+- `igraph_community_infomap()` now returns `IGRAPH_INTERRUPTED` when interrupted. Previously, an interruption was reported as a generic failure (`IGRAPH_FAILURE`).
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was directed with some mutual edges, but no multi-edges; the `mode=IGRAPH_ALL` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set. An incorrect cache entry may cause various igraph functions to return invalid results.
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was undirected with some self-loops, but no multi-edges; the `loops=IGRAPH_LOOPS_TWICE` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set; it was not yet cached whether the graph had multi-edges. An incorrect cache entry may cause various igraph functions to return invalid results.
 - When `igraph_adjlist_init()` or `igraph_lazy_adjlist_init()` were called with `multiple=IGRAPH_NO_MULTIPLE`, they would not remove all multi-edges under the following conditions: the input was directed, had some mutual edges, but no multi-edges; `mode=IGRAPH_ALL` was set, meaning that mutual edges effectively act like multi-edges; it was already cached that the graph had no multi-edges; This could have caused several igraph functions that ignore edge directions in directed graphs to return invalid results in some cases.
@@ -27,9 +28,13 @@
 - `igraph_hub_and_authority_scores()` would crash when an undirected graph was used and the optional `value` parameter was set to `NULL`. Note hub and authority scores are meaningful in directed graphs only. In undirected graphs both are the same as eigenvector centralities.
 - `igraph_distances_floyd_warshall()` ignored source and target vertex selectors on singleton graphs, returning incorrect result matrix dimensions for empty selections or repeated source vertices. This bug was introduced in 0.10.4.
 - `igraph_community_spinglass_single()` failed to reject an invalid vertex ID equal to the vertex count.
+- `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` ignored the `vids` vertex selector when using `IGRAPH_PAGERANK_ALGO_ARPACK` on graphs with no edges or with all-zero weights, returning scores for all vertices and accepting invalid vertex IDs.
 - `igraph_bipartite_projection()`, `igraph_community_spinglass_single()`, `igraph_dfs()`, `igraph_fundamental_cycles()`, `igraph_layout_star()`, `igraph_pseudo_diameter()`, `igraph_random_walk()`, `igraph_st_vertex_connectivity()`, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVVID` instead of `IGRAPH_EINVAL` when validating invalid scalar vertex IDs. Conversely, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVAL` instead of `IGRAPH_EINVVID` for an invalid vertex count.
 - `igraph_strength()` returned incorrect results when called without weights and with a vertex selection whose size differed from the vertex count. The result always had one entry per vertex of the graph: when fewer vertices were selected, it was padded with zeros; when more were selected (i.e. with repetitions), it was truncated. Results computed with weights were not affected. This bug was introduced in 0.10.0.
-- `igraph_community_infomap()` now returns `IGRAPH_INTERRUPTED` when interrupted. Previously, an interruption was reported as a generic failure (`IGRAPH_FAILURE`).
+- `igraph_vit_create()` and `igraph_eit_create()` did not reject negative vertex or edge IDs in single-vertex and single-edge selectors (`igraph_vss_1()`, `igraph_ess_1()`). Any function taking such a selector could access memory out of bounds, e.g. `igraph_degree()` or `igraph_delete_edges()`. The same affected the `to` argument of `igraph_get_shortest_path()`, `igraph_get_shortest_path_dijkstra()`, `igraph_get_shortest_path_bellman_ford()` and `igraph_get_widest_path()`. These now return `IGRAPH_EINVVID` or `IGRAPH_EINVEID`.
+- `igraph_adjlist_init()` and `igraph_lazy_adjlist_init()` now validate their `loops` argument.
+- `igraph_degree_1()`, `igraph_get_widest_paths()` and `igraph_bfs_simple()` did not validate their vertex ID argument, reading out of bounds for invalid IDs. `igraph_get_widest_path()` and `igraph_layout_lgl()` were affected as well.
+- `igraph_count_multiple_1()` did not validate its edge ID argument, reading out of bounds for invalid IDs.
 
 ### Other
 

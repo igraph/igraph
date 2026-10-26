@@ -6,6 +6,7 @@
 int main(void) {
     igraph_t graph;
     igraph_vector_int_t counts;
+    igraph_int_t count;
 
     igraph_vector_int_init(&counts, 0);
 
@@ -26,6 +27,10 @@ int main(void) {
 
     igraph_count_multiple(&graph, &counts, igraph_ess_all(IGRAPH_EDGEORDER_ID));
     print_vector_int(&counts);
+
+    /* invalid edge ID */
+    CHECK_ERROR(igraph_count_multiple_1(&graph, &count, -1), IGRAPH_EINVEID);
+    CHECK_ERROR(igraph_count_multiple_1(&graph, &count, 6), IGRAPH_EINVEID);
 
     igraph_destroy(&graph);
 

@@ -1407,7 +1407,7 @@ static igraph_error_t igraph_i_xml_escape(const char *src, char **dest, const ch
         }
     }
     *dest = IGRAPH_CALLOC(destlen + 1, char);
-    IGRAPH_CHECK_OOM(dest, "Insufficient memory to write GraphML file.");
+    IGRAPH_CHECK_OOM(*dest, "Insufficient memory to write GraphML file.");
     for (s = src, d = *dest; *s; s++, d++) {
         ch = (unsigned char)(*s);
         switch (ch) {
