@@ -250,6 +250,69 @@ int main(void) {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
+    /* Special cases with a vertex selector. The result must contain only
+     * the selected vertices, and invalid vertex IDs must be rejected. */
+
+    {
+        igraph_vs_t vs;
+        igraph_vector_int_t vids;
+        igraph_pagerank_algo_t algos[] = { IGRAPH_PAGERANK_ALGO_ARPACK, IGRAPH_PAGERANK_ALGO_PRPACK };
+        const char *algo_names[] = { "ARPACK", "PRPACK" };
+
+        igraph_vector_int_init_int(&vids, 3, 3, 0, 3);
+        vs = igraph_vss_vector(&vids);
+        igraph_vector_init_range(&reset, 1, 5);
+
+        printf("\nEdgeless graph, vertex selector\n");
+        igraph_empty(&g, 4, IGRAPH_UNDIRECTED);
+        for (int i = 0; i < 2; i++) {
+            igraph_pagerank(&g, NULL, &res, &value, 0.85, 1, vs, algos[i], NULL);
+            printf("%s: ", algo_names[i]); print_vector(&res);
+            IGRAPH_ASSERT(is_almost_one(value));
+        }
+
+        printf("\nEdgeless graph, personalized, vertex selector\n");
+        for (int i = 0; i < 2; i++) {
+            igraph_personalized_pagerank(&g, NULL, &res, &value, &reset, 0.85, 1, vs, algos[i], NULL);
+            printf("%s: ", algo_names[i]); print_vector(&res);
+            IGRAPH_ASSERT(is_almost_one(value));
+        }
+
+        for (int i = 0; i < 2; i++) {
+            CHECK_ERROR(igraph_pagerank(&g, NULL, &res, &value, 0.85, 1,
+                                        igraph_vss_1(4), algos[i], NULL),
+                        IGRAPH_EINVVID);
+        }
+        igraph_destroy(&g);
+
+        printf("\nComplete graph, zero weights, vertex selector\n");
+        igraph_full(&g, 4, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+        igraph_vector_init(&weights, 6);
+        for (int i = 0; i < 2; i++) {
+            igraph_pagerank(&g, &weights, &res, &value, 0.85, 1, vs, algos[i], NULL);
+            printf("%s: ", algo_names[i]); print_vector(&res);
+            IGRAPH_ASSERT(is_almost_one(value));
+        }
+
+        printf("\nComplete graph, zero weights, personalized, vertex selector\n");
+        for (int i = 0; i < 2; i++) {
+            igraph_personalized_pagerank(&g, &weights, &res, &value, &reset, 0.85, 1, vs, algos[i], NULL);
+            printf("%s: ", algo_names[i]); print_vector(&res);
+            IGRAPH_ASSERT(is_almost_one(value));
+        }
+
+        for (int i = 0; i < 2; i++) {
+            CHECK_ERROR(igraph_pagerank(&g, &weights, &res, &value, 0.85, 1,
+                                        igraph_vss_1(4), algos[i], NULL),
+                        IGRAPH_EINVVID);
+        }
+        igraph_vector_destroy(&weights);
+        igraph_destroy(&g);
+
+        igraph_vector_destroy(&reset);
+        igraph_vector_int_destroy(&vids);
+    }
+
     /* Another test case for PageRank (bug #792352) */
 
     printf("\nTest graph 3\n");

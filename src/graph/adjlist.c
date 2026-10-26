@@ -164,6 +164,10 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_EINVMODE);
     }
 
+    if (loops != IGRAPH_NO_LOOPS && loops != IGRAPH_LOOPS_ONCE && loops != IGRAPH_LOOPS_TWICE) {
+        IGRAPH_ERROR("Invalid loops argument.", IGRAPH_EINVAL);
+    }
+
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
@@ -1014,8 +1018,9 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
             }
         }
     } else {
-        /* TODO; we don't use this combination yet */
-        return IGRAPH_UNIMPLEMENTED;
+        /* LOOPS_TWICE with MULTIPLE returned early above; invalid 'loops'
+         * values are rejected by the caller. */
+        IGRAPH_FATAL("Must not reach here.");
     }
 
     /* always succeeds since we are never growing the vector */
@@ -1075,6 +1080,10 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                              igraph_bool_t multiple) {
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create lazy adjacency list view.", IGRAPH_EINVMODE);
+    }
+
+    if (loops != IGRAPH_NO_LOOPS && loops != IGRAPH_LOOPS_ONCE && loops != IGRAPH_LOOPS_TWICE) {
+        IGRAPH_ERROR("Invalid loops argument.", IGRAPH_EINVAL);
     }
 
     if (!igraph_is_directed(graph)) {
