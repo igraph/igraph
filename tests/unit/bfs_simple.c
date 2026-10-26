@@ -62,6 +62,10 @@ int main(void) {
     igraph_bfs_simple(&g, 7, IGRAPH_OUT, 0, &layers, &parents);
     print_vector_int(&layers);
     print_vector_int(&parents);
+
+    /* Invalid root vertex */
+    CHECK_ERROR(igraph_bfs_simple(&g, -1, IGRAPH_OUT, NULL, NULL, &parents), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_bfs_simple(&g, 20, IGRAPH_OUT, NULL, NULL, &parents), IGRAPH_EINVVID);
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&vids);

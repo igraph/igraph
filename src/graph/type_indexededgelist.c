@@ -1165,6 +1165,10 @@ igraph_error_t igraph_degree_1(
 ) {
     igraph_int_t loop_counter;
 
+    if (vid < 0 || vid >= igraph_vcount(graph)) {
+        IGRAPH_ERROR("Vertex ID out of range.", IGRAPH_EINVVID);
+    }
+
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }

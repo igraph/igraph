@@ -81,7 +81,7 @@ static igraph_error_t entity_encode(const char *src, char **dest, igraph_bool_t 
         }
     }
     *dest = IGRAPH_CALLOC(destlen + 1, char);
-    IGRAPH_CHECK_OOM(dest, "Not enough memory to encode string for GML export.");
+    IGRAPH_CHECK_OOM(*dest, "Not enough memory to encode string for GML export.");
     for (s = src, d = *dest; *s != '\0'; s++, d++) {
         switch (*s) {
         case '&':
@@ -122,7 +122,7 @@ static igraph_error_t entity_decode(const char *src, char **dest, igraph_bool_t 
     char *d;
     size_t len = strlen(src);
     *dest = IGRAPH_CALLOC(len+1, char); /* at most as much storage needed as for 'src' */
-    IGRAPH_CHECK_OOM(dest, "Not enough memory to decode string during GML import.");
+    IGRAPH_CHECK_OOM(*dest, "Not enough memory to decode string during GML import.");
 
     for (s = src, d = *dest; *s != '\0';) {
         if (*s == '&') {
