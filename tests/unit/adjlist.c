@@ -304,6 +304,20 @@ int regression_2899(void) {
 }
 
 
+int test_invalid_loops(void) {
+    igraph_t g;
+    igraph_adjlist_t adjlist;
+    igraph_lazy_adjlist_t lazy_adjlist;
+
+    igraph_ring(&g, 3, IGRAPH_UNDIRECTED, false, true);
+
+    CHECK_ERROR(igraph_adjlist_init(&g, &adjlist, IGRAPH_ALL, (igraph_loops_t) 7, IGRAPH_MULTIPLE), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_lazy_adjlist_init(&g, &lazy_adjlist, IGRAPH_ALL, (igraph_loops_t) 7, IGRAPH_MULTIPLE), IGRAPH_EINVAL);
+
+    igraph_destroy(&g);
+
+    return 0;
+}
 
 int main(void) {
 
@@ -315,6 +329,8 @@ int main(void) {
     RUN_TEST(test_multiedge_elimination_for_directed_graph);
 
     RUN_TEST(regression_2899);
+
+    RUN_TEST(test_invalid_loops);
 
     VERIFY_FINALLY_STACK();
 
