@@ -327,7 +327,7 @@ struct igraph_safelocale_s {
 
 igraph_error_t igraph_enter_safelocale(igraph_safelocale_t *loc) {
     *loc = IGRAPH_CALLOC(1, struct igraph_safelocale_s);
-    IGRAPH_CHECK_OOM(loc, "Could not set C locale.");
+    IGRAPH_CHECK_OOM(*loc, "Could not set C locale.");
     igraph_safelocale_t l = *loc;
 #ifdef HAVE_USELOCALE
     l->c_locale = newlocale(LC_NUMERIC_MASK, "C", NULL);

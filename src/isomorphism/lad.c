@@ -562,7 +562,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                     IGRAPH_FINALLY(igraph_free, mu);
 
                     mv = IGRAPH_CALLOC(VECTOR(Gt->nbSucc)[v], igraph_int_t);
-                    IGRAPH_CHECK_OOM(mu, "Insufficient memory for subisomorphism search with LAD.");
+                    IGRAPH_CHECK_OOM(mv, "Insufficient memory for subisomorphism search with LAD.");
                     IGRAPH_FINALLY(igraph_free, mv);
 
                     for (i = 0; i < VECTOR(Gp->nbSucc)[u]; i++) {
