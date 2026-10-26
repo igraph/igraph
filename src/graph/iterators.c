@@ -794,13 +794,13 @@ igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_v
         vit->end = 0;
         break;
     case IGRAPH_VS_1:
+        if (vs.data.vid < 0 || vs.data.vid >= igraph_vcount(graph)) {
+            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID.", IGRAPH_EINVVID);
+        }
         vit->type = IGRAPH_VIT_RANGE;
         vit->pos = vs.data.vid;
         vit->start = vs.data.vid;
         vit->end = vs.data.vid + 1;
-        if (vit->pos >= igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID.", IGRAPH_EINVVID);
-        }
         break;
     case IGRAPH_VS_VECTORPTR:
     case IGRAPH_VS_VECTOR:
@@ -1943,13 +1943,13 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
         eit->end = 0;
         break;
     case IGRAPH_ES_1:
+        if (es.data.eid < 0 || es.data.eid >= igraph_ecount(graph)) {
+            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVEID);
+        }
         eit->type = IGRAPH_EIT_RANGE;
         eit->pos = es.data.eid;
         eit->start = es.data.eid;
         eit->end = es.data.eid + 1;
-        if (eit->pos >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator.", IGRAPH_EINVEID);
-        }
         break;
     case IGRAPH_ES_VECTOR:
     case IGRAPH_ES_VECTORPTR:
