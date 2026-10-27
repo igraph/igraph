@@ -255,22 +255,28 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * \experimental
  *
  * This function determines if there is a connected graph with a given graphical
- * degree sequence. While it is safe to pass any sequence of non-negative integers
- * as input, the result will only be meaningful if the sequence was graphical.
- * This can be checked using \ref igraph_is_graphical().
+ * degree sequence. This function assumes that the degree sequence is graphical
+ * for the given allowed_edge_types, and does not check it.
+ * For non-graphical input the result is unspecified.
+ * The function will not crash or take excessive time, but the value it returns has no meaning.
+ * If graphicality is not known to hold, check it with \ref igraph_is_graphical() first.
  *
  * For undirected graphs, it suffices that the sequence satisfies two conditions.
  * Each degree must be positive, otherwise there would be an isolated vertex.
  * The sum of degrees must be large enough to support n - 1 edges, that is, at least form a tree.
+ * There is one exception in the case of simple graphs with self-loops.
+ * For the sequence (2, 2), there are technically enough edges to form a tree,
+ * but placing them in such a way would require multiedges.
+ * Therefore, the only possible realization of two self-loops is disconnected.
  *
  * For weak connectivity in directed graphs, the same conditions apply,
  * essentially treating edges as if they were undirected.
- * 
- * For strong connectivity, there are difference between simple graphs and multigraphs.
+ *
+ * For strong connectivity, there are differences between simple graphs and multigraphs.
  * In multigraphs, it is sufficient that each in-degree and out-degree is positive.
  * In simple graphs, an additional condition must be satisfied, given by Beineke-Harary,
  * and later also by Hong-Liu-Lai.
- * 
+ *
  * </para><para>
  * References:
  *
@@ -279,12 +285,12 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * https://doi.org/10.1088/2632-072x/abced5
  *
  * </para><para>
- * Hong, Y., Liu, Q. and Lai, H.-J., 
- * Characterization of Digraphic Sequences with Strongly Connected Realizations. J. Graph Theory, 84: 191-201 (2017).
+ * Hong, Y., Liu, Q. and Lai, H.-J.,
+ * Characterization of Digraphic Sequences with Strongly Connected Realizations. J. Graph Theory, 84: 191-201 (2016).
  * https://doi.org/10.1002/jgt.22020
  *
  * </para><para>
- * Beineke, L.W. and Harary, F., Local Restrictions for Various Classes of Directed Graphs. 
+ * Beineke, L.W. and Harary, F., Local Restrictions for Various Classes of Directed Graphs.
  * Journal of the London Mathematical Society, s1-40: 87-95 (1965).
  * https://doi.org/10.1112/jlms/s1-40.1.87
  *
@@ -309,9 +315,12 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  *     with self-loops allowed but multi-edges disallowed is not implemented
  *     and returns \c IGRAPH_UNIMPLEMENTED.
  * \param res Pointer to a Boolean. The result will be stored here.
+ *     For non-graphical input the result is unspecified.
+ *     The function will not crash or take excessive time, but the value it returns has no meaning.
+ *     If graphicality is not known to hold, check it with \ref igraph_is_graphical() first.
  *
  * \return Error code.
- * 
+ *
  * \sa \ref igraph_is_graphical
  *
  * Time complexity: O(n), where n is the length of the degree sequence(s).
