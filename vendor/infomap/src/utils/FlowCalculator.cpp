@@ -71,7 +71,9 @@ namespace {
       if (m_haveLast) {
         const unsigned int slot = m_next;
         m_next = (m_next + 1) % kMemory;
-        m_cols = std::min(m_cols + 1, kMemory);
+        // Pass a copy: binding kMemory itself to std::min's const& odr-uses it, and
+        // C++14 (igraph builds the sources as C++14) then needs an out-of-class definition.
+        m_cols = std::min(m_cols + 1, static_cast<unsigned int>(kMemory));
         auto& dF = m_dF[slot];
         auto& dG = m_dG[slot];
         dF.resize(n);
