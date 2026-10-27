@@ -688,7 +688,7 @@ igraph_betweenness_cutoff:
 igraph_betweenness_subset:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VERTEX_QTY res,
-        VERTEX_SELECTOR vids=ALL, VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL,
+        VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL, VERTEX_SELECTOR vids=ALL,
         BOOLEAN directed=True, BOOLEAN normalized=False
     DEPS: |-
         vids ON graph, weights ON graph, res ON graph vids, sources ON graph, targets ON graph
