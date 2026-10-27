@@ -41,6 +41,7 @@
 ### Other
 
 - Documentation improvements.
+- The documentation of `igraph_forest_fire_game()` now states correctly that the `ambs` ambassador vertices are drawn with replacement, so a new vertex may have fewer than `ambs` distinct ambassadors (#2959).
 - Proofread the documentation and error/warning message texts, correcting spelling, grammar, and formatting, using AI assistance.
 - nanoflann was updated to version 2.0.1
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!

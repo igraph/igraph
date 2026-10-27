@@ -26,25 +26,25 @@ int main(void) {
 
     printf("No vertices:\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/0, /*fw_prob*/ 0.0,
-                  /*bw_factor*/ 0.0, /*pambs*/1, /*directed*/ 0) == IGRAPH_SUCCESS);
+                  /*bw_factor*/ 0.0, /*ambs*/1, /*directed*/ 0) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("No ambassadors:\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/10, /*fw_prob*/ 0.0,
-                  /*bw_factor*/ 0.0, /*pambs*/0, /*directed*/ 0) == IGRAPH_SUCCESS);
+                  /*bw_factor*/ 0.0, /*ambs*/0, /*directed*/ 0) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("More ambassadors than nodes:\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/5, /*fw_prob*/ 0.0,
-                  /*bw_factor*/ 0.0, /*pambs*/100, /*directed*/ 1) == IGRAPH_SUCCESS);
+                  /*bw_factor*/ 0.0, /*ambs*/100, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("Some normal inputs, just to check for memory problems, no output checking.\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/50, /*fw_prob*/ 0.5,
-                  /*bw_factor*/ 0.5, /*pambs*/3, /*directed*/ 1) == IGRAPH_SUCCESS);
+                  /*bw_factor*/ 0.5, /*ambs*/3, /*directed*/ 1) == IGRAPH_SUCCESS);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
@@ -52,15 +52,15 @@ int main(void) {
 
     printf("Negative fw_prob.\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/5, /*fw_prob*/ -0.5,
-                  /*bw_factor*/ 0.0, /*pambs*/100, /*directed*/ 1) == IGRAPH_EINVAL);
+                  /*bw_factor*/ 0.0, /*ambs*/100, /*directed*/ 1) == IGRAPH_EINVAL);
 
     printf("Negative bw_factor.\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/5, /*fw_prob*/ 0.5,
-                  /*bw_factor*/ -0.5, /*pambs*/100, /*directed*/ 0) == IGRAPH_EINVAL);
+                  /*bw_factor*/ -0.5, /*ambs*/100, /*directed*/ 0) == IGRAPH_EINVAL);
 
     printf("Negative number of ambassadors.\n");
     IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/5, /*fw_prob*/ 0.5,
-                  /*bw_factor*/ 0.5, /*pambs*/-100, /*directed*/ 1) == IGRAPH_EINVAL);
+                  /*bw_factor*/ 0.5, /*ambs*/-100, /*directed*/ 1) == IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();
     return 0;
