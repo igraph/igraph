@@ -43,6 +43,7 @@
 - `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` did not reject infinite weights, regardless of the algorithm or the graph's directedness. `IGRAPH_PAGERANK_ALGO_PRPACK` returned NaN results, while `IGRAPH_PAGERANK_ALGO_ARPACK` terminated the process.
 - `igraph_hrg_dendrogram()` wrote out of bounds on every call, which could crash. This bug was introduced in 1.0.0.
 - `igraph_community_label_propagation()` accepted initial labels equal to the vertex count, which led to out-of-bounds memory access. It also terminated the process when given the null graph and an initial labeling.
+- `igraph_lcf()` and `igraph_lcf_small()` terminated the process with a division by zero when given zero vertices together with shifts, and with a failed assertion when given a negative vertex count. These now return an error.
 
 ### Other
 
