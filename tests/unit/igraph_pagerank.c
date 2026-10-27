@@ -377,6 +377,37 @@ int main(void) {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
+    /* Undirected self-loops act as two directed self-loops. */
+
+    printf("\nSmall undirected graph with self-loop (unweighted)\n");
+
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0,1, 1,1, 1,2,
+                 -1);
+
+    igraph_pagerank(&g, NULL, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_ARPACK, &arpack_options);
+    printf("ARPACK: "); print_vector(&res);
+
+    igraph_pagerank(&g, NULL, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
+    printf("PRPACK: "); print_vector(&res);
+
+    printf("\nSmall undirected graph with self-loop (weighted)\n");
+
+    igraph_vector_init_real(&weights, 3, 1.0, 2.0, 3.0);
+
+    igraph_pagerank(&g, &weights, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_ARPACK, &arpack_options);
+    printf("ARPACK: "); print_vector(&res);
+
+    igraph_pagerank(&g, &weights, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
+    printf("PRPACK: "); print_vector(&res);
+
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
     igraph_vector_destroy(&res);
 
     /* Graph with more than 127 vertices. PRPACK uses a different method above this size. */

@@ -115,7 +115,6 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
 
             int temp = igraph_vector_int_size(&neis);
 
-            // TODO: should loop edges be added in both directions?
             int *p_head_copy = p_head;
             for (int j = 0; j < temp; j++) {
                 if (weights != NULL) {
