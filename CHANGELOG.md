@@ -7,6 +7,10 @@
 - `igraph_hamming()` creates a Hamming graph (experimental function). Thanks to @zxawry for contributing this functionality in #2890!
 - `igraph_is_triangle_free()` determines whether a graph contains no triangles (experimental function).
 
+### Changed
+
+- `igraph_transitive_closure()` now copies graph and vertex attributes to the result. Edge attributes are not copied, as the edges of the closure do not correspond to edges of the original graph (#2932).
+
 ### Fixed
 
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was directed with some mutual edges, but no multi-edges; the `mode=IGRAPH_ALL` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set. An incorrect cache entry may cause various igraph functions to return invalid results.
