@@ -31,6 +31,7 @@
 #include "igraph_structural.h"
 
 #include "core/math.h" /* M_PI */
+#include "math/safe_intop.h"
 
 static igraph_error_t layout_reingold_tilford_unreachable(
     const igraph_t *graph,
@@ -697,11 +698,11 @@ igraph_error_t igraph_roots_for_tree_layout(
  *   The root selection heuristic may change without notice. To ensure a consistent
  *   output, please specify the roots manually. The \ref igraph_roots_for_tree_layout()
  *   function gives more control over automatic root selection.
- * \param rootlevel This argument can be useful when drawing forests which are
- *   not trees (i.e. they are unconnected and have tree components). It specifies
- *   the level of the root vertices for every tree in the forest. It is only
- *   considered if not a null pointer and the \p roots argument is also given
- *   (and it is not a null pointer or an empty vector).
+ * \param rootlevel The level of each root vertex, useful when drawing forests
+ *   that consist of several trees. A root with level \c k is placed \c k levels
+ *   further from the top than a root with level zero. If given, it must have the same length as \p roots and must not
+ *   contain negative values. It is ignored if it is a null pointer or an empty
+ *   vector, and also when \p roots has fewer than two elements.
  * \return Error code.
  *
  * Added in version 0.2.
@@ -739,6 +740,10 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
+    if (roots && ! igraph_vector_int_isininterval(roots, 0, no_of_nodes_orig - 1)) {
+        IGRAPH_ERROR("Invalid root vertex ID.", IGRAPH_EINVVID);
+    }
+
     if ( (!roots || igraph_vector_int_size(roots) == 0) &&
          rootlevel && igraph_vector_int_size(rootlevel) != 0 ) {
         IGRAPH_WARNING("Reingold-Tilford layout: 'rootlevel' ignored.");
@@ -768,21 +773,34 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                          IGRAPH_EINVAL);
         }
 
-        /* count the rootlevels that are not zero */
+        if (igraph_vector_int_any_smaller(rootlevel, 0)) {
+            IGRAPH_ERROR("Reingold-Tilford: 'rootlevel' must not contain negative values.",
+                         IGRAPH_EINVAL);
+        }
+
+        /* count the levels to be added above the roots */
         for (igraph_int_t i = 0; i < igraph_vector_int_size(roots); i++) {
-            plus_levels += VECTOR(*rootlevel)[i];
+            IGRAPH_SAFE_ADD(plus_levels, VECTOR(*rootlevel)[i], &plus_levels);
         }
 
         /* make copy of graph, add vertices/edges */
         if (plus_levels != 0) {
             igraph_int_t edgeptr = 0;
+            igraph_int_t newedges_size;
+
+            /* The roots are replaced by the topmost added vertices below,
+             * so work on a copy instead of the caller's vector. */
+            IGRAPH_CHECK(igraph_vector_int_init_copy(&myroots, roots));
+            IGRAPH_FINALLY(igraph_vector_int_destroy, &myroots);
+            proots = &myroots;
 
             pextended = &extended;
             IGRAPH_CHECK(igraph_copy(&extended, graph));
             IGRAPH_FINALLY(igraph_destroy, &extended);
             IGRAPH_CHECK(igraph_add_vertices(&extended, plus_levels, 0));
 
-            IGRAPH_CHECK(igraph_vector_int_resize(&newedges, plus_levels * 2));
+            IGRAPH_SAFE_MULT(plus_levels, 2, &newedges_size);
+            IGRAPH_CHECK(igraph_vector_int_resize(&newedges, newedges_size));
 
             for (igraph_int_t i = 0; i < igraph_vector_int_size(roots); i++) {
                 igraph_int_t rl = VECTOR(*rootlevel)[i];
@@ -817,7 +835,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                 }
 
                 /* move on to the next root */
-                VECTOR(*roots)[i] = no_of_nodes++;
+                VECTOR(myroots)[i] = no_of_nodes++;
             }
 
             /* actually add the edges to the graph */
@@ -853,9 +871,6 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
     /* if there is only one root, no need for real_root */
     if (igraph_vector_int_size(proots) == 1) {
         real_root = VECTOR(*proots)[0];
-        if (real_root < 0 || real_root >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid vertex ID.", IGRAPH_EINVVID);
-        }
 
         /* else, we need to make real_root */
     } else {
@@ -897,8 +912,6 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
     }
-    igraph_vector_int_destroy(&newedges);
-    IGRAPH_FINALLY_CLEAN(1);
 
     /* ----------------------------------------------------------------------- */
     /* Layout */
@@ -933,6 +946,9 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
+    igraph_vector_int_destroy(&newedges);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -961,11 +977,11 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
  *   500 vertices, and high degree vertices (according to \p mode) in larger graphs.
  *   The root selection heuristic may change without notice. To ensure a consistent
  *   output, please specify the roots manually.
- * \param rootlevel This argument can be useful when drawing forests which are
- *   not trees (i.e. they are unconnected and have tree components). It specifies
- *   the level of the root vertices for every tree in the forest. It is only
- *   considered if not a null pointer and the \p roots argument is also given
- *   (and it is not a null pointer or an empty vector).
+ * \param rootlevel The level of each root vertex, useful when drawing forests
+ *   that consist of several trees. A root with level \c k is placed \c k levels
+ *   further from the top than a root with level zero. If given, it must have the same length as \p roots and must not
+ *   contain negative values. It is ignored if it is a null pointer or an empty
+ *   vector, and also when \p roots has fewer than two elements.
  * \return Error code.
  *
  * \sa \ref igraph_layout_reingold_tilford().
