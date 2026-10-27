@@ -490,11 +490,11 @@ void writeOutputArtifacts(InfomapBase& infomap, Network& network, OutputPhase ph
     return;
   }
 
-  const auto summaries = summarizeOutputFiles(prettyOutputFiles);
-  for (unsigned int i = 0; i < summaries.size(); ++i) {
-    const std::string prefix = i == 0 ? fmt::format(FMT_STRING("{} files -> "), prettyOutputFiles.size()) : "         ";
-    Console().status("Output", fmt::format(FMT_STRING("{}{}"), prefix, summaries[i]));
-  }
+  // One status line per file group, each in the same column: a file count on the first
+  // line only says again what the lines below it already show, and it pushed the first
+  // path out of line with the rest.
+  for (const auto& summary : summarizeOutputFiles(prettyOutputFiles))
+    Console().status("Output", summary);
 }
 
 } // namespace infomap

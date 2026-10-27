@@ -94,7 +94,7 @@ struct Config {
   bool multilayerRelaxByJensenShannonDivergence = false;
   int multilayerJSRelaxLimit = -1;
   bool multilayerRelaxToSelf = false; // Couple only physical nodes across layers instead of spreading to neighbours
-  unsigned int maxFlowIterations = 400;
+  unsigned int maxFlowIterations = 0; // 0: no cap, iterate until converged or no longer falling (#1353)
   unsigned int minFlowIterations = 50;
   double flowTolerance = 1.0e-15; // Convergence tolerance for flow calculation (PageRank)
 
@@ -104,6 +104,9 @@ struct Config {
   bool recordedTeleportation = false;
   bool regularized = false; // Add a Bayesian prior network with recorded teleportation (sets recordedTeleportation and teleportToNodes to true)
   double regularizationStrength = 1.0; // Scale Bayesian prior constant ln(N)/N with this factor
+  bool multilayerSkipAbsentNodes = false; // Treat absence from a layer as real, so the Bayesian prior of --regularized spans only the physical nodes each layer actually holds
+  double intraRegularizationStrength = 1.0; // Scale the intra-layer part of the multilayer prior, relative to regularizationStrength
+  double interRegularizationStrength = 1.0; // Scale the inter-layer part of the multilayer prior, relative to regularizationStrength
   double teleportationProbability = 0.15;
   unsigned int preferredNumberOfModules = 0;
   unsigned int preferredNumberOfLevels = 0; // 0 = off. Soft, asymmetric depth preference (issue #308)
@@ -251,6 +254,9 @@ struct Config {
     recordedTeleportation = other.recordedTeleportation;
     regularized = other.regularized;
     regularizationStrength = other.regularizationStrength;
+    multilayerSkipAbsentNodes = other.multilayerSkipAbsentNodes;
+    intraRegularizationStrength = other.intraRegularizationStrength;
+    interRegularizationStrength = other.interRegularizationStrength;
     teleportationProbability = other.teleportationProbability;
     entropyBiasCorrection = other.entropyBiasCorrection;
     entropyBiasCorrectionMultiplier = other.entropyBiasCorrectionMultiplier;
@@ -318,6 +324,17 @@ struct Config {
   bool isBipartite() const { return bipartite; }
 #ifndef SWIG
   bool isRegularizedMultilayerFlow() const { return isMultilayerNetwork() && regularized; }
+
+  // Whether the flow step adds the regularized prior. It is implemented for the directed and
+  // undirected models; undirdir, outdirdir, rawdir and precomputed compute their flow as without
+  // it, so the option is ignored there (#1189). Multilayer input is left as it was: its flow
+  // model is settled only after the network has been generated for --regularized.
+  bool usesRegularizedFlow() const { return regularized && (flowModel == FlowModel::directed || flowModel == FlowModel::undirected || isMultilayerNetwork()); }
+
+  // Whether the coded walk has teleportation steps to record. Only the directed model and the
+  // regularized prior teleport; under the other flow models the link flow already sums to 1, and
+  // the recorded-teleportation terms would add exit flow with no enter flow to match (#1188).
+  bool recordsTeleportation() const { return recordedTeleportation && (flowModel == FlowModel::directed || usesRegularizedFlow()); }
 #endif
 
   bool haveMemory() const { return stateInput; }

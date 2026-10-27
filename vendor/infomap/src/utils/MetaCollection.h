@@ -124,6 +124,8 @@ public:
 
   double calculateEntropy()
   {
+    if (m_total.flow == 0)
+      return 0.0; // only zero-flow nodes: the 0/0 below would feed NaN to plogp
     double metaCodelength = 0.0;
     for (auto& it : m_metaToFlowCount) {
       metaCodelength -= infomath::plogp(it.second.flow / m_total.flow);
@@ -137,6 +139,8 @@ public:
   double calculateEntropyWith(const MetaCollection& other, int sign) const
   {
     const double total = sign > 0 ? m_total.flow + other.m_total.flow : m_total.flow - other.m_total.flow;
+    if (total == 0)
+      return 0.0; // as in calculateEntropy()
     double metaCodelength = 0.0;
     auto it = m_metaToFlowCount.begin();
     auto otherIt = other.m_metaToFlowCount.begin();

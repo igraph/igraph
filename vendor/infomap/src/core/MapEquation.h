@@ -490,10 +490,7 @@ double MapEquation<FlowDataType, DeltaFlowDataType>::calcCodelengthOnModuleOfLea
 template <typename FlowDataType, typename DeltaFlowDataType>
 double MapEquation<FlowDataType, DeltaFlowDataType>::calcCodelengthOnModuleOfModules(const InfoNode& parent) const
 {
-  double parentFlow = parent.data.flow;
   double parentExit = parent.data.exitFlow;
-  if (parentFlow < 1e-16)
-    return 0.0;
 
   // H(x) = -xlog(x), T = q + SUM(p), q = exitFlow, p = enterFlow
   // Normal format
@@ -513,6 +510,11 @@ double MapEquation<FlowDataType, DeltaFlowDataType>::calcCodelengthOnModuleOfMod
   }
   // The possibilities from this module: Either exit to coarser level or enter one of its children
   double totalCodewordUse = parentExit + sumEnter;
+  // Guard on the codebook's use, not the module's flow: under bipartite input the
+  // feature nodes are not coded, so a module of them has no flow, yet the walker
+  // still enters its children, and the search's running terms charge for that (#1290).
+  if (totalCodewordUse < 1e-16)
+    return 0.0;
 
   return infomath::plogp(totalCodewordUse) - sumEnterLogEnter - infomath::plogp(parentExit);
 }

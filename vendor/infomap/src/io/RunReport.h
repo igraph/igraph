@@ -40,6 +40,8 @@ struct RunSummaryReport {
   bool flowConverged = true;
   unsigned int flowIterations = 0;
   double flowError = 0.0;
+  double flowRate = 0.0; // NaN, written as null, when no step was measured
+  bool flowAccelerated = false;
   std::vector<double> trialCodelengths;
   std::vector<unsigned int> trialTopModules;
 };

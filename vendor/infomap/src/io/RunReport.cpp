@@ -13,6 +13,7 @@
 #include "SafeFile.h"
 #include "../utils/Log.h"
 
+#include <cmath>
 #include <utility>
 
 namespace {
@@ -44,6 +45,13 @@ std::string runSummaryReportJson(const RunSummaryReport& report)
     flow["converged"] = report.flowConverged;
     flow["iterations"] = report.flowIterations;
     flow["error"] = report.flowError;
+    // Benchmark data on the network rather than on the result: how slowly the walk mixes.
+    if (std::isfinite(report.flowRate)) {
+      flow["rate"] = report.flowRate;
+    } else {
+      flow["rate"] = nullptr;
+    }
+    flow["accelerated"] = report.flowAccelerated;
     json["flow"] = std::move(flow);
   }
   json["trial_codelengths"] = report.trialCodelengths;

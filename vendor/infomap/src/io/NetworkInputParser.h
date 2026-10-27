@@ -32,7 +32,9 @@ namespace infomap {
 namespace input {
 
   struct NetworkInputOptions {
-    bool undirectedFlow = true;
+    // Whether the run treats the links as undirected: only the undirected flow model.
+    // undirdir has an undirected steady state but keeps every link directed as given.
+    bool undirectedLinks = true;
     unsigned int matchableMultilayerIds = 0;
   };
 
@@ -461,13 +463,13 @@ namespace input {
         } else if (!shouldIgnoreHeading && headingLowerCase == "*states") {
           heading = parseStateNodes(input, heading, sink);
         } else if (!shouldIgnoreHeading && headingLowerCase == "*edges") {
-          if (!options.undirectedFlow) {
+          if (!options.undirectedLinks) {
             Log() << "\n";
             Console::note(0, "Links marked as undirected but parsed as directed.");
           }
           heading = parseLinks(input, sink, progress);
         } else if (!shouldIgnoreHeading && headingLowerCase == "*arcs") {
-          if (options.undirectedFlow) {
+          if (options.undirectedLinks) {
             Log() << "\n";
             Console::note(0, "Links marked as directed but parsed as undirected.");
           }
@@ -495,7 +497,7 @@ namespace input {
   template <typename Sink>
   void parseNetworkInput(const std::string& filename, Sink& sink, const NetworkInputOptions& options)
   {
-    Console::detail(1, "parsing {} network from {}", options.undirectedFlow ? "undirected" : "directed", filename);
+    Console::detail(1, "parsing {} network from {}", options.undirectedLinks ? "undirected" : "directed", filename);
     detail::parseNetwork(filename, detail::generalValidHeadings(), detail::generalIgnoredHeadings(), sink, options);
   }
 
@@ -556,6 +558,11 @@ namespace input {
       numMetaDataColumns = std::max<unsigned int>(numMetaDataColumns, metaData.size());
       ++numMetaDataRows;
     }
+    // No records means no meta-data columns, and the run would then give every node
+    // an empty meta-data vector that MetaMapEquation indexes into. A directory
+    // opens as an empty stream on POSIX, so it ends up here too.
+    if (numMetaDataRows == 0)
+      throw std::runtime_error(fmt::format(FMT_STRING("Can't parse any meta data from '{}'. Check that the path points to a meta-data file with lines 'node_id meta_category'."), filename));
     Console::detail(1, "parsed {} columns of meta data for {} nodes", numMetaDataColumns, numMetaDataRows);
   }
 

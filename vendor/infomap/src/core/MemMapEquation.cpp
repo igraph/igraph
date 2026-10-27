@@ -57,8 +57,11 @@ void MemMapEquation::initSuperNetwork(InfoNode& /*root*/)
   // TODO: How use enterFlow instead of flow
 }
 
-void MemMapEquation::initSubNetwork(InfoNode& /*root*/)
+void MemMapEquation::initSubNetwork(InfoNode& root)
 {
+  // The module's exit codeword in the index codebook of the sub-network, as for
+  // MapEquation. initNetwork has already set up the physical nodes (#1282).
+  Base::initSubNetwork(root);
 }
 
 void MemMapEquation::initPartition(std::vector<InfoNode*>& nodes)
@@ -129,11 +132,15 @@ void MemMapEquation::initPhysicalNodes(InfoNode& root)
       node.physicalNodes.emplace_back(zeroBasedIndex, node.data.flow);
     }
 
-    // If leaf nodes was not directly under root, make sure leaf modules have
-    // physical nodes defined also
+    // If leaf nodes were not directly under root, make sure modules have
+    // physical nodes defined also. Every module, not only the leaf modules:
+    // removeSubModules makes a module of modules a leaf module, and
+    // calcCodelengthOnModuleOfLeafNodes reads its physical nodes (#1209).
     if (depth > 1) {
-      for (auto it(root.begin_leaf_modules()); !it.isEnd(); ++it) {
+      for (auto it(root.begin_post_depth_first()); !it.isEnd(); ++it) {
         InfoNode& module = *it;
+        if (module.isLeaf() || &module == &root)
+          continue;
         std::map<unsigned int, double> physToFlow;
         for (auto& node : module) {
           for (PhysData& physData : node.physicalNodes) {
@@ -183,9 +190,11 @@ void MemMapEquation::initPhysicalNodes(InfoNode& root)
         }
       }
     } else {
-      // whole network with reconstructed tree
-      for (auto it(root.begin_leaf_modules()); !it.isEnd(); ++it) {
+      // whole network with reconstructed tree, every module as above
+      for (auto it(root.begin_post_depth_first()); !it.isEnd(); ++it) {
         InfoNode& module = *it;
+        if (module.isLeaf() || &module == &root)
+          continue;
         std::map<unsigned int, double> physToFlow;
         for (auto& node : module) {
           for (PhysData& physData : node.physicalNodes) {

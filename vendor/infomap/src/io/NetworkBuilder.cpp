@@ -38,7 +38,7 @@ public:
 
   input::NetworkInputOptions inputOptions() const
   {
-    return { m_network.m_config.isUndirectedFlow(), m_network.m_config.matchableMultilayerIds };
+    return { m_network.m_config.isUndirectedClustering(), m_network.m_config.matchableMultilayerIds };
   }
 
   void onFileInput() { m_network.m_haveFileInput = true; }

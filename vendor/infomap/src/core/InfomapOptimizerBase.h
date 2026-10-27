@@ -65,6 +65,11 @@ public:
   // uses them (BiasedMapEquation).
   virtual void inheritNetworkPropertiesFrom(const InfomapOptimizerBase& /*parent*/) {}
 
+  // Set the node count of the network a sub/super Infomap instance partitions. The entropy
+  // bias correction charges a free parameter per node of that network, not of the whole
+  // network (#1283). No-op unless the objective uses it (BiasedMapEquation).
+  virtual void setNumNetworkNodes(unsigned int /*numNodes*/) {}
+
   // Propagate the objective's own parameters -- what it minimises, as opposed to the network
   // it minimises over -- from a parent optimizer. Needed by the super-level instance, which is
   // built without memory and therefore from a default Config. No-op unless the objective has

@@ -24,6 +24,7 @@
 #include <set>
 #include <utility>
 #include <algorithm>
+#include <cmath>
 #include <vector>
 
 #ifdef _OPENMP
@@ -77,6 +78,8 @@ public:
 
   void inheritNetworkPropertiesFrom(const InfomapOptimizerBase& parent) override;
 
+  void setNumNetworkNodes(unsigned int numNodes) override;
+
   void inheritObjectiveParametersFrom(const InfomapOptimizerBase& parent) override;
 
   bool implementsObjectiveParameters() const override;
@@ -120,6 +123,14 @@ protected:
   void consolidateModules(bool replaceExistingModules = true) override;
 
   bool restoreConsolidatedOptimizationPointIfNoImprovement(bool forceRestore = false) override;
+
+  // The delta an accepted move was chosen on must be the change it made to the objective's
+  // codelength. A wrong delta steers the search without breaking any bookkeeping (#830, #904),
+  // so neither the flow invariants nor a recomputed codelength can see it. Throws through
+  // InfomapBase::failMoveDelta. Compiled in only with INFOMAP_CHECK_INVARIANTS, like checkInvariants.
+#if INFOMAP_CHECK_INVARIANTS
+  void checkMoveDelta(double predictedDelta, double codelengthBefore, const char* where) const;
+#endif
 
   // ===================================================
   // Debug: *
@@ -248,6 +259,17 @@ inline void InfomapOptimizer<BiasedMapEquation>::inheritNetworkPropertiesFrom(co
   // the same entropy bias correction normalization the shared static used to provide.
   if (const auto* p = dynamic_cast<const InfomapOptimizer<BiasedMapEquation>*>(&parent))
     m_objective.setNetworkPropertiesFrom(p->m_objective);
+}
+
+template <typename Objective>
+inline void InfomapOptimizer<Objective>::setNumNetworkNodes(unsigned int /*numNodes*/)
+{
+}
+
+template <>
+inline void InfomapOptimizer<BiasedMapEquation>::setNumNetworkNodes(unsigned int numNodes)
+{
+  m_objective.setNumNodes(numNodes);
 }
 
 template <typename Objective>
@@ -608,6 +630,7 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
     // Prefer strongest connected module if equal delta codelength
     if (strongestConnectedModule.module != bestDeltaModule.module && deltaCodelengthOnStrongestConnectedModule <= bestDeltaCodelength + m_infomap->minimumSingleNodeCodelengthImprovement) {
       bestDeltaModule = strongestConnectedModule;
+      bestDeltaCodelength = deltaCodelengthOnStrongestConnectedModule;
     }
 
     // Make best possible move
@@ -621,7 +644,13 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
         m_emptyModules.push_back(current.index);
       }
 
+#if INFOMAP_CHECK_INVARIANTS
+      const double codelengthBeforeMove = m_objective.getCodelength();
+#endif
       m_objective.updateCodelengthOnMovingNode(current, oldModuleDelta, bestDeltaModule, m_moduleFlowData, m_moduleMembers);
+#if INFOMAP_CHECK_INVARIANTS
+      checkMoveDelta(bestDeltaCodelength, codelengthBeforeMove, "the move loop");
+#endif
 
       m_moduleMembers[current.index] -= 1;
       m_moduleMembers[bestModuleIndex] += 1;
@@ -901,7 +930,16 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
     // edge iteration and delta re-evaluation) can be skipped.
     if (m_moduleTouchedSweep[proposal.oldModule] != parallelMoveSweep
         && m_moduleTouchedSweep[proposal.newModule] != parallelMoveSweep) {
+#if INFOMAP_CHECK_INVARIANTS
+      // The proposal's own delta saw the sweep-start total enter flow and module count, which
+      // earlier commits may have changed, so check a delta taken now on the same flow deltas.
+      const double codelengthBeforeMove = m_objective.getCodelength();
+      const double deltaNow = m_objective.getDeltaCodelengthOnMovingNode(current, proposal.oldDelta, proposal.newDelta, m_moduleFlowData, m_moduleMembers);
+#endif
       m_objective.updateCodelengthOnMovingNode(current, proposal.oldDelta, proposal.newDelta, m_moduleFlowData, m_moduleMembers);
+#if INFOMAP_CHECK_INVARIANTS
+      checkMoveDelta(deltaNow, codelengthBeforeMove, "a fast-accepted parallel move");
+#endif
       m_moduleMembers[proposal.oldModule] -= 1;
       m_moduleMembers[proposal.newModule] += 1;
       current.index = proposal.newModule;
@@ -961,7 +999,13 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
       continue;
     }
 
+#if INFOMAP_CHECK_INVARIANTS
+    const double codelengthBeforeMove = m_objective.getCodelength();
+#endif
     m_objective.updateCodelengthOnMovingNode(current, oldModuleDelta, newModuleDelta, m_moduleFlowData, m_moduleMembers);
+#if INFOMAP_CHECK_INVARIANTS
+    checkMoveDelta(deltaCodelength, codelengthBeforeMove, "a rechecked parallel move");
+#endif
 
     m_moduleMembers[oldModule] -= 1;
     m_moduleMembers[newModule] += 1;
@@ -1101,6 +1145,20 @@ inline bool InfomapOptimizer<Objective>::restoreConsolidatedOptimizationPointIfN
   }
   return false;
 }
+
+#if INFOMAP_CHECK_INVARIANTS
+template <typename Objective>
+void InfomapOptimizer<Objective>::checkMoveDelta(double predictedDelta, double codelengthBefore, const char* where) const
+{
+  // The codelength is a difference of running plogp sums, so the rounding of one update scales
+  // with the codelength and, through the enter and exit flow, with the Markov time.
+  constexpr double tolerance = 1e-9;
+  const double actualDelta = m_objective.getCodelength() - codelengthBefore;
+  const double scale = std::max({ 1.0, std::abs(codelengthBefore), m_infomap->rateScale() });
+  if (std::abs(actualDelta - predictedDelta) > tolerance * scale)
+    m_infomap->failMoveDelta(where, predictedDelta, actualDelta);
+}
+#endif
 
 } /* namespace infomap */
 

@@ -56,8 +56,11 @@ void RegularizedMultilayerMapEquation::initSuperNetwork(InfoNode& /*root*/)
   // TODO: How use enterFlow instead of flow
 }
 
-void RegularizedMultilayerMapEquation::initSubNetwork(InfoNode& /*root*/)
+void RegularizedMultilayerMapEquation::initSubNetwork(InfoNode& root)
 {
+  // The module's exit codeword in the index codebook of the sub-network, as for
+  // MapEquation. initNetwork has already set up the physical nodes (#1282).
+  Base::initSubNetwork(root);
 }
 
 void RegularizedMultilayerMapEquation::initPartition(std::vector<InfoNode*>& nodes)

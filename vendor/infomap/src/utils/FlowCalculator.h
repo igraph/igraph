@@ -10,6 +10,7 @@
 #ifndef FLOW_CALCULATOR_H_
 #define FLOW_CALCULATOR_H_
 
+#include <limits>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -55,7 +56,7 @@ private:
   void finalize(StateNetwork&, const Config&, bool) noexcept;
 
   void addFlowNote(const std::string& note);
-  void recordPageRank(unsigned int iterations, double error, bool converged) noexcept;
+  void recordPageRank(unsigned int iterations, double error, bool converged, double rate, bool accelerated) noexcept;
 
   double accumulateDanglingRank() const noexcept;
 
@@ -92,6 +93,8 @@ private:
   double m_pageRankError = 0.0;
   bool m_havePageRank = false;
   bool m_pageRankConverged = true;
+  double m_pageRankRate = std::numeric_limits<double>::quiet_NaN();
+  bool m_pageRankAccelerated = false;
 };
 
 inline void calculateFlow(StateNetwork& network, const Config& config)

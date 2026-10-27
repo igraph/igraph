@@ -17,7 +17,7 @@ namespace infomap {
 struct Config;
 
 // Identity of one input file: path as given, size, mtime, and a hash of the
-// whole content (FNV-1a 64, one streaming pass). Empty when no file is known
+// whole content (XXH64, one streaming pass). Empty when no file is known
 // (an in-memory network built through the bindings).
 struct InputIdentity {
   std::string path;

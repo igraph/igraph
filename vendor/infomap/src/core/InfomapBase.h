@@ -24,6 +24,7 @@
 #include "../utils/Date.h"
 #include "../utils/Stopwatch.h"
 
+#include <algorithm>
 #include <vector>
 #include <deque>
 #include <map>
@@ -324,7 +325,17 @@ private:
   bool isFullNetwork() const { return m_isMain && m_aggregationLevel == 0; }
   bool isFirstLoop() const { return m_tuneIterationIndex == 0 && isFullNetwork(); }
 
-  InfomapBase* getNewInfomapInstance() const { return new InfomapBase(getConfig()); }
+  // A sub-Infomap partitions one module, and its modules are never the tree's top modules, so it
+  // runs without --preferred-number-of-modules. The tree charges that term once, on its top
+  // modules (calcCodelengthOnTree); a sub-search charging it on its own module count kept or
+  // rejected splits on a cost the tree does not have (#1292). The objective reads the
+  // preference when the instance is built, so it is cleared here, not in cloneAsNonMain.
+  InfomapBase* getNewInfomapInstance() const
+  {
+    Config subConfig = getConfig();
+    subConfig.preferredNumberOfModules = 0;
+    return new InfomapBase(subConfig);
+  }
   InfomapBase* getNewInfomapInstanceWithoutMemory() const
   {
     auto im = new InfomapBase();
@@ -517,6 +528,12 @@ private:
   //! materializes engine-generated trees, which cannot have that shape (#990).
   static void validateClusterDataTreeShape(const NodePaths& tree);
 
+#ifndef SWIG
+  //! Apply a tree parsed from input: a .tree/.ftree file or JSON node paths. A hard
+  //! partition from a tree must be one level deep, and is applied as from a .clu file.
+  InfomapBase& initTreeInput(const NodePaths& tree, bool hard);
+#endif
+
   /**
    * Normalize tree leaf ids so the leaf id always identifies a state node in
    * m_leafNodes. For higher-order networks, physical-id rows are expanded by
@@ -528,6 +545,27 @@ private:
   NodePaths normalizeTreePaths(const TreePaths& tree, unsigned int& numNodesNotInNetwork) const;
 
   void init();
+
+  // The scale of enter and exit flow. They are built from link flow scaled by the Markov time, so
+  // their rounding grows with it, and so does the tolerance of every check on them (#1192).
+  double rateScale() const { return std::max(1.0, markovTime); }
+
+  // Flow invariants of the tree under `root`: total flow, no negative flow, enter and exit
+  // flow that balance at every module, and module flow that equals the sum of its children.
+  // Throws InfomapError naming `phase` on the first violation. Compiled in only when
+  // INFOMAP_CHECK_INVARIANTS is set (debug, sanitizer and fuzz builds); a no-op otherwise.
+#if INFOMAP_CHECK_INVARIANTS
+  void checkInvariants(const InfoNode& root, const char* phase) const;
+  // Throws the InfomapOptimizer::checkMoveDelta violation, formatted here rather than in the header.
+  [[noreturn]] void failMoveDelta(const char* where, double predictedDelta, double actualDelta) const;
+  // The codelength the search tracked must be the one the objective prices on the partition it
+  // ended on, and the codelength that recursivePartition compared for a module must be the one
+  // of the subtree it kept (#1279). Throws InfomapError naming `phase` on a mismatch.
+  void checkCodelength(double tracked, double priced, const char* phase) const;
+  void checkPartitionCodelength() const;
+#else
+  void checkInvariants(const InfoNode& /*root*/, const char* /*phase*/) const {}
+#endif
 
   void runPartition()
   {
@@ -571,6 +609,14 @@ private:
   {
     m_optimizer->initNetwork();
     m_objectiveTermsAreForLeafNetwork = m_root.firstChild != nullptr && m_root.firstChild->isLeaf();
+  }
+
+  // Re-init the network-level terms for the leaf network if they describe a module network.
+  // Call it with the leaves as root's children, after removeModules().
+  void restoreLeafNetworkTerms()
+  {
+    if (!m_objectiveTermsAreForLeafNetwork)
+      initNetwork();
   }
 
   void initSuperNetwork()
@@ -789,6 +835,9 @@ protected:
   bool m_objectiveTermsAreForLeafNetwork = false;
 
   double m_hierarchicalCodelength = 0.0;
+  // Whether the leaf flow of this run sums to 1, for checkInvariants(). Set by the run once the
+  // flow is calculated; false until then, which skips that one check.
+  bool m_flowSumsToOne = false;
   std::vector<double> m_codelengths;
   std::vector<unsigned int> m_numTopModules;
   double m_entropyRate = 0.0;

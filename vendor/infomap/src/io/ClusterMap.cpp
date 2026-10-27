@@ -9,14 +9,51 @@
 
 #include "ClusterMap.h"
 #include "SafeFile.h"
+#include "InfomapError.h"
 #include "../utils/Log.h"
 #include "../utils/Console.h"
 #include "../utils/FileURI.h"
 #include "../utils/format.h"
+#include <algorithm>
+#include <limits>
+#include <unordered_set>
 #include <sstream>
 #include "../utils/convert.h"
 
 namespace infomap {
+
+namespace {
+
+  // A tree path is positive integers separated by ':' (1-based, kept as written).
+  // Reading it with `>> unsigned` stopped at the first non-digit, so `x` and `:1` gave
+  // an empty path that initTree then indexed, and `1:x` or `1.2` were cut or misread
+  // without a word (#1208).
+  bool parseTreePath(const std::string& pathString, Path& path)
+  {
+    std::size_t start = 0;
+    while (true) {
+      const auto end = std::min(pathString.find(':', start), pathString.size());
+      if (end == start)
+        return false;
+      unsigned long long childNumber = 0;
+      for (auto i = start; i < end; ++i) {
+        const char c = pathString[i];
+        if (c < '0' || c > '9')
+          return false;
+        childNumber = childNumber * 10 + static_cast<unsigned int>(c - '0');
+        if (childNumber > std::numeric_limits<unsigned int>::max())
+          return false;
+      }
+      if (childNumber == 0)
+        return false;
+      path.push_back(static_cast<unsigned int>(childNumber));
+      if (end == pathString.size())
+        return true;
+      start = end + 1;
+    }
+  }
+
+} // namespace
 
 void ClusterMap::readClusterData(const std::string& filename, bool includeFlow, const std::map<unsigned int, std::map<unsigned int, unsigned int>>* layerNodeToStateId)
 {
@@ -30,15 +67,27 @@ void ClusterMap::readClusterData(const std::string& filename, bool includeFlow, 
   m_hasTreeLeafIdType = false;
   m_treeLeafIdType = TreeLeafIdType::physical;
 
-  FileURI file(filename);
-  m_extension = file.getExtension();
-  if (m_extension == "tree" || m_extension == "ftree") {
-    return readTree(filename, includeFlow, layerNodeToStateId);
+  // The readers throw a plain runtime_error on a missing or malformed file, and
+  // FileURI an invalid_argument on a malformed name. Both are input errors (exit
+  // 2), as for the network and the meta data, not internal ones (#1263). Other
+  // logic errors pass through: they are bugs.
+  try {
+    FileURI file(filename);
+    m_extension = file.getExtension();
+    if (m_extension == "tree" || m_extension == "ftree") {
+      return readTree(filename, includeFlow, layerNodeToStateId);
+    }
+    if (m_extension == "clu") {
+      return readClu(filename, includeFlow, layerNodeToStateId);
+    }
+    throw std::runtime_error(fmt::format(FMT_STRING("Input cluster data from file '{}' is of unknown extension '{}'. Must be 'clu', 'tree' or 'ftree'."), filename, m_extension));
+  } catch (const InfomapError&) {
+    throw;
+  } catch (const std::runtime_error& e) {
+    throw InfomapError(ExitCode::InputError, e.what());
+  } catch (const std::invalid_argument& e) {
+    throw InfomapError(ExitCode::InputError, e.what());
   }
-  if (m_extension == "clu") {
-    return readClu(filename, includeFlow, layerNodeToStateId);
-  }
-  throw std::runtime_error(fmt::format(FMT_STRING("Input cluster data from file '{}' is of unknown extension '{}'. Must be 'clu', 'tree' or 'ftree'."), filename, m_extension));
 }
 
 /**
@@ -60,9 +109,9 @@ void ClusterMap::readTree(const std::string& filename, bool includeFlow, const s
   SafeInFile input(filename);
   std::string line;
   std::istringstream lineStream;
-  std::istringstream pathStream;
 
   unsigned int lineNr = 0;
+  std::unordered_set<unsigned int> seenStateIds;
 
   while (!std::getline(input, line).fail()) {
     ++lineNr;
@@ -88,6 +137,9 @@ void ClusterMap::readTree(const std::string& filename, bool includeFlow, const s
     unsigned int layerId = 0;
     if (!(lineStream >> pathString))
       throw std::runtime_error(fmt::format(FMT_STRING("Couldn't parse tree path from line '{}'"), line));
+    Path path;
+    if (!parseTreePath(pathString, path))
+      throw std::runtime_error(fmt::format(FMT_STRING("Invalid tree path '{}' on line {} ('{}'). A path is positive integers separated by ':', such as 1:2:1."), pathString, lineNr, line));
     if (!(lineStream >> flow))
       throw std::runtime_error(fmt::format(FMT_STRING("Couldn't parse node flow from line '{}'"), line));
     // Everything between the first and the last quote, the same rule the network parser
@@ -152,16 +204,17 @@ void ClusterMap::readTree(const std::string& filename, bool includeFlow, const s
       }
     }
 
-    pathStream.clear();
-    pathStream.str(pathString);
-    unsigned int childNumber;
-
-    Path path;
-    while (pathStream >> childNumber) {
-      pathStream.get(); // Extract the delimiting character also
-      if (childNumber == 0)
-        throw std::runtime_error("There is a '0' in the tree path, lowest allowed integer is 1.");
-      path.push_back(childNumber); // Keep 1-based indexing in path
+    // A states tree has one row per state node. A repeated state id put the same
+    // leaf into two modules, and a multi-level tree then crashed in initTree (#1335).
+    // Physical rows repeat by design on higher-order networks, one per module of a
+    // split physical node, and are paired with states in normalizeTreePaths.
+    if (m_treeLeafIdType == TreeLeafIdType::state && !seenStateIds.insert(stateId).second) {
+      const auto node = isMultilayer ? fmt::format(FMT_STRING("Node {} in layer {}"), nodeId, layerId) : fmt::format(FMT_STRING("State id {}"), stateId);
+      throw std::runtime_error(fmt::format(FMT_STRING("{} appears more than once in the tree, again on line {} ('{}'). "
+                                                      "A tree with state ids has one row per state node."),
+                                           node,
+                                           lineNr,
+                                           line));
     }
 
     m_treePaths.push_back({ stateId, path, m_treeLeafIdType });

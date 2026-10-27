@@ -18,6 +18,7 @@
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include <set>
 #include <stdexcept>
 
 namespace infomap {
@@ -96,9 +97,16 @@ void Network::postProcessInputData()
   }
 
   if (!haveMemoryInput()) {
-    // If no memory input, add physical nodes as state nodes to not miss unconnected nodes
-    for (auto& it : m_physNodes) {
-      addNode(it.second.physId, it.second.weight);
+    // If no memory input, add physical nodes as state nodes to not miss unconnected nodes.
+    // Only a weight given for the physical node replaces the state node's, so a
+    // weight set through addNode(id, weight) survives (#1183).
+    for (const auto& it : m_physNodes) {
+      const auto& physNode = it.second;
+      if (physNode.hasWeight) {
+        addNode(physNode.physId, physNode.weight);
+      } else {
+        addNode(physNode.physId);
+      }
     }
     // The physical nodes now mirror the state nodes 1:1, and nothing reads
     // m_physNodes' contents past this point (only numPhysicalNodes(), which is
@@ -127,7 +135,7 @@ void Network::printSummary()
   Console console;
   console.section("Network");
   console.metric("Input", m_config.networkFile);
-  console.metric("Direction", m_config.isUndirectedFlow() ? "undirected" : "directed");
+  console.metric("Direction", m_config.isUndirectedClustering() ? "undirected" : "directed");
   if (haveMemoryInput()) {
     console.metric("Type", isMultilayerNetwork() ? "higher-order multilayer" : "higher-order state");
     console.metric("State nodes", fmt::to_string(numNodes()));
@@ -213,7 +221,8 @@ void Network::generateStateNetworkFromMultilayer()
   // the symmetry is broken so we need directed links for inter-layer flow
   if (!m_networks.empty() && m_config.isUndirectedFlow()) {
     m_haveDirectedInput = true;
-    // TODO: Don't allow undirdir/outdirdir/rawdir?
+    // undirdir is replaced by the directed model here and warns in configureNetworkMode (#1233).
+    // outdirdir and rawdir are not undirected flow and keep the intra-layer links as given.
     // Expand each undirected intra-layer link to two opposite directed links
     Console::detail(1, "expanding undirected links to directed");
     for (auto& layerIt : m_networks) {
@@ -264,6 +273,20 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
     }
   }
 
+  // Spread drops an inter-layer link to a layer where the node has no intra-layer
+  // out-links, so the to-self links below are dropped there too: the relax-to-self
+  // flow relays the link's flow onward along those out-links, and without any the
+  // flow would be lost (#1314).
+  auto hasIntraOutLinks = [this](unsigned int layer, unsigned int physId) {
+    auto networkIt = m_networks.find(layer);
+    if (networkIt == m_networks.end()) {
+      return false;
+    }
+    const auto& linkMap = networkIt->second.nodeLinkMap();
+    auto linksIt = linkMap.find(physId);
+    return linksIt != linkMap.end() && !linksIt->second.empty();
+  };
+
   Console::detail(1, "connecting layers");
   // Connect layers with inter-layer links spread out in target layer
   for (auto& it : m_interLinks) {
@@ -276,6 +299,9 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
       double interWeight = it2.second;
 
       if (m_config.multilayerRelaxToSelf) {
+        if (!hasIntraOutLinks(layer2, physId)) {
+          continue;
+        }
         unsigned int stateId2 = addMultilayerNode(layer2, physId);
         addLink(stateId1, stateId2, interWeight);
         ++m_numInterLayerLinks;
@@ -313,6 +339,9 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
       unsigned int physId = layerNode.node;
 
       if (m_config.multilayerRelaxToSelf) {
+        if (!hasIntraOutLinks(layer2, physId)) {
+          continue;
+        }
         unsigned int stateId2 = addMultilayerNode(layer2, physId);
         for (auto& it2 : it.second) {
           unsigned int layer1 = it2.first;
@@ -367,68 +396,73 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnLa
   Log(1) << std::flush;
   double relaxRate = m_config.multilayerRelaxRate;
 
-  // TODO: Add relax limits
-  // int maxRelaxLimit = m_networks.size();
-  // int relaxLimitSymmetric = m_config.multilayerRelaxLimit < 0 ? maxRelaxLimit : m_config.multilayerRelaxLimit;
-  // int relaxLimitDown = m_config.multilayerRelaxLimitDown < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitDown);
-  // int relaxLimitUp = m_config.multilayerRelaxLimitUp < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitUp);
-  // auto haveUpOrDownLimit = m_config.multilayerRelaxLimitDown >= 0 || m_config.multilayerRelaxLimitUp >= 0;
+  // A negative limit means no limit, also across gaps in the layer ids
+  const unsigned int noRelaxLimit = std::numeric_limits<unsigned int>::max();
+  auto toRelaxLimit = [](int limit) { return limit < 0 ? std::numeric_limits<unsigned int>::max() : static_cast<unsigned int>(limit); };
+  unsigned int relaxLimitSymmetric = toRelaxLimit(m_config.multilayerRelaxLimit);
+  unsigned int relaxLimitDown = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitDown));
+  unsigned int relaxLimitUp = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitUp));
+  auto haveUpOrDownLimit = m_config.multilayerRelaxLimitDown >= 0 || m_config.multilayerRelaxLimitUp >= 0;
 
   Console::detail(1, "{} networks", m_networks.size());
   Console::detail(1, "relax rate: {:g}", relaxRate);
-  // if (haveUpOrDownLimit) {
-  //   Log(1) << "-> Relax limit up: " << relaxLimitUp << (relaxLimitUp == maxRelaxLimit ? " (no limit)\n" : "\n");
-  //   Log(1) << "-> Relax limit down: " << relaxLimitDown << (relaxLimitDown == maxRelaxLimit ? " (no limit)\n" : "\n");
-  // } else if (m_config.multilayerRelaxLimit >= 0) {
-  //   Log(1) << "-> Relax limit: " << m_config.multilayerRelaxLimit << "\n";
-  // }
+  if (haveUpOrDownLimit) {
+    Console::detail(1, "relax limit up: {}", relaxLimitUp == noRelaxLimit ? "no limit" : std::to_string(relaxLimitUp));
+    Console::detail(1, "relax limit down: {}", relaxLimitDown == noRelaxLimit ? "no limit" : std::to_string(relaxLimitDown));
+  } else if (m_config.multilayerRelaxLimit >= 0) {
+    Console::detail(1, "relax limit: {}", m_config.multilayerRelaxLimit);
+  }
 
-  // auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](auto& layer1, auto& layer2) {
-  //   int diff = layer1 - layer2;
-  //   return layer1 >= layer2 ? diff <= relaxLimitDown : -diff <= relaxLimitUp;
-  // };
+  // Whether a state in layer1 may relax to layer2. A layer is always within reach
+  // of itself, so the intra-layer links are kept with limit 0.
+  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](unsigned int layer1, unsigned int layer2) {
+    return layer1 >= layer2 ? layer1 - layer2 <= relaxLimitDown : layer2 - layer1 <= relaxLimitUp;
+  };
+  // Layers further below than this are out of reach in both directions
+  unsigned int relaxReach = std::max(relaxLimitDown, relaxLimitUp);
 
   if (m_config.multilayerRelaxByJensenShannonDivergence) {
     Console::detail(1, "using Jensen-Shannon divergence");
 
     for (unsigned int nodeId = 0; nodeId <= m_maxNodeIdInIntraLayerNetworks; ++nodeId) {
-      unsigned int layer2from = 0;
-
       // Calculate Jensen-Shannon similarity between all layers such that layer1 >= layer2,
-      // and then use its symmetry for layer2 > layer1
+      // and then use its symmetry for layer2 > layer1. Keep only the directions within
+      // the relax limits.
       std::map<unsigned int, std::map<unsigned int, double>> jsRelaxWeights;
       std::map<unsigned int, double> jsTotWeight;
 
-      for (unsigned int layer1 = 0; layer1 < m_networks.size(); ++layer1) {
-        unsigned int layer2to = layer1 + 1;
-        // Limit possible jumps to close by layers
-        if (m_config.multilayerRelaxLimit >= 0) {
-          layer2from = ((int)layer1 - m_config.multilayerRelaxLimit) < 0 ? 0 : layer1 - m_config.multilayerRelaxLimit;
-        }
-
-        auto& layer1LinkMap = m_networks[layer1].nodeLinkMap();
-        auto& layer1OutLinks = layer1LinkMap[nodeId];
+      for (auto& layer1It : m_networks) {
+        unsigned int layer1 = layer1It.first;
+        auto& layer1OutLinks = layer1It.second.nodeLinkMap()[nodeId];
         // Skip dangling nodes, because they have no information to calculate similarity
         if (layer1OutLinks.empty())
           continue;
 
-        double sumOutLinkWeightLayer1 = m_networks[layer1].outWeights()[nodeId];
+        double sumOutLinkWeightLayer1 = layer1It.second.outWeights()[nodeId];
 
-        for (unsigned int layer2 = layer2from; layer2 < layer2to; ++layer2) {
-          auto& layer2LinkMap = m_networks[layer2].nodeLinkMap();
-          auto& layer2OutLinks = layer2LinkMap[nodeId];
+        auto layer2It = m_networks.lower_bound(layer1 > relaxReach ? layer1 - relaxReach : 0);
+        for (; layer2It != m_networks.end() && layer2It->first <= layer1; ++layer2It) {
+          unsigned int layer2 = layer2It->first;
+          bool down = withinRelaxLimit(layer1, layer2);
+          bool up = withinRelaxLimit(layer2, layer1);
+          if (!down && !up)
+            continue;
+
+          auto& layer2OutLinks = layer2It->second.nodeLinkMap()[nodeId];
           if (layer2OutLinks.empty())
             continue;
 
-          double sumOutLinkWeightLayer2 = m_networks[layer2].outWeights()[nodeId];
+          double sumOutLinkWeightLayer2 = layer2It->second.outWeights()[nodeId];
 
           bool intersect;
           double div = calculateJensenShannonDivergence(intersect, layer1OutLinks, sumOutLinkWeightLayer1, layer2OutLinks, sumOutLinkWeightLayer2);
           double jsWeight = 1.0 - div;
           if (intersect && (jsWeight >= m_config.multilayerJSRelaxLimit)) {
-            jsTotWeight[layer1] += jsWeight;
-            jsRelaxWeights[layer1][layer2] = jsWeight;
-            if (layer1 != layer2) {
+            if (down) {
+              jsTotWeight[layer1] += jsWeight;
+              jsRelaxWeights[layer1][layer2] = jsWeight;
+            }
+            if (up && layer1 != layer2) {
               jsTotWeight[layer2] += jsWeight;
               jsRelaxWeights[layer2][layer1] = jsWeight;
             }
@@ -436,55 +470,42 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnLa
         }
       }
 
-      // Second loop over all pairs of layers
-      unsigned int layer2to = m_networks.size();
-
-      for (unsigned int layer1 = 0; layer1 < m_networks.size(); ++layer1) {
-        // Limit possible jumps to close by layers
-        if (m_config.multilayerRelaxLimit >= 0) {
-          layer2from = ((int)layer1 - m_config.multilayerRelaxLimit) < 0 ? 0 : layer1 - m_config.multilayerRelaxLimit;
-          layer2to = (layer1 + m_config.multilayerRelaxLimit) > m_networks.size() ? m_networks.size() : layer1 + m_config.multilayerRelaxLimit;
-        }
-
+      // Second loop over the pairs of layers within the relax limits
+      for (auto& jsRelaxWeightsLayer1It : jsRelaxWeights) {
+        unsigned int layer1 = jsRelaxWeightsLayer1It.first;
         double sumOutLinkWeightLayer1 = m_networks[layer1].outWeights()[nodeId];
-
-        auto jsRelaxWeightsLayer1It = jsRelaxWeights.find(layer1);
-        auto jsTotWeightIt = jsTotWeight.find(layer1);
+        double jsTotWeightLayer1 = jsTotWeight[layer1];
 
         // Create inter-links to the intra-connected nodes in other layers
-        for (unsigned int layer2 = layer2from; layer2 < layer2to; ++layer2) {
-          if (jsRelaxWeightsLayer1It != jsRelaxWeights.end()) {
-            auto jsRelaxWeightsIt = jsRelaxWeightsLayer1It->second.find(layer2);
-            if (jsRelaxWeightsIt != jsRelaxWeightsLayer1It->second.end()) {
-              bool isIntra = layer2 == layer1;
+        for (auto& jsRelaxWeightsIt : jsRelaxWeightsLayer1It.second) {
+          unsigned int layer2 = jsRelaxWeightsIt.first;
+          bool isIntra = layer2 == layer1;
 
-              // Create inter-links to the outgoing nodes in the target layer
-              double linkWeightNormalizationFactor;
-              if (isIntra) {
-                linkWeightNormalizationFactor = 1;
-              } else {
-                linkWeightNormalizationFactor = jsRelaxWeightsIt->second * relaxRate / (1.0 - relaxRate) * sumOutLinkWeightLayer1 / jsTotWeightIt->second;
-              }
+          // Create inter-links to the outgoing nodes in the target layer
+          double linkWeightNormalizationFactor;
+          if (isIntra) {
+            linkWeightNormalizationFactor = 1;
+          } else {
+            linkWeightNormalizationFactor = jsRelaxWeightsIt.second * relaxRate / (1.0 - relaxRate) * sumOutLinkWeightLayer1 / jsTotWeightLayer1;
+          }
 
-              auto& targetLinks = m_networks[layer2].nodeLinkMap();
-              auto& targetOutlinks = targetLinks[nodeId];
-              if (targetOutlinks.empty()) {
-                continue;
-              }
-              for (auto& outLink : targetOutlinks) {
-                auto& n2 = outLink.first;
-                auto& linkData = outLink.second;
-                double intraWeight = linkData.weight;
-                // Add intra link weight as teleport weight to source node
-                // TODO: Why, and only first intra link that sets the teleport weight?
-                unsigned int stateId1 = addMultilayerNode(layer1, nodeId, intraWeight);
-                unsigned int stateId2i = addMultilayerNode(layer2, n2, 0.0);
+          auto& targetLinks = m_networks[layer2].nodeLinkMap();
+          auto& targetOutlinks = targetLinks[nodeId];
+          if (targetOutlinks.empty()) {
+            continue;
+          }
+          for (auto& outLink : targetOutlinks) {
+            auto& n2 = outLink.first;
+            auto& linkData = outLink.second;
+            double intraWeight = linkData.weight;
+            // Add intra link weight as teleport weight to source node
+            // TODO: Why, and only first intra link that sets the teleport weight?
+            unsigned int stateId1 = addMultilayerNode(layer1, nodeId, intraWeight);
+            unsigned int stateId2i = addMultilayerNode(layer2, n2, 0.0);
 
-                double weight = intraWeight == 0.0 ? 0.0 : linkWeightNormalizationFactor * intraWeight;
-                addLink(stateId1, stateId2i, weight);
-                ++m_numInterLayerLinks;
-              }
-            }
+            double weight = intraWeight == 0.0 ? 0.0 : linkWeightNormalizationFactor * intraWeight;
+            addLink(stateId1, stateId2i, weight);
+            ++m_numInterLayerLinks;
           }
         }
       }
@@ -498,25 +519,26 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNo
   Log(1) << std::flush;
   double relaxRate = m_config.multilayerRelaxRate;
 
-  unsigned int L = m_networks.size();
-  int maxRelaxLimit = L;
-  int relaxLimitSymmetric = m_config.multilayerRelaxLimit < 0 ? maxRelaxLimit : m_config.multilayerRelaxLimit;
-  int relaxLimitDown = m_config.multilayerRelaxLimitDown < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitDown);
-  int relaxLimitUp = m_config.multilayerRelaxLimitUp < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitUp);
+  // A negative limit means no limit. Layer ids can have gaps, so no limit is
+  // not the number of layers but the largest difference (#1322).
+  const unsigned int maxRelaxLimit = std::numeric_limits<unsigned int>::max();
+  auto toRelaxLimit = [](int limit) { return limit < 0 ? std::numeric_limits<unsigned int>::max() : static_cast<unsigned int>(limit); };
+  unsigned int relaxLimitSymmetric = toRelaxLimit(m_config.multilayerRelaxLimit);
+  unsigned int relaxLimitDown = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitDown));
+  unsigned int relaxLimitUp = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitUp));
   auto haveUpOrDownLimit = m_config.multilayerRelaxLimitDown >= 0 || m_config.multilayerRelaxLimitUp >= 0;
 
   Console::detail(1, "{} networks", m_networks.size());
   Console::detail(1, "relax rate: {:g}", relaxRate);
   if (haveUpOrDownLimit) {
-    Console::detail(1, "relax limit up: {}{}", relaxLimitUp, relaxLimitUp == maxRelaxLimit ? " (no limit)" : "");
-    Console::detail(1, "relax limit down: {}{}", relaxLimitDown, relaxLimitDown == maxRelaxLimit ? " (no limit)" : "");
+    Console::detail(1, "relax limit up: {}", relaxLimitUp == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitUp));
+    Console::detail(1, "relax limit down: {}", relaxLimitDown == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitDown));
   } else if (m_config.multilayerRelaxLimit >= 0) {
     Console::detail(1, "relax limit: {}", m_config.multilayerRelaxLimit);
   }
 
-  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](auto& layer1, auto& layer2) {
-    int diff = layer1 - layer2;
-    return layer1 >= layer2 ? diff <= relaxLimitDown : -diff <= relaxLimitUp;
+  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](unsigned int layer1, unsigned int layer2) {
+    return layer1 >= layer2 ? layer1 - layer2 <= relaxLimitDown : layer2 - layer1 <= relaxLimitUp;
   };
 
   for (auto& it1 : m_networks) {
@@ -570,14 +592,15 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNo
           continue;
         }
 
-        double linkWeightNormalizationFactor = relaxRate / sumOutWeightAllLayers;
-        if (isIntra) {
-          linkWeightNormalizationFactor += (1.0 - relaxRate) / sumOutLinkWeightLayer1;
-        }
         auto& targetLinks = network2.nodeLinkMap();
         auto& targetOutlinks = targetLinks[n1];
         if (targetOutlinks.empty()) {
           continue;
+        }
+        // After the empty check: a node without intra-layer out-links has sumOutLinkWeightLayer1 == 0.
+        double linkWeightNormalizationFactor = relaxRate / sumOutWeightAllLayers;
+        if (isIntra) {
+          linkWeightNormalizationFactor += (1.0 - relaxRate) / sumOutLinkWeightLayer1;
         }
         for (auto& outLink : targetOutlinks) {
           auto& n2 = outLink.first;
@@ -605,17 +628,19 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNo
 
   unsigned int L = m_networks.size();
   // unsigned int N = numPhysicalNodes();
-  int maxRelaxLimit = L;
-  int relaxLimitSymmetric = m_config.multilayerRelaxLimit < 0 ? maxRelaxLimit : m_config.multilayerRelaxLimit;
-  int relaxLimitDown = m_config.multilayerRelaxLimitDown < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitDown);
-  int relaxLimitUp = m_config.multilayerRelaxLimitUp < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitUp);
+  // A negative limit means no limit, also across gaps in the layer ids (#1322).
+  const unsigned int maxRelaxLimit = std::numeric_limits<unsigned int>::max();
+  auto toRelaxLimit = [](int limit) { return limit < 0 ? std::numeric_limits<unsigned int>::max() : static_cast<unsigned int>(limit); };
+  unsigned int relaxLimitSymmetric = toRelaxLimit(m_config.multilayerRelaxLimit);
+  unsigned int relaxLimitDown = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitDown));
+  unsigned int relaxLimitUp = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitUp));
   auto haveUpOrDownLimit = m_config.multilayerRelaxLimitDown >= 0 || m_config.multilayerRelaxLimitUp >= 0;
 
   // double interLinkStrength = std::log(L);
   // double interLinkWeight = std::log(L) / L;
-  double interLinkWeight = m_config.regularizationStrength * std::log(L) / (m_config.noSelfLinks ? L - 1 : L);
+  // The inter-layer prior spreads ln(L_i) over the L_i layers that hold physical node i,
+  // so its per-link weight is only a constant while every node is in every layer.
   // double intraLinkStrength = std::log(N) / L;
-  // double totalInterWeightIfNoLimit = interLinkWeight * L;
   if (haveUpOrDownLimit) {
     // TODO: create a map with aggregated inter-flow for each layer with limits.
   }
@@ -623,26 +648,59 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNo
   Console::detail(1, "{} networks and {} physical nodes", m_networks.size(), m_physNodes.size());
   // Log(1) << "-> Relax rate: " << relaxRate << "\n";
   if (haveUpOrDownLimit) {
-    Console::detail(1, "relax limit up: {}{}", relaxLimitUp, relaxLimitUp == maxRelaxLimit ? " (no limit)" : "");
-    Console::detail(1, "relax limit down: {}{}", relaxLimitDown, relaxLimitDown == maxRelaxLimit ? " (no limit)" : "");
+    Console::detail(1, "relax limit up: {}", relaxLimitUp == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitUp));
+    Console::detail(1, "relax limit down: {}", relaxLimitDown == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitDown));
     throw std::runtime_error("Relax limits not implemented for regularized flow");
   } else if (m_config.multilayerRelaxLimit >= 0) {
     Console::detail(1, "relax limit: {}", m_config.multilayerRelaxLimit);
     throw std::runtime_error("Relax limits not implemented for regularized flow");
   }
 
-  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](auto& layer1, auto& layer2) {
-    int diff = layer1 - layer2;
-    return layer1 >= layer2 ? diff <= relaxLimitDown : -diff <= relaxLimitUp;
+  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](unsigned int layer1, unsigned int layer2) {
+    return layer1 >= layer2 ? layer1 - layer2 <= relaxLimitDown : layer2 - layer1 <= relaxLimitUp;
   };
+
+  // Which physical nodes each layer holds, and which layers hold each physical node.
+  // With --multilayer-skip-absent-nodes a node belongs to a layer only if that layer's
+  // links mention it, so the prior spans what the data shows; by default a node is
+  // assumed to exist in every layer, unobserved where its links are missing. Both maps
+  // stay proportional to the input: the rosters together hold one entry per (node,
+  // layer) pair that the prior covers.
+  std::map<unsigned int, std::vector<unsigned int>> nodesInLayer;
+  std::map<unsigned int, std::vector<unsigned int>> layersOfNode;
+
+  for (auto& it : m_networks) {
+    auto layer = it.first;
+    auto& roster = nodesInLayer[layer];
+
+    if (m_config.multilayerSkipAbsentNodes) {
+      std::set<unsigned int> present;
+      for (const auto& outLinks : it.second.nodeLinkMap()) {
+        present.insert(outLinks.first);
+        for (const auto& outLink : outLinks.second) {
+          present.insert(outLink.first);
+        }
+      }
+      roster.assign(present.begin(), present.end());
+    } else {
+      roster.reserve(m_physNodes.size());
+      for (const auto& physNodeIt : m_physNodes) {
+        roster.push_back(physNodeIt.first);
+      }
+    }
+
+    for (auto n : roster) {
+      layersOfNode[n].push_back(layer);
+    }
+  }
 
   for (auto& it1 : m_networks) {
     auto layer1 = it1.first;
     auto& network1 = it1.second;
 
-    // Loop over all physical nodes, even if they lack intra links, to add inter links
-    for (auto& physNodeIt : m_physNodes) {
-      auto& n1 = physNodeIt.first;
+    // Loop over the physical nodes this layer holds, even if they lack intra links, to
+    // add inter links
+    for (auto n1 : nodesInLayer[layer1]) {
       unsigned int stateId1 = addMultilayerNode(layer1, n1);
 
       // double sumOutLinkWeightLayer1 = network1.outWeights()[n1];
@@ -669,8 +727,17 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNo
         }
       }
 
-      for (auto& it2 : m_networks) {
-        auto layer2 = it2.first;
+      // Add inter links. The prior couples node n1 across the L_i layers that hold it
+      // with total strength ln(L_i), which is zero for a node confined to one layer:
+      // nothing to spread, and the per-link weight below would divide by zero.
+      const auto& layers = layersOfNode[n1];
+      if (layers.size() < 2) {
+        continue;
+      }
+      const auto numInterTargets = m_config.noSelfLinks ? layers.size() - 1 : layers.size();
+      const double interLinkWeight = m_config.regularizationStrength * m_config.interRegularizationStrength * std::log(static_cast<double>(layers.size())) / numInterTargets;
+
+      for (auto layer2 : layers) {
         if (!withinRelaxLimit(layer1, layer2) || (m_config.noSelfLinks && layer1 == layer2)) {
           continue;
         }

@@ -52,6 +52,7 @@
 #include <numeric>
 #include <cmath>
 #include <exception>
+#include <functional>
 #include <mutex>
 
 #ifdef _OPENMP
@@ -240,6 +241,72 @@ namespace {
     }
   }
 
+  // Order every node's children as they come in the tree rows: a leaf by its own row,
+  // a module by its first leaf. Returns the row of the first leaf under node.
+  std::size_t orderChildrenAsRows(InfoNode& node, const std::unordered_map<unsigned int, std::size_t>& rowOfState)
+  {
+    if (node.isLeaf()) {
+      const auto it = rowOfState.find(node.stateId);
+      return it != rowOfState.end() ? it->second : rowOfState.size();
+    }
+    std::vector<std::pair<std::size_t, InfoNode*>> children;
+    children.reserve(node.childDegree());
+    for (InfoNode& child : node.children())
+      children.emplace_back(orderChildrenAsRows(child, rowOfState), &child);
+    std::stable_sort(children.begin(), children.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+    node.releaseChildren();
+    for (const auto& child : children)
+      node.addChild(child.second);
+    return children.front().first;
+  }
+
+  // restoreBestResult rebuilds the best trial with initTree from rows taken off its
+  // flow-sorted tree. initTree's two-level shortcut goes through initPartition, which
+  // creates the modules in node id order, so the restored tree came back unsorted and
+  // its module ids depended on the trial count (#1202). Put it back in the order the
+  // trial had. That is the flow order, ties included, which sorting on flow again
+  // would not promise. A deeper tree is already rebuilt in row order.
+  void orderTreeAsRows(InfoNode& root, const NodePaths& tree)
+  {
+    std::unordered_map<unsigned int, std::size_t> rowOfState;
+    rowOfState.reserve(tree.size());
+    for (std::size_t row = 0; row < tree.size(); ++row)
+      rowOfState.emplace(tree[row].first, row);
+    orderChildrenAsRows(root, rowOfState);
+  }
+
+  // Copy the objective-specific module aggregates from a sub-Infomap module onto the
+  // main-tree module node made from it. calcCodelength and the deeper recursion read
+  // these on module nodes (e.g. MemMapEquation reads parent.physicalNodes); without
+  // them, higher-order and feature builds price the module wrongly (#1262).
+  void copyModuleAggregates(InfoNode& module, const InfoNode& subModule)
+  {
+    module.physicalNodes = subModule.physicalNodes;
+    module.stateNodes = subModule.stateNodes;
+#ifndef SWIG
+    // #659 moved these feature-only fields out-of-line into InfoNodeExtras; only
+    // allocate extras when the source actually carries them (preserve the shrink).
+    if (!subModule.layerTeleFlowData().empty())
+      module.ensureExtras().layerTeleFlowData = subModule.layerTeleFlowData();
+    if (subModule.hasMetaCollection())
+      module.ensureMetaCollection() = subModule.metaCollection();
+#endif
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+    module.lossyEntropy = subModule.lossyEntropy;
+    module.lossyFlowLogFlow = subModule.lossyFlowLogFlow;
+#endif
+  }
+
+  // Flow-weighted effective number of top modules: the perplexity 2^H of the
+  // top modules' flow distribution, as in the Python effective_num_top_modules.
+  double effectiveNumTopModules(const InfoNode& root)
+  {
+    double entropy = 0.0;
+    for (const auto& module : root)
+      entropy -= infomath::plogp(module.data.flow);
+    return std::exp2(entropy);
+  }
+
 } // namespace
 
 class InfomapBase::RunSession {
@@ -324,7 +391,8 @@ public:
     }
     m_reportNetwork.nodes = m_network.numNodes();
     m_reportNetwork.links = m_network.numLinks();
-    m_reportNetwork.directed = !m_infomap.isUndirectedFlow();
+    // The links as the run treats them: undirdir keeps every link directed as given.
+    m_reportNetwork.directed = !m_infomap.isUndirectedClustering();
     m_runParallelTrials = selectParallelTrialMode();
     m_trialWorkers = m_runParallelTrials ? parallelTrialWorkers() : 1;
     releaseInputLinksIfCli();
@@ -392,7 +460,7 @@ public:
     console.metric("Nodes", fmt::to_string(m_infomap.numLeafNodes()));
     console.metric("Links", fmt::to_string(m_network.numLinks()));
     console.metric("Average degree", io::toPrecision(m_network.numLinks() * 2.0 / m_infomap.numLeafNodes(), 1, true));
-    console.metric("Top modules", fmt::format(FMT_STRING("{} ({} non-trivial)"), m_infomap.numTopModules(), m_infomap.numNonTrivialTopModules()));
+    console.metric("Top modules", fmt::format(FMT_STRING("{} ({} non-trivial, {} effective)"), m_infomap.numTopModules(), m_infomap.numNonTrivialTopModules(), io::toPrecision(effectiveNumTopModules(m_infomap.root()), 1, true)));
     console.metric("Levels", fmt::to_string(result.bestNumLevels));
     console.metric("One-level codelength", io::toPrecision(m_infomap.getReferenceOneLevelCodelength()));
     console.metric("Best codelength", io::toPrecision(result.bestHierarchicalCodelength));
@@ -487,6 +555,10 @@ private:
     unsigned int firstErrorTrial = 0;
     std::string firstError;
     std::mutex bestResultMutex;
+    // result.bestHierarchicalCodelength, readable without the lock so a trial that
+    // cannot win skips building its tree (#996). Written under bestResultMutex;
+    // +inf until the first trial lands, so that trial always builds.
+    std::atomic<double> bestCodelengthSoFar(std::numeric_limits<double>::infinity());
     std::mutex errorMutex;
     std::mutex outputMutex;
 
@@ -525,6 +597,7 @@ private:
       // Share the cancel flag so workers observe a cancel; they only read it and
       // unwind, caught by the per-trial handler below (issue #412).
       worker.inheritRuntimeContext(m_infomap);
+      worker.m_flowSumsToOne = m_infomap.m_flowSumsToOne;
 
       for (unsigned int trialIndex = static_cast<unsigned int>(workerIndex); trialIndex < m_numTrials; trialIndex += numWorkers) {
         try {
@@ -553,12 +626,21 @@ private:
           worker.root().sortChildrenOnFlow();
 
           trialNumLevels = printPerLevelCodelength(worker.root(), trialStatistics);
-          trialTree.reserve(worker.numLeafNodes());
-          for (auto it(worker.iterLeafNodes()); !it.isEnd(); ++it) {
-            trialTree.emplace_back(it->stateId, it.path());
-          }
+          const auto collectTrialTree = [&]() {
+            trialTree.reserve(worker.numLeafNodes());
+            for (auto it(worker.iterLeafNodes()); !it.isEnd(); ++it) {
+              trialTree.emplace_back(it->stateId, it.path());
+            }
+          };
 
           const auto trialCodelength = worker.m_hierarchicalCodelength;
+          // The best only moves down, so a stale read is at or above the true best:
+          // a trial that is neither better nor tied against it cannot win under the
+          // lock either, and skipping its leaf walk loses nothing. Tied counts, to
+          // keep isEarlierTie's lower-index rule.
+          const auto mayBeBest = trialCodelength < bestCodelengthSoFar.load(std::memory_order_relaxed) + 1e-10;
+          if (mayBeBest)
+            collectTrialTree();
           const auto trialTopModules = worker.numTopModules();
           const auto trialTime = trialTimer.getElapsedTimeInSec();
           codelengths[trialIndex] = trialCodelength;
@@ -582,12 +664,17 @@ private:
           const auto isBetter = trialCodelength < result.bestHierarchicalCodelength - 1e-10;
           const auto isEarlierTie = std::abs(trialCodelength - result.bestHierarchicalCodelength) < 1e-10 && trialIndex < result.bestTrialIndex;
           if (bestIndexMissing || isBetter || isEarlierTie) {
+            // Backstop for the gate: an earlier tie can nudge the best up by under
+            // 1e-10, and a chain of them can carry it past a stale read.
+            if (!mayBeBest)
+              collectTrialTree();
             result.bestSolutionStatistics.clear();
             result.bestSolutionStatistics.str(trialStatistics.str());
             result.bestNumLevels = trialNumLevels;
             result.bestHierarchicalCodelength = trialCodelength;
             result.bestTrialIndex = trialIndex;
             result.bestTree = std::move(trialTree);
+            bestCodelengthSoFar.store(trialCodelength, std::memory_order_relaxed);
           }
         } catch (const std::exception& e) {
           std::lock_guard<std::mutex> lock(errorMutex);
@@ -652,6 +739,7 @@ private:
       {
         auto timer = m_timing.scope("best_restore_s");
         m_infomap.initTree(result.bestTree);
+        orderTreeAsRows(m_infomap.root(), result.bestTree);
       }
       if (!m_infomap.noFinalOutput) {
         auto outputTimer = m_timing.scope("output_s");
@@ -721,7 +809,11 @@ private:
       return;
     }
 
-    if (m_network.isMultilayerNetwork()) {
+    // The writers add the layer id column only when the run is multilayer, and a
+    // multilayer network whose expansion is the identity runs first-order (no memory
+    // input, so configureNetworkMode() never sets it). Read with the same test, or
+    // Infomap cannot read its own output back (#1273).
+    if (m_network.isMultilayerNetwork() && m_infomap.isMultilayerNetwork()) {
       const auto& map = m_network.layerNodeToStateId();
       m_clusterData.readClusterData(m_infomap.clusterDataFile, false, &map);
     } else {
@@ -822,9 +914,24 @@ private:
     }
 
     if (m_network.haveDirectedInput() && m_infomap.isUndirectedFlow()) {
+      // Only multilayer input with intra-layer links sets haveDirectedInput: the inter-layer links
+      // break the symmetry, so the intra-layer links are expanded to both directions and run with
+      // the directed model. That is the undirected multilayer flow, and undirdir was replaced by it
+      // with only the note below to show for it (#1233). outdirdir and rawdir are not replaced.
+      if (m_infomap.flowModel == FlowModel::undirdir)
+        Console::warn(0, "The undirdir flow model has no effect on multilayer input with intra-layer links: the links are expanded to both directions and run with the directed model, which is the flow of the default undirected model.");
       Console::note(1, "Directed input found, changing flow model from '{}' to '{}'.", m_infomap.flowModel, FlowModel(FlowModel::directed));
       m_infomap.flowModel = FlowModel::directed;
     }
+
+    // Undirected flow walks every state link in both directions. That fits states that say only
+    // where the walker is, as in a multilayer network, but not a memory network, where a state also
+    // says where the walker came from: walked backwards, the link for the path 0 -> 2 -> 3 leaves
+    // the walker at 2 in the state that came from 0. Warn rather than switch to directed, which
+    // would make every link one-way and change what the input means. Multilayer input is left out:
+    // its states are layers, and *Intra/*Inter input was made directed above (#1384).
+    if (m_network.haveMemoryInput() && !m_network.isMultilayerNetwork() && m_infomap.isUndirectedFlow())
+      Console::warn(0, "The {} flow model walks every state link in both directions. That suits states that say only where the walker is, but not a memory network, where a state also says where the walker came from and a backward step lands in a state with the wrong memory. Use --directed for a memory network.", m_infomap.flowModel);
     m_network.setConfig(m_infomap);
   }
 
@@ -834,6 +941,11 @@ private:
     // weights and writes computed flows directly into the CSR arrays, which
     // initNetwork and the output writers then consume.
     m_network.finalizeLinks();
+    // Sum each link a b and its opposite link b a for the undirected coding here, where the flow
+    // model is final, and not when the links are added: the bindings choose it per run (#1366). The
+    // multilayer expansion lists undirected links in both directions itself, so it reads its
+    // links as entered.
+    m_network.useUndirectedLinkView(m_infomap.flowModel == FlowModel::undirected && !m_infomap.isMultilayerNetwork());
 
     {
       auto timer = m_timing.scope("flow_calculation_s");
@@ -884,6 +996,16 @@ private:
       // makes this a memory network does not enter the objective at all.
       Console::warn(0, "--meta-data takes precedence over higher-order input: the run optimizes the meta-data objective over state nodes, without the physical-node codebook of the higher-order map equation. The higher-order structure affects the network, not the objective.");
     }
+
+    // Recorded teleportation needs a walk that teleports (recordsTeleportation). Undirected flow
+    // has always ignored the option silently; the other models reported a wrong codelength
+    // instead (#1188), so they say that the option is now ignored. The same models ignore
+    // --regularized, which sets the option itself, so that warning covers both (#1189).
+    const auto model = m_infomap.flowModel;
+    if (m_infomap.regularized && !m_infomap.usesRegularizedFlow())
+      Console::warn(0, "--regularized has no effect with the {} flow model: the regularized flow is implemented for the directed and undirected models only. The run uses the {} flow and reports the codelength without the prior.", io::stringify(model), io::stringify(model));
+    else if (m_infomap.recordedTeleportation && !m_infomap.recordsTeleportation() && model != FlowModel::undirected)
+      Console::warn(0, "--recorded-teleportation has no effect with the {} flow model: it does not teleport, so there are no teleportation steps to record. The run optimizes and reports the codelength without them.", io::stringify(model));
   }
 
   // The map equation is defined on a visit-rate distribution, so a non-finite
@@ -910,6 +1032,13 @@ private:
     // total is only degenerate when there were links to carry flow.
     const bool zeroFlowIsExpected = m_network.numLinks() == 0;
 
+    // Normalised unless the flow step says otherwise: a link-free network has no flow, and an
+    // unconverged power iteration and --skip-adjust-bipartite-flow are not normalised. Decided
+    // on every run, before the link-free return, so a reused instance never keeps a stale value,
+    // and from the network actually run. The parallel-trial workers, whose own network member
+    // stays empty, are handed the same value.
+    m_infomap.m_flowSumsToOne = !zeroFlowIsExpected && !m_infomap.skipAdjustBipartiteFlow && !(m_network.haveFlowConvergence() && !m_network.flowConverged());
+
     if (!std::isfinite(sumNodeFlow) || (sumNodeFlow <= 0 && !zeroFlowIsExpected))
       throw InfomapError(ExitCode::InputError,
                          fmt::format(FMT_STRING("Degenerate flow: total flow on nodes is {:g} for a network with {} links, so no "
@@ -919,6 +1048,33 @@ private:
                                      sumNodeFlow,
                                      m_network.numLinks()));
 
+    // The node flow can come from somewhere else than the walk: --use-node-weights-as-flow
+    // replaces it with the node weights after the flow model has run. The case above then
+    // passed with a walk that takes no link steps and teleports into no node, and the run
+    // reported a codelength for it (#1232). Check the walk itself as well. A link-free network
+    // is checked too when its nodes have flow and teleportation is recorded: the teleportation
+    // steps are then the whole walk, and with recorded teleportation to links they land on no
+    // node, so the run reported a codelength above the one-level one (#1253). Without recorded
+    // teleportation nothing is coded, and the trivial partition at zero bits stays the answer.
+    const bool checkWalk = !zeroFlowIsExpected || (sumNodeFlow > 0 && m_infomap.recordsTeleportation());
+    if (checkWalk) {
+      double sumLinkFlow = 0.0;
+      m_network.forEachLink([&](unsigned int, unsigned int, double, double& flow) { sumLinkFlow += flow; });
+      double sumTeleportWeight = 0.0;
+      for (const auto& nodeIt : m_network.nodes())
+        sumTeleportWeight += nodeIt.second.weight;
+      if (sumLinkFlow <= 0 && sumTeleportWeight <= 0)
+        throw InfomapError(ExitCode::InputError,
+                           fmt::format(FMT_STRING("Degenerate flow: no link carries flow (the network has {} links) and no "
+                                                  "node is reached by teleportation, so the walk takes no steps and no "
+                                                  "codelength is defined. Node weights used as flow set the visit rates but "
+                                                  "not the steps between nodes. This happens when the flow model cannot "
+                                                  "distribute flow over the network -- for example a directed flow model "
+                                                  "with recorded teleportation on a bipartite network whose links all point "
+                                                  "from the primary side to the feature side, or on a network without links."),
+                                       m_network.numLinks()));
+    }
+
     if (zeroFlowIsExpected)
       return;
 
@@ -926,6 +1082,8 @@ private:
 
     if (std::abs(sumNodeFlow - 1.0) > 1e-10)
       Console::warn(0, "Total flow on nodes is {:g}, not 1. The reported codelength is scaled accordingly.", sumNodeFlow);
+
+    m_infomap.checkInvariants(m_infomap.root(), "the flow calculation");
   }
 
   // A visit rate and a boundary-crossing rate are probabilities, so a negative one leaves every
@@ -936,16 +1094,17 @@ private:
   // came out at 1.1e-16 -- no cost at all for entering either of two modules (#957). An error
   // rather than a warning: there is no reading of the map equation under which this is a result.
   // Not an exact zero bound: the flow models accumulate, so a value a few epsilons below zero is
-  // rounding, not a broken distribution.
+  // rounding, not a broken distribution. Enter and exit flow are compared against `rateScale`
+  // times the bound, see InfomapBase::rateScale().
   static constexpr double negativeFlowTolerance = -1e-10;
 
-  static const char* negativeFlowQuantity(const FlowData& data) noexcept
+  static const char* negativeFlowQuantity(const FlowData& data, double rateScale) noexcept
   {
     if (data.flow < negativeFlowTolerance)
       return "flow";
-    if (data.enterFlow < negativeFlowTolerance)
+    if (data.enterFlow < negativeFlowTolerance * rateScale)
       return "enter flow";
-    if (data.exitFlow < negativeFlowTolerance)
+    if (data.exitFlow < negativeFlowTolerance * rateScale)
       return "exit flow";
     return nullptr;
   }
@@ -954,7 +1113,12 @@ private:
   {
     for (const auto* leafNode : m_infomap.leafNodes()) {
       const auto& data = leafNode->data;
-      const char* quantity = negativeFlowQuantity(data);
+      // Unscaled: a leaf's enter and exit flow are only added up from non-negative terms -- link
+      // flow (scaled by the Markov time in initEnterExitFlow()) and teleportation -- so nothing of
+      // size t cancels, unlike in a module's, which subtracts the flow internal to it. Under
+      // regularized multilayer flow they are the flow calculator's, which does not apply the
+      // Markov time.
+      const char* quantity = negativeFlowQuantity(data, 1.0);
       if (quantity == nullptr)
         continue;
 
@@ -998,7 +1162,7 @@ private:
       if (node.isLeaf())
         continue;
 
-      const char* quantity = negativeFlowQuantity(node.data);
+      const char* quantity = negativeFlowQuantity(node.data, m_infomap.rateScale());
       if (quantity == nullptr)
         continue;
 
@@ -1110,6 +1274,12 @@ private:
   {
     seedTrial(trialIndex);
     m_infomap.removeModules();
+    // A previous trial can leave the objective's network-level terms for a module network,
+    // as the restore of its super-level tree does (#837). A trial without an initial
+    // partition starts from the leaves on them, tracking a codelength off by a constant
+    // that the one-level comparison in partition() reads. Restore them here, as init()
+    // set them for the first trial (#1284).
+    m_infomap.restoreLeafNetworkTerms();
     auto startDate = Date();
     Stopwatch timer(true);
 
@@ -1174,7 +1344,7 @@ private:
       if (numNodesNotInNetwork > 0)
         Console::note(1, "{} nodes in embedded initial-partition paths not found in network.", numNodesNotInNetwork);
       InfomapBase::validateClusterDataTreeShape(normalizedTree);
-      infomap.initTree(normalizedTree);
+      infomap.initTreeInput(normalizedTree, infomap.clusterDataIsHard);
     }
   }
 
@@ -1185,10 +1355,15 @@ private:
     else
       infomap.m_hierarchicalCodelength = infomap.calcCodelengthOnTree(infomap.root(), true);
 
-    if (infomap.haveHardPartition())
+    if (infomap.haveHardPartition()) {
       infomap.restoreHardPartition();
+      // The hard modules were leaves while the run scored the tree, so their own codebooks
+      // were not in its codelength. Score the tree that is returned (#1207).
+      infomap.m_hierarchicalCodelength = infomap.calcCodelengthOnTree(infomap.root(), true);
+    }
 
     checkNoNegativeModuleFlow(infomap.root());
+    infomap.checkInvariants(infomap.root(), "the finished tree");
   }
 
   void finishTrial(unsigned int trialIndex, Stopwatch& timer, Result& result)
@@ -1260,6 +1435,8 @@ public:
       report.flowConverged = m_infomap.m_network.flowConverged();
       report.flowIterations = m_infomap.m_network.flowIterations();
       report.flowError = m_infomap.m_network.flowError();
+      report.flowRate = m_infomap.m_network.flowRate();
+      report.flowAccelerated = m_infomap.m_network.flowAccelerated();
       report.trialCodelengths = m_infomap.m_codelengths;
       report.trialTopModules = m_infomap.m_numTopModules;
       writeJsonReport(m_infomap.summaryJsonPath, runSummaryReportJson(report), m_infomap.overwriteOutput());
@@ -1523,6 +1700,10 @@ void InfomapBase::run(Network& network)
   if (!isMainInfomap())
     throw std::logic_error("Can't run a non-main Infomap with an input network");
 
+  // Set here rather than in the constructor, which also builds the sub-Infomaps
+  // inside the parallel regions.
+  Log::precision(verboseNumberPrecision);
+
   // Stamp the owner thread (gates the callback) and clear any leftover cancel so
   // the instance is reusable after an interrupted run (issue #412). The team count
   // starts over for the same reason: it describes this run, not the instance.
@@ -1584,6 +1765,9 @@ InfomapBase& InfomapBase::initNetwork(InfoNode& parent, bool asSuperNetwork)
   if (asSuperNetwork)
     transformNodeFlowToEnterFlow(m_root);
 
+  // Before init() prices the one-level codelength with it (#1283).
+  m_optimizer->setNumNetworkNodes(numLeafNodes());
+
   init();
   return *this;
 }
@@ -1591,7 +1775,8 @@ InfomapBase& InfomapBase::initNetwork(InfoNode& parent, bool asSuperNetwork)
 InfomapBase& InfomapBase::initPartition(const std::string& clusterDataFile, bool hard, const Network* network)
 {
   ClusterMap clusterMap;
-  if (network != nullptr && network->isMultilayerNetwork()) {
+  // Same test as readClusterData() in the run path (#1273).
+  if (network != nullptr && network->isMultilayerNetwork() && isMultilayerNetwork()) {
     const auto& map = network->layerNodeToStateId();
     clusterMap.readClusterData(clusterDataFile, false, &map);
   } else {
@@ -1614,7 +1799,7 @@ InfomapBase& InfomapBase::initPartition(const ClusterMap& clusterMap, bool hard)
       Console::note(1, "{} physical nodes in tree not found in network.", numTreeNodesNotInNetwork);
     }
     validateClusterDataTreeShape(normalizedTree);
-    initTree(normalizedTree);
+    initTreeInput(normalizedTree, hard);
   } else if (ext == "clu") {
     // Repeated ids in this file are reported once per run by
     // RunSession::reportClusterDataIssues, not here: this runs per trial, and per
@@ -1777,6 +1962,29 @@ void InfomapBase::validateClusterDataTreeShape(const NodePaths& tree)
                                    modulePath,
                                    modulePath));
   }
+}
+
+// A hard partition keeps each of its modules whole, which a tree only defines for
+// one level of modules. A deeper tree is refused rather than read as one of its
+// levels. A one-level tree is the partition a .clu file gives, and is applied the
+// same way; initTree has no hard partition and ran it as a soft one (#1244).
+InfomapBase& InfomapBase::initTreeInput(const NodePaths& tree, bool hard)
+{
+  if (!hard)
+    return initTree(tree);
+  std::map<unsigned int, unsigned int> clusterIds;
+  for (const auto& nodePath : tree) {
+    const auto& path = nodePath.second;
+    if (path.empty())
+      continue;
+    if (path.size() > 2)
+      throw InfomapError(ExitCode::InputError,
+                         fmt::format(FMT_STRING("A hard partition from a tree must be one level deep, but node {} is "
+                                                "in a sub-module. Give only the top-level modules, as a .clu file does."),
+                                     nodePath.first));
+    clusterIds[nodePath.first] = path[0];
+  }
+  return initPartition(clusterIds, true);
 }
 
 InfomapBase& InfomapBase::initTree(const NodePaths& tree)
@@ -2059,7 +2267,7 @@ InfomapBase& InfomapBase::initPartition(const std::map<unsigned int, unsigned in
     }
   }
 
-  return initPartition(modules);
+  return initPartition(modules, hard);
 }
 
 InfomapBase& InfomapBase::initPartition(std::vector<std::vector<unsigned int>>& clusters, bool hard)
@@ -2115,8 +2323,7 @@ InfomapBase& InfomapBase::initPartition(std::vector<unsigned int>& modules, bool
   // initNetwork() reads. Skip it when the terms already describe the leaf network: the
   // walk is over every leaf through the sibling chain, and paying it per trial costs
   // web-NotreDame --two-level --columnar ~2.5% for nothing.
-  if (!m_objectiveTermsAreForLeafNetwork)
-    initNetwork();
+  restoreLeafNetworkTerms();
   initPartition(); // TODO: confusing same name, should be able to init default without arguments here too
   moveActiveNodesToPredefinedModules(modules);
   consolidateModules(false);
@@ -2132,6 +2339,9 @@ InfomapBase& InfomapBase::initPartition(std::vector<unsigned int>& modules, bool
     unsigned int numLinksInNewNetwork = 0;
     for (InfoNode& node : m_root) {
       m_leafNodes[nodeIndex] = &node;
+      // Give the hard module a node id of its own, so that a tree saved by node id over this
+      // network (the super-level tree in hierarchicalPartition) can be rebuilt with initTree.
+      node.stateId = nodeIndex;
       // Collapse children
       node.collapseChildren();
       numLinksInNewNetwork += node.outDegree();
@@ -2165,6 +2375,23 @@ void InfomapBase::generateSubNetwork(Network& network)
   double sumTeleFlow = 0.0;
   std::unordered_map<unsigned int, unsigned int> nodeIndexMap;
   nodeIndexMap.reserve(numNodes);
+
+  // Every per-layer teleport term the objective adds is a teleport flow times a teleport
+  // weight, or a difference of two such flows, so a network where nothing teleports
+  // contributes nothing at all. Skipping the data there costs one scan and saves an
+  // InfoNodeExtras per leaf node plus a per-module map lookup on every move. It is all
+  // or nothing: a node that does not teleport still pays the flow its module teleports
+  // away, so its own zero is not enough to leave it out.
+  bool haveLayerTeleportFlow = false;
+  if (isRegularizedMultilayerFlow()) {
+    for (auto& nodeIt : network.nodes()) {
+      if (nodeIt.second.intraLayerTeleFlow > 0) {
+        haveLayerTeleportFlow = true;
+        break;
+      }
+    }
+  }
+
   for (auto& nodeIt : network.nodes()) {
     auto& networkNode = nodeIt.second;
     auto* node = &allocNode(networkNode.flow, networkNode.id, networkNode.physicalId, networkNode.layerId);
@@ -2172,10 +2399,15 @@ void InfomapBase::generateSubNetwork(Network& network)
     node->data.teleportFlow = networkNode.teleFlow;
     node->data.exitFlow = networkNode.exitFlow;
     node->data.enterFlow = networkNode.enterFlow;
+    // The tree drops self-links below, so a node whose only out-link is a self-link has
+    // no out-edges there, but the flow calculation did not take it for dangling (#1182).
+    // Keep the network's classification for initEnterExitFlow.
+    if (network.isDangling(network.indexOfId(networkNode.id)))
+      node->data.danglingFlow = networkNode.flow;
     // Only regularized-multilayer flow consumes layerTeleFlowData; populating it
     // unconditionally would allocate an InfoNodeExtras for every node and defeat
     // the out-of-line shrink (extras must stay null in the common case).
-    if (isRegularizedMultilayerFlow())
+    if (haveLayerTeleportFlow)
       node->ensureExtras().layerTeleFlowData.emplace_back(networkNode.layerId, networkNode.intraLayerTeleFlow, networkNode.intraLayerTeleWeight);
     // Log(1) << "Node " << node->stateId << " (" << node->layerId << "," << node->physicalId << ") data: " << node->data << ", tele-flow: " << networkNode.teleFlow << ", intra-tele: " << networkNode.intraLayerTeleFlow << "\n";
     if (haveMetaData()) {
@@ -2194,10 +2426,7 @@ void InfomapBase::generateSubNetwork(Network& network)
   }
   m_root.data.flow = sumNodeFlow;
   m_root.data.teleportFlow = sumTeleFlow;
-  // m_calculateEnterExitFlow = true; //TODO: Implement always in flow calculation
-  if (!this->regularized) {
-    m_calculateEnterExitFlow = true;
-  }
+  m_calculateEnterExitFlow = true;
   if (std::abs(sumNodeFlow - 1.0) > 1e-10)
     Console::warn(1, "Total flow on nodes differs from 1.0 by {:g}.", sumNodeFlow - 1.0);
 
@@ -2226,7 +2455,6 @@ void InfomapBase::generateSubNetwork(Network& network)
   unsigned int maxDegree = 0;
   unsigned int maxOutDegree = 0;
   unsigned int maxInDegree = 0;
-  double totDegree = network.sumDegree();
   std::vector<double> entropies(numNodes, 0);
 
   for (unsigned i = 0; i < numNodes; ++i) {
@@ -2260,21 +2488,35 @@ void InfomapBase::generateSubNetwork(Network& network)
   double minLocalScale = variableMarkovTimeMinLocalScale;
   double damping = variableMarkovTimeDamping;
 
-  double maxScale = infomath::linlog(maxFlow * totDegree, damping);
+  // An undirected run reads a link a b and its opposite link b a as one link (#1264, #1366)
+  double totDegree = network.sumDegree();
 
-  if (variableMarkovTime) {
+  // No links means nothing to rescale, and maxFlow * totDegree = 0 would give linlog(0) = log2(0).
+  if (variableMarkovTime && totDegree > 0) {
+    // maxFlow * totDegree is the largest effective degree. With the walk's own flow it is at
+    // least 1, but node weights as flow or the teleportation flow under --regularized can put
+    // it below, and its log would scale the links by a negative Markov time (#1191).
+    double maxScale = infomath::linlog(std::max(1.0, maxFlow * totDegree), damping);
     if (damping < 0) {
       maxScale = infomath::linlog(pow(2.0, maxEntropy), -damping);
     }
+    // Each link divides by a local scale floored at minLocalScale, so floor the largest one
+    // there too. Otherwise, when the largest effective degree is below 2 (the default
+    // minLocalScale, log2(2)), every link was scaled by less than 1, and by 0 at degree 1: two
+    // disjoint links reported 0 bits, and node weights as flow left a walk without steps.
+    maxScale = std::max(minLocalScale, maxScale);
     for (unsigned i = 0; i < numNodes; ++i) {
       InfoNode& node = *m_leafNodes[i];
       double localScale = damping < 0 ? infomath::linlog(pow(2.0, entropies[i]), -damping) : infomath::linlog(std::max(minLocalScale, node.data.flow * totDegree), damping);
       for (InfoEdge* e : node.outEdges()) {
+        // Under undirected flow a link takes the larger scale of its two ends. Keep it per link,
+        // so the scale does not depend on the links listed before it (#1264).
+        double linkLocalScale = localScale;
         if (isUndirectedFlow()) {
           double oppositeLocalScale = damping < 0 ? infomath::linlog(pow(2.0, entropies[nodeIndexMap[e->target->stateId]]), -damping) : infomath::linlog(std::max(minLocalScale, e->target->data.flow * totDegree), damping);
-          localScale = std::max(localScale, oppositeLocalScale);
+          linkLocalScale = std::max(localScale, oppositeLocalScale);
         }
-        double localMarkovTimeScale = maxScale / std::max(minLocalScale, localScale);
+        double localMarkovTimeScale = maxScale / std::max(minLocalScale, linkLocalScale);
         e->data.flow *= localMarkovTimeScale;
         // Note: deliberately do NOT write the scaled flow back into the shared StateNetwork
         // (network.nodeLinkMap()). The optimizer and output use only the per-instance InfoEdge
@@ -2304,11 +2546,28 @@ void InfomapBase::generateSubNetwork(InfoNode& parent)
   // exact first chunks remove it. Module nodes allocated later still ramp from
   // kInitialChunk, which stays tight for the tiny refined modules.
   m_nodePool.reserve(numNodes);
+
+  // Decide whether a link stays inside the module from the module's own node
+  // list, never from the neighbour's parent pointer. In the recursive partition,
+  // the task that owns a neighbouring module reparents its nodes while this one
+  // runs, so reading the neighbour's parent would be a data race.
+  std::vector<const InfoNode*> ownNodes;
+  ownNodes.reserve(numNodes);
+  for (const InfoNode& node : parent)
+    ownNodes.push_back(&node);
+  std::sort(ownNodes.begin(), ownNodes.end(), std::less<const InfoNode*>());
+  auto isOwnNode = [&ownNodes](const InfoNode* node) {
+    return std::binary_search(ownNodes.begin(), ownNodes.end(), node, std::less<const InfoNode*>());
+  };
+
+  // One flag per out-link, in iteration order, so each link is looked up once.
+  std::vector<char> isInternalEdge;
   unsigned int numInternalEdges = 0;
   for (InfoNode& node : parent) {
     for (InfoEdge* e : node.outEdges()) {
-      if (e->target->parent == &parent)
-        ++numInternalEdges;
+      const bool isInternal = isOwnNode(e->target);
+      isInternalEdge.push_back(isInternal);
+      numInternalEdges += isInternal;
     }
   }
   m_edgePool.reserve(numInternalEdges);
@@ -2325,13 +2584,13 @@ void InfomapBase::generateSubNetwork(InfoNode& parent)
     ++childIndex;
   }
 
-  InfoNode* parentPtr = &parent;
   // Clone edges
+  std::size_t edgeIndex = 0;
   for (InfoNode& node : parent) {
     for (InfoEdge* e : node.outEdges()) {
       InfoEdge& edge = *e;
       // If neighbour node is within the same module, add the link to this subnetwork.
-      if (edge.target->parent == parentPtr) {
+      if (isInternalEdge[edgeIndex++]) {
         m_leafNodes[edge.source->index]->addOutEdge(*m_leafNodes[edge.target->index], edge.data.weight, edge.data.flow);
       }
     }
@@ -2402,8 +2661,22 @@ void InfomapBase::hierarchicalPartition()
       double codelengthBefore = 0.0;
       double codelengthAfter = 0.0;
 
+      // Fine-tune only modules whose children are all leaf modules. Testing the first
+      // child is not enough on a ragged tree: a module with a leaf module first and a
+      // deeper module or a lone leaf next would size its buffers by the wrong leaf
+      // count and write past them (#1216).
+      const auto isModuleOfLeafModules = [](const InfoNode& module) {
+        if (module.isLeaf())
+          return false;
+        for (const InfoNode& child : module) {
+          if (!child.isLeafModule())
+            return false;
+        }
+        return true;
+      };
+
       for (InfoNode& module : m_root.infomapTree()) {
-        if (!module.isLeaf() && module.firstChild->isLeafModule()) {
+        if (isModuleOfLeafModules(module)) {
           codelengthBefore += module.codelength;
           auto numLeafs = 0;
           for (auto& leafModule : module) {
@@ -2452,7 +2725,9 @@ void InfomapBase::hierarchicalPartition()
             InfoNode* leaf = leafs[j];
             unsigned int moduleIndex = modules[j];
             if (subModules[moduleIndex] == nullptr) {
-              subModules[moduleIndex] = &allocNode(subInfomap.leafNodes()[j]->parent->data);
+              const InfoNode& subModule = *subInfomap.leafNodes()[j]->parent;
+              subModules[moduleIndex] = &allocNode(subModule.data);
+              copyModuleAggregates(*subModules[moduleIndex], subModule);
               subModules[moduleIndex]->index = moduleIndex;
               module.addChild(subModules[moduleIndex]);
             }
@@ -2467,7 +2742,12 @@ void InfomapBase::hierarchicalPartition()
       restoreSilent.restore();
 
       const double diffCodelength = codelengthBefore - codelengthAfter;
-      Console::detail(1, "fine-tune bottom modules: improvement {:g}% {} codelength {}", (diffCodelength / codelengthBefore) * 100, Console::arrow(), io::toPrecision(codelengthAfter));
+      Console::detail(1, "fine-tune bottom modules: improvement {:g}% {} codelength {}", (codelengthBefore < 1e-16 ? 0.0 : diffCodelength / codelengthBefore * 100), Console::arrow(), io::toPrecision(codelengthAfter));
+
+      // The recursion below starts from m_hierarchicalCodelength and the leaf modules'
+      // codelength terms. Both still describe the seed tree, and the new sub modules have
+      // no term at all, so re-score the fine-tuned tree.
+      m_hierarchicalCodelength = calcCodelengthOnTree(root(), true);
     }
 
     recursivePartition();
@@ -2529,6 +2809,13 @@ void InfomapBase::partition()
   double oldCodelength = initialCodelength;
 
   m_tuneIterationIndex = 0;
+  // A single node is never moved, so findTopModulesRepeatedly never initialises the
+  // objective's terms for it, and the run reported 0 instead of the codelength of the
+  // tree it returns, including the term for the number of modules (#1293).
+  if (numTopModules() == 1 && !haveModules()) {
+    setActiveNetworkFromLeafs();
+    initPartition();
+  }
   findTopModulesRepeatedly(levelAggregationLimit);
 
   double newCodelength = getCodelength();
@@ -2584,8 +2871,12 @@ void InfomapBase::partition()
   if (m_numNonTrivialTopModules != numTopModules())
     nonTrivialSummary = fmt::format(FMT_STRING(" ({} non-trivial)"), m_numNonTrivialTopModules);
   progress.finish(fmt::format(FMT_STRING("{} {} codelength {}, {} modules{}"), compressionSummary(prettyCompression), Console::arrow(), io::toPrecision(getCodelength()), numTopModules(), nonTrivialSummary));
-  const bool regularizedPriorOnly = regularized && network().numLinks() == 0;
-  if (!preferModularSolution && preferredNumberOfModules == 0 && (haveNonTrivialModules() || regularizedPriorOnly) && getCodelength() > getOneLevelCodelength()) {
+#if INFOMAP_CHECK_INVARIANTS
+  checkPartitionCodelength();
+#endif
+  const bool regularizedPriorOnly = usesRegularizedFlow() && network().numLinks() == 0;
+  double oneModuleCodelength = getOneLevelCodelength();
+  if (!preferModularSolution && preferredNumberOfModules == 0 && (haveNonTrivialModules() || regularizedPriorOnly) && getCodelength() > oneModuleCodelength) {
     Console::detail(1, "worse codelength than one-level, putting all nodes in one module");
 
     // Create new single module between modules and root
@@ -2601,8 +2892,8 @@ void InfomapBase::partition()
     for (auto& node : module) {
       node.index = 0;
     }
-    module.codelength = getOneLevelCodelength();
-    m_hierarchicalCodelength = getOneLevelCodelength();
+    module.codelength = oneModuleCodelength;
+    m_hierarchicalCodelength = oneModuleCodelength;
     // calcCodelengthOnTree(root(), true);
     m_root.codelength = 0.0;
     m_numNonTrivialTopModules = calculateNumNonTrivialTopModules();
@@ -2618,6 +2909,8 @@ void InfomapBase::partition()
     m_root.codelength = getIndexCodelength();
     m_hierarchicalCodelength = getCodelength();
   }
+
+  checkInvariants(m_root, "the two-level partition");
 }
 
 void InfomapBase::restoreHardPartition()
@@ -2637,7 +2930,10 @@ void InfomapBase::restoreHardPartition()
   for (InfoNode* node : leafNodes) {
     ++numExpandedNodes;
     numExpandedChildren += node->expandChildren();
-    node->replaceWithChildren();
+    // A hard module directly under the root, as every one is under --no-infomap, stays a
+    // module. Replaced by its nodes there, the partition it was part of would be lost.
+    if (!node->parent->isRoot())
+      node->replaceWithChildren();
   }
 
   // Swap back original leaf nodes
@@ -2661,14 +2957,59 @@ void InfomapBase::initEnterExitFlow()
   for (auto* n : m_leafNodes) {
     n->data.enterFlow = n->data.exitFlow = 0.0;
   }
+  // Under --regularized the flow calculator sets each node's teleportation flow and weight,
+  // and the enter and exit flow are its links plus the teleportation to and from other nodes,
+  // as the module terms in aggregateFlowValuesFromLeafToRoot() and the optimizer price them.
+  // Taking them from the node flow instead, less self-teleportation, agrees with that only
+  // when the node flow is the walk's own. With node weights as flow, a Markov time other than
+  // 1 or variable Markov time it is not, and modules got negative enter flow (#1191), exit
+  // flow the walk does not have (#1231), and a restored tree a different codelength than the
+  // search gave it (#1189).
+  if (usesRegularizedFlow()) {
+    const double sumTeleportFlow = m_root.data.teleportFlow;
+    const bool undirectedLinks = isUndirectedClustering();
+    // Regularized multilayer flow teleports within a layer, so a node's teleportation
+    // enter flow comes from the other nodes in its layer (#1287).
+    std::map<unsigned int, double> layerTeleportFlow;
+    for (const auto* n : m_leafNodes) {
+      for (const auto& layerData : n->layerTeleFlowData())
+        layerTeleportFlow[layerData.layerId] += layerData.teleportFlow;
+    }
+    for (auto* n : m_leafNodes) {
+      auto& node = *n;
+      for (InfoEdge* e : node.outEdges()) {
+        InfoEdge& edge = *e;
+        if (undirectedLinks) {
+          double halfFlow = edge.data.flow / 2;
+          edge.source->data.exitFlow += halfFlow;
+          edge.target->data.exitFlow += halfFlow;
+          edge.source->data.enterFlow += halfFlow;
+          edge.target->data.enterFlow += halfFlow;
+        } else {
+          edge.source->data.exitFlow += edge.data.flow;
+          edge.target->data.enterFlow += edge.data.flow;
+        }
+      }
+      node.data.exitFlow += node.data.teleportFlow * (1.0 - node.data.teleportWeight);
+      node.data.enterFlow += (sumTeleportFlow - node.data.teleportFlow) * node.data.teleportWeight;
+      for (const auto& layerData : node.layerTeleFlowData()) {
+        node.data.exitFlow += layerData.teleportFlow * (1.0 - layerData.teleportWeight);
+        node.data.enterFlow += (layerTeleportFlow[layerData.layerId] - layerData.teleportFlow) * layerData.teleportWeight;
+      }
+    }
+    return;
+  }
+  // Per run: a second run on this instance, or a --parallel-trials worker's next
+  // trial, would otherwise count the dangling flow again (#1201).
+  m_sumDanglingFlow = 0.0;
   if (!isUndirectedClustering()) {
     for (auto* n : m_leafNodes) {
       auto& node = *n;
       node.data.teleportFlow = alpha * node.data.flow;
       node.data.teleportSourceFlow = node.data.flow;
-      if (node.isDangling()) {
+      // Set by generateSubNetwork from the network, which still has the self-links
+      if (node.data.danglingFlow > 0.0) {
         node.data.teleportFlow = node.data.flow;
-        node.data.danglingFlow = node.data.flow;
         m_sumDanglingFlow += node.data.flow;
       }
     }
@@ -2680,7 +3021,7 @@ void InfomapBase::initEnterExitFlow()
         edge.source->data.exitFlow += edge.data.flow;
         edge.target->data.enterFlow += edge.data.flow;
       }
-      if (recordedTeleportation) {
+      if (recordsTeleportation()) {
         // Don't let self-teleportation add to the enter/exit flow (i.e. multiply with (1.0 - node.data.teleportWeight))
         node.data.exitFlow += (alpha * node.data.flow + beta * node.data.danglingFlow) * (1.0 - node.data.teleportWeight);
         node.data.enterFlow += (alpha * (1.0 - node.data.flow) + beta * (m_sumDanglingFlow - node.data.danglingFlow)) * node.data.teleportWeight;
@@ -2691,9 +3032,8 @@ void InfomapBase::initEnterExitFlow()
       auto& node = *n;
       node.data.teleportFlow = alpha * node.data.flow;
       node.data.teleportSourceFlow = node.data.flow;
-      if (node.isDangling()) {
+      if (node.data.danglingFlow > 0.0) {
         node.data.teleportFlow = node.data.flow;
-        node.data.danglingFlow = node.data.flow;
       }
       for (InfoEdge* e : node.outEdges()) {
         InfoEdge& edge = *e;
@@ -2792,7 +3132,7 @@ void InfomapBase::aggregateFlowValuesFromLeafToRoot()
       }
     }
   }
-  if (recordedTeleportation) {
+  if (recordsTeleportation()) {
     Console::detail(1, "aggregating enter/exit flow for recorded teleportation, sum teleFlow {:g}", m_root.data.teleportFlow);
 
     for (auto& node : m_root.infomapTree()) {
@@ -2804,7 +3144,178 @@ void InfomapBase::aggregateFlowValuesFromLeafToRoot()
       }
     }
   }
+#if INFOMAP_FEATURE_REGULARIZED_MULTILAYER
+  // Regularized multilayer flow teleports within each layer, and the leaf nodes carry that
+  // teleportation per layer, not in teleportFlow. A module M sends T_{M,l} (W_l - W_{M,l}) out
+  // of layer l and receives (T_l - T_{M,l}) W_{M,l} there, as the optimizer prices it. Without
+  // these terms, a tree deeper than two levels read back below the codelength the search
+  // reported for it (#1022). The module keeps its per-layer sums, as consolidateModules leaves
+  // them, for an optimizer that continues from this tree.
+  std::unordered_map<InfoNode*, std::map<unsigned int, LayerTeleFlowData>> moduleLayerTeleFlow;
+  std::map<unsigned int, LayerTeleFlowData> layerTeleFlow;
+  for (const auto* leafNode : m_leafNodes) {
+    for (const auto& layerData : leafNode->layerTeleFlowData()) {
+      layerTeleFlow[layerData.layerId] += layerData;
+      for (auto* module = leafNode->parent; module != nullptr && !module->isRoot(); module = module->parent) {
+        auto& moduleLayerData = moduleLayerTeleFlow[module][layerData.layerId];
+        moduleLayerData.layerId = layerData.layerId;
+        moduleLayerData += layerData;
+      }
+    }
+  }
+  for (auto& moduleIt : moduleLayerTeleFlow) {
+    auto& module = *moduleIt.first;
+    auto& moduleLayerTele = module.ensureExtras().layerTeleFlowData;
+    moduleLayerTele.clear();
+    for (const auto& layerIt : moduleIt.second) {
+      const auto& moduleLayerData = layerIt.second;
+      const auto& layerData = layerTeleFlow[layerIt.first];
+      module.data.exitFlow += moduleLayerData.teleportFlow * (layerData.teleportWeight - moduleLayerData.teleportWeight);
+      module.data.enterFlow += (layerData.teleportFlow - moduleLayerData.teleportFlow) * moduleLayerData.teleportWeight;
+      moduleLayerTele.push_back(moduleLayerData);
+    }
+  }
+#endif
 }
+
+#if INFOMAP_CHECK_INVARIANTS
+// An oracle for debug, sanitizer and fuzz builds (#1171). Each check holds for any correct
+// flow and tree, whatever the objective:
+// - the walker is somewhere, so the leaf flow sums to 1 in the main instance -- unless the flow
+//   step says otherwise and warns: a link-free network has no flow, and neither an unconverged
+//   power iteration nor --skip-adjust-bipartite-flow is normalised (m_flowSumsToOne);
+// - flow, enter flow and exit flow are finite rates, so none is NaN, infinite or negative;
+// - a module's flow is the flow of its children;
+// - a step that leaves a child of a module either enters a sibling or leaves the module, and a
+//   step that enters a child comes from a sibling or from outside, so the children's exit flow
+//   less the module's exit equals their enter flow less the module's enter;
+// - with undirected flow and nothing recorded but links, every node is entered as often as it
+//   is exited.
+// The balance is not checked at the root of a sub-instance, whose enter and exit flow belong
+// to the module it partitions.
+void InfomapBase::checkInvariants(const InfoNode& root, const char* phase) const
+{
+  // Far above the rounding of a sum of flows, far below any real error. Flow is at most 1, but
+  // enter and exit flow scale with the Markov time and are built by adding and subtracting rates
+  // of that size, so their tolerance scales with it and with the rates compared.
+  constexpr double tolerance = 1e-9;
+  const double rateScale = this->rateScale();
+  const auto rateTolerance = [rateScale](double a, double b) { return tolerance * std::max({ rateScale, std::abs(a), std::abs(b) }); };
+  const bool undirectedBalance = isUndirectedClustering() && !recordsTeleportation();
+
+  const auto fail = [this, phase](const std::string& what) {
+    throw InfomapError(ExitCode::InternalError,
+                       fmt::format(FMT_STRING("Flow invariant violated after {}{}: {}. This is a bug in Infomap."),
+                                   phase,
+                                   isMainInfomap() ? "" : " in a sub-partition",
+                                   what));
+  };
+
+  double sumLeafFlow = 0.0;
+  const std::function<void(const InfoNode&, unsigned int)> check = [&](const InfoNode& node, unsigned int depth) {
+    const auto& data = node.data;
+    if (!std::isfinite(data.flow) || !std::isfinite(data.enterFlow) || !std::isfinite(data.exitFlow))
+      fail(fmt::format(FMT_STRING("non-finite flow on a node at depth {}: flow {:g}, enter flow {:g}, exit flow {:g}"), depth, data.flow, data.enterFlow, data.exitFlow));
+    // Worded like the run's own negative-flow guards, which only look at the finished tree, so a
+    // run they would refuse fails with the same message whichever check sees it first.
+    const char* negative = data.flow < -tolerance ? "flow" : data.enterFlow < -tolerance * rateScale ? "enter flow"
+        : data.exitFlow < -tolerance * rateScale                                                     ? "exit flow"
+                                                                                                     : nullptr;
+    if (negative != nullptr) {
+      const auto where = node.isLeaf() ? fmt::format(FMT_STRING("node {}"), node.stateId) : fmt::format(FMT_STRING("a module at depth {} with {} children"), depth, node.childDegree());
+      fail(fmt::format(FMT_STRING("Negative {} on {}: flow {:g}, enter flow {:g}, exit flow {:g}"), negative, where, data.flow, data.enterFlow, data.exitFlow));
+    }
+    if (undirectedBalance && std::abs(data.enterFlow - data.exitFlow) > rateTolerance(data.enterFlow, data.exitFlow))
+      fail(fmt::format(FMT_STRING("undirected flow enters a node at depth {} at rate {:.12g} but exits it at {:.12g}"), depth, data.enterFlow, data.exitFlow));
+    if (node.isLeaf()) {
+      sumLeafFlow += data.flow;
+      return;
+    }
+    double sumFlow = 0.0;
+    double sumEnter = 0.0;
+    double sumExit = 0.0;
+    for (const InfoNode& child : node) {
+      check(child, depth + 1);
+      sumFlow += child.data.flow;
+      sumEnter += child.data.enterFlow;
+      sumExit += child.data.exitFlow;
+    }
+    if (std::abs(data.flow - sumFlow) > tolerance)
+      fail(fmt::format(FMT_STRING("a module at depth {} has flow {:.12g} but its {} children sum to {:.12g}"), depth, data.flow, node.childDegree(), sumFlow));
+    if (depth > 0 || isMainInfomap()) {
+      const double imbalance = (sumExit - data.exitFlow) - (sumEnter - data.enterFlow);
+      if (std::abs(imbalance) > rateTolerance(sumExit + data.enterFlow, sumEnter + data.exitFlow))
+        fail(fmt::format(FMT_STRING("enter and exit flow do not balance at a module at depth {} with {} children: "
+                                    "children exit {:.12g} and enter {:.12g}, module exit {:.12g} and enter {:.12g}"),
+                         depth,
+                         node.childDegree(),
+                         sumExit,
+                         sumEnter,
+                         data.exitFlow,
+                         data.enterFlow));
+    }
+  };
+  check(root, 0);
+
+  if (isMainInfomap() && m_flowSumsToOne && std::abs(sumLeafFlow - 1.0) > tolerance)
+    fail(fmt::format(FMT_STRING("the leaf flow sums to {:.12g}, not 1"), sumLeafFlow));
+}
+
+void InfomapBase::checkCodelength(double tracked, double priced, const char* phase) const
+{
+  // Like checkMoveDelta: the tracked value is a difference of running plogp sums, whose
+  // rounding scales with the codelength and, through the enter and exit flow, with the Markov time.
+  constexpr double tolerance = 1e-9;
+  const double scale = std::max({ 1.0, std::abs(tracked), std::abs(priced), rateScale() });
+  if (std::abs(tracked - priced) > tolerance * scale)
+    throw InfomapError(ExitCode::InternalError,
+                       fmt::format(FMT_STRING("Codelength invariant violated after {}{}: the search has {:.12g} bits, "
+                                              "the tree it ended on {:.12g}. This is a bug in Infomap."),
+                                   phase,
+                                   isMainInfomap() ? "" : " in a sub-partition",
+                                   tracked,
+                                   priced));
+}
+
+// The objective tracks the codelength through running sums of its terms, and the search
+// compares that value: against the one-level codelength here, and, in a sub-partition,
+// through the sub-Infomap's codelength against the module's own term in recursivePartition.
+// Every reported codelength is instead priced again node by node on the tree, so a fault in
+// the running terms steers those decisions without showing in any result (#1279). Hence the
+// two must agree on the two-level tree the search ended on. The root's term is the index
+// codebook. In a sub-partition it has the module's exit codeword, as the module's own term
+// does in the parent tree, so the two price that codeword alike.
+void InfomapBase::checkPartitionCodelength() const
+{
+  // A hard partition searches the hard modules as leaves, so its codelength leaves out
+  // their own codebooks, which the tree under the root still has (#1207).
+  if (haveHardPartition())
+    return;
+  // Known gaps, each skipped until its fix:
+  // - a sub-search of a memory network has no exit codeword in its index codebook (#1282);
+  // - an entropy-corrected sub- or super-search charges the parameters of the whole network (#1283);
+  // - a trial after a restored tree starts from the module network's terms (#1284).
+  if (!isMainInfomap() && (haveMemory() || entropyBiasCorrection))
+    return;
+  if (isMainInfomap() && !m_objectiveTermsAreForLeafNetwork)
+    return;
+  double priced = calcCodelength(m_root) + calcTreeCodelengthCost(numTopModules());
+  for (const InfoNode& module : m_root)
+    priced += calcCodelength(module);
+  checkCodelength(getCodelength(), priced, "the two-level partition");
+}
+
+void InfomapBase::failMoveDelta(const char* where, double predictedDelta, double actualDelta) const
+{
+  throw InfomapError(ExitCode::InternalError,
+                     fmt::format(FMT_STRING("Move invariant violated in {}{}: the move was chosen on a codelength change of {:.12g} "
+                                            "but changed the codelength by {:.12g}. This is a bug in Infomap."),
+                                 where,
+                                 isMainInfomap() ? "" : " in a sub-partition",
+                                 predictedDelta,
+                                 actualDelta));
+}
+#endif
 
 double InfomapBase::calcCodelengthOnTree(InfoNode& root, bool includeRoot) const
 {
@@ -2878,6 +3389,7 @@ void InfomapBase::findTopModulesRepeatedly(unsigned int maxLevels)
     // Consolidate modules
     bool replaceExistingModules = haveModules();
     consolidateModules(replaceExistingModules);
+    checkInvariants(m_root, "consolidating modules");
     ++numLevelsConsolidated;
     ++m_aggregationLevel;
   }
@@ -2920,6 +3432,7 @@ unsigned int InfomapBase::fineTune()
     // Delete existing modules and consolidate fine-tuned modules
     root().replaceChildrenWithGrandChildren();
     consolidateModules(false);
+    checkInvariants(m_root, "fine-tuning");
     Log(4).print("Fine-tune done in {} effective loops to codelength {} in {} modules.\n", numEffectiveLoops, io::stringify(*this), numTopModules());
   }
 
@@ -3004,6 +3517,7 @@ unsigned int InfomapBase::coarseTune()
   unsigned int numEffectiveLoops = optimizeActiveNetwork();
   Log(4).print("Tuned sub-modules in {} effective loops to codelength {} in {} modules.\n", numEffectiveLoops, io::stringify(*this), numActiveModules());
   consolidateModules(true);
+  checkInvariants(m_root, "coarse-tuning");
   Log(4).print("Consolidated tuned sub-modules to codelength {} in {} modules.\n", io::stringify(*this), numTopModules());
   return numEffectiveLoops;
 }
@@ -3089,8 +3603,7 @@ unsigned int InfomapBase::findHierarchicalSuperModules(unsigned int superLevelLi
 
     workingHierarchicalCodelength += superCodelength - oldIndexLength;
 
-    const double superCompression = ((hierarchicalCodelength - workingHierarchicalCodelength)
-                                     / hierarchicalCodelength * 100);
+    const double superCompression = hierarchicalCodelength < 1e-16 ? 0.0 : (hierarchicalCodelength - workingHierarchicalCodelength) / hierarchicalCodelength * 100;
     prettyCompression.push_back(Console::percent(superCompression));
     progress.update(fmt::format(FMT_STRING("working… codelength {} · {} top modules"), io::toPrecision(workingHierarchicalCodelength), numSuperModules));
     Console::detail(1, "super iter {}: found {} super modules, codelength {:g} + {:g} + {:g} = {:g}", numLevelsCreated + 1, numSuperModules, superIndexCodelength, superCodelength - superIndexCodelength, workingHierarchicalCodelength - superCodelength, workingHierarchicalCodelength);
@@ -3135,6 +3648,7 @@ unsigned int InfomapBase::findHierarchicalSuperModules(unsigned int superLevelLi
 
   // Calculate and store hierarchical codelengths
   m_hierarchicalCodelength = calcCodelengthOnTree(root(), true);
+  checkInvariants(m_root, "the super-module search");
 
   return numLevelsCreated;
 }
@@ -3181,7 +3695,7 @@ unsigned int InfomapBase::findHierarchicalSuperModulesFast(unsigned int superLev
 
     workingHierarchicalCodelength += codelength - oldIndexLength;
 
-    Log(1) << hideIf(!acceptSolution) << ((hierarchicalCodelength - workingHierarchicalCodelength) / hierarchicalCodelength * 100) << "% " << std::flush;
+    Log(1) << hideIf(!acceptSolution) << (hierarchicalCodelength < 1e-16 ? 0.0 : (hierarchicalCodelength - workingHierarchicalCodelength) / hierarchicalCodelength * 100) << "% " << std::flush;
     Console::note(1, "Found {} super modules in {} effective loops with hierarchical codelength {:g} + {:g} = {:g}{}", numActiveModules(), numEffectiveLoops, indexCodelength, workingHierarchicalCodelength - indexCodelength, workingHierarchicalCodelength, acceptSolution ? "" : ", discarding the solution.");
     Log(1) << std::flush;
     Log(1).print("{:g} -> {}\n", oldIndexLength, io::stringify(*this));
@@ -3211,6 +3725,7 @@ unsigned int InfomapBase::findHierarchicalSuperModulesFast(unsigned int superLev
 
   // Calculate and store hierarchical codelengths
   m_hierarchicalCodelength = calcCodelengthOnTree(root(), true);
+  checkInvariants(m_root, "the super-module search");
 
   return numLevelsCreated;
 }
@@ -3314,7 +3829,19 @@ namespace detail {
     double leafCodelength = 0.0;
     double queueFlow = 0.0; // flow of the sub-queue spawned from this module
     std::vector<PartitionTaskRecord> children;
+    // An error from this module's sub-run. It must not escape the OpenMP task, so it is
+    // kept here and rethrown once the task graph has joined.
+    std::exception_ptr error;
   };
+
+  inline void rethrowFirstError(const std::vector<PartitionTaskRecord>& records)
+  {
+    for (const auto& record : records) {
+      if (record.error)
+        std::rethrow_exception(record.error);
+      rethrowFirstError(record.children);
+    }
+  }
 } // namespace detail
 
 unsigned int InfomapBase::recursivePartition()
@@ -3340,7 +3867,9 @@ unsigned int InfomapBase::recursivePartition()
     double moduleCodelength = 0.0;
     for (auto& module : m_root)
       moduleCodelength += module.codelength;
-    hierarchicalCodelength = indexCodelength + moduleCodelength;
+    // The tree-level term, as calcCodelengthOnTree adds it: no node holds it, and
+    // without it a tree with K != K_pref top modules was reported |K - K_pref| short.
+    hierarchicalCodelength = indexCodelength + moduleCodelength + calcTreeCodelengthCost(numTopModules());
   }
   Console::detail(1, "recursive: from {}, codelength {:g} + {:g} = {}", queueSource, indexCodelength, hierarchicalCodelength - indexCodelength, io::toPrecision(hierarchicalCodelength));
 
@@ -3402,7 +3931,8 @@ unsigned int InfomapBase::recursivePartition()
     Log::setSilent(isSilent);
 
   // Tasks have joined: throwing here is safe (outside any OpenMP block) and
-  // aborts the recursion if a cancel was requested while tasks ran (#412).
+  // aborts the recursion if a sub-run failed or a cancel was requested while tasks ran (#412).
+  detail::rethrowFirstError(rootRecords);
   checkCancelled();
 
   // Aggregate the recorded statistics level by level, visiting the records in
@@ -3440,7 +3970,7 @@ unsigned int InfomapBase::recursivePartition()
     sumConsolidatedCodelength += sumIndexCodelength + sumLeafCodelength;
     double limitCodelength = sumConsolidatedCodelength + leftToImprove;
 
-    const double recursiveCompression = ((hierarchicalCodelength - limitCodelength) / hierarchicalCodelength) * 100;
+    const double recursiveCompression = hierarchicalCodelength < 1e-16 ? 0.0 : (hierarchicalCodelength - limitCodelength) / hierarchicalCodelength * 100;
     prettyCompression.push_back(Console::percent(recursiveCompression));
     progress.update(fmt::format(FMT_STRING("working… {} levels · codelength {}"), levelNum, io::toPrecision(limitCodelength)));
     Console::detail(1, "level {}: {} modules ({:g}% flow) {} codelength {:.6g} + {:.6g} (+{:.6g} to improve) = {} bits", levelNum, levelModules, levelFlowPct, Console::arrow(), sumIndexCodelength, sumLeafCodelength, leftToImprove, io::toPrecision(limitCodelength));
@@ -3454,6 +3984,7 @@ unsigned int InfomapBase::recursivePartition()
 
   // Store resulting hierarchical codelength
   m_hierarchicalCodelength = hierarchicalCodelength;
+  checkInvariants(m_root, "the recursive search");
 
   progress.finish(fmt::format(FMT_STRING("{} {} {} levels, codelength {}"), compressionSummary(prettyCompression), Console::arrow(), level, io::toPrecision(hierarchicalCodelength)));
 
@@ -3564,6 +4095,8 @@ unsigned int InfomapBase::dissolveUnprofitableModules()
 
   if (numDissolved > 0) {
     m_hierarchicalCodelength = calcCodelengthOnTree(root(), true);
+    // A dissolved top module lifts its children to the top level (#1361).
+    m_numNonTrivialTopModules = calculateNumNonTrivialTopModules();
     Console::detail(1, "prune: dissolved {} modules, codelength {} {} {}", numDissolved, io::toPrecision(codelengthBefore), Console::arrow(), io::toPrecision(m_hierarchicalCodelength));
   }
   return numDissolved;
@@ -3669,6 +4202,12 @@ void InfomapBase::partitionModuleRecursively(InfoNode& module, unsigned int leve
     module.codelength = oldModuleCodelength;
     record.leafCodelength = module.codelength;
     return;
+  } catch (const std::exception&) {
+    module.disposeInfomap();
+    module.codelength = oldModuleCodelength;
+    record.leafCodelength = module.codelength;
+    record.error = std::current_exception();
+    return;
   }
 
   double subCodelength = subInfomap.getHierarchicalCodelength();
@@ -3694,7 +4233,6 @@ void InfomapBase::partitionModuleRecursively(InfoNode& module, unsigned int leve
   // Improvement
   PartitionQueue subQueue;
   subInfomap.queueTopModules(subQueue);
-  record.indexCodelength = subIndexCodelength;
   record.moduleCodelength = subModuleCodelength;
   record.queueFlow = subQueue.flow;
 
@@ -3723,26 +4261,8 @@ void InfomapBase::partitionModuleRecursively(InfoNode& module, unsigned int leve
       const InfoNode* cloneSubModule = subQueue[k];
       auto* newSubModule = new InfoNode(cloneSubModule->data);
       newSubModule->codelength = cloneSubModule->codelength;
-      // Copy the objective-specific module aggregates the lazy sub-Infomap module
-      // node carried, so the materialized node is equivalent: calcCodelength and
-      // the deeper recursion read these on module nodes (e.g. MemMapEquation reads
-      // parent.physicalNodes). Without them, feature/higher-order builds compute
-      // wrong codelengths.
-      newSubModule->physicalNodes = cloneSubModule->physicalNodes;
-      newSubModule->stateNodes = cloneSubModule->stateNodes;
-#ifndef SWIG
-      // #659 moved these feature-only fields out-of-line into InfoNodeExtras;
-      // route the materialize-copy through the extras API and only allocate
-      // extras when the clone actually carries them (preserve the shrink).
-      if (!cloneSubModule->layerTeleFlowData().empty())
-        newSubModule->ensureExtras().layerTeleFlowData = cloneSubModule->layerTeleFlowData();
-      if (cloneSubModule->hasMetaCollection())
-        newSubModule->ensureMetaCollection() = cloneSubModule->metaCollection();
-#endif
-#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
-      newSubModule->lossyEntropy = cloneSubModule->lossyEntropy;
-      newSubModule->lossyFlowLogFlow = cloneSubModule->lossyFlowLogFlow;
-#endif
+      // So the materialized node is equivalent to the lazy sub-Infomap module node.
+      copyModuleAggregates(*newSubModule, *cloneSubModule);
       cloneToMaterialized[cloneSubModule] = newSubModule;
       materializedSubModules[k] = newSubModule;
     }
@@ -3770,11 +4290,34 @@ void InfomapBase::partitionModuleRecursively(InfoNode& module, unsigned int leve
     for (InfoNode* newSubModule : materializedSubModules)
       module.addChild(newSubModule);
 
-    // module now plays the role the sub-Infomap root did under getInfomapRoot():
-    // its index codelength is the sub-partition's index codelength.
-    module.codelength = subInfomap.root().codelength;
+    // module now plays the role the sub-Infomap root did under getInfomapRoot(),
+    // but priced where it sits: the sub-Infomap root has no exit codeword, module
+    // does, and the entropy correction charges a free parameter for it (#1176).
     module.disposeInfomap();
+    module.codelength = calcCodelength(module);
   }
+#if INFOMAP_CHECK_INVARIANTS
+  // The sub-partition was kept on subCodelength, so the subtree now in its place must price
+  // to it (#1279). Only the sub-module terms compare like with like. The index term moved from
+  // the sub-Infomap root to module, which prices the same codewords except under the entropy
+  // correction: the root has no exit codeword and module does (#1176). The rest of the
+  // sub-Infomap's codelength is compared whole, so a tree-level term the parent tree does not
+  // charge, such as a module-count preference leaking into the sub-search (#1292), fails here.
+  // oldModuleCodelength is calcCodelength(module) by construction above.
+  {
+    double pricedSubModuleCodelength = 0.0;
+    for (const InfoNode* subModule : materializedSubModules)
+      pricedSubModuleCodelength += calcCodelength(*subModule);
+    try {
+      checkCodelength(subModuleCodelength, pricedSubModuleCodelength, "keeping a sub-partition");
+    } catch (const std::exception&) {
+      // Inside an OpenMP task: record it, recursivePartition rethrows after the region.
+      record.error = std::current_exception();
+      return;
+    }
+  }
+#endif
+  record.indexCodelength = module.codelength;
 
   // Spawn the largest sub-modules first so the dominant subtrees start immediately.
   // Children recurse into the materialized real nodes (disjoint subtrees, no shared

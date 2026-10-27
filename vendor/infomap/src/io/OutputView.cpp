@@ -132,6 +132,7 @@ OutputModuleLinks OutputView::moduleLinks()
 {
   auto stateTargets = stateNodeTargets();
   OutputModuleLinks moduleLinks;
+  const bool undirected = m_infomap.isUndirectedClustering();
 
   for (auto& leaf : m_infomap.leafNodes()) {
     for (auto& link : leaf->outEdges()) {
@@ -165,7 +166,13 @@ OutputModuleLinks OutputView::moduleLinks()
         if (sourceParentIt == targetParentIt && sourceChildIndex != targetChildIndex) {
           const auto parentId = io::stringify(sourceParentIt->calculatePath(), ":");
           auto& linkMap = moduleLinks[parentId];
-          linkMap[std::make_pair(sourceChildIndex + 1, targetChildIndex + 1)] += flow;
+          // An undirected link is stored in whichever direction the input listed it, so
+          // aggregate it on the lower index first, as consolidateModules does. Otherwise one
+          // module pair can be split over two opposite rows.
+          auto modulePair = std::make_pair(sourceChildIndex + 1, targetChildIndex + 1);
+          if (undirected && modulePair.first > modulePair.second)
+            std::swap(modulePair.first, modulePair.second);
+          linkMap[modulePair] += flow;
         }
 
         sourceChildIndex = sourceParentIt->childIndex();

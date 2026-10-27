@@ -25,10 +25,10 @@ public:
 
   InfomapConfig(const std::string& flags, bool isCli = false) : InfomapConfig(Config(flags, isCli)) {}
 
-  InfomapConfig(const Config& conf) : Config(conf), m_rand(conf.seedToRandomNumberGenerator)
-  {
-    Log::precision(conf.verboseNumberPrecision);
-  }
+  // No Log::precision here: sub-Infomaps and --parallel-trials workers are
+  // constructed inside OpenMP regions, and the precision is process-global
+  // stream state. The main instance sets it when it runs.
+  InfomapConfig(const Config& conf) : Config(conf), m_rand(conf.seedToRandomNumberGenerator) {}
 
   virtual ~InfomapConfig() = default;
 

@@ -65,7 +65,14 @@ void MetaMapEquation::initNetwork(InfoNode& root)
 {
   Log(3) << "MetaMapEquation::initNetwork()...\n";
   Base::initNetwork(root);
-  m_unweightedNodeFlow = 1.0 / root.childDegree();
+  // Unweighted meta data weighs each leaf 1/N. A tree read with cluster data leaves
+  // the top modules as root's children, so count the leaves, not the children (#1271).
+  unsigned int numLeafNodes = 0;
+  if (root.firstChild != nullptr) {
+    for (auto it(root.begin_leaf_nodes()); !it.isEnd(); ++it)
+      ++numLeafNodes;
+  }
+  m_unweightedNodeFlow = 1.0 / numLeafNodes;
 }
 
 void MetaMapEquation::initPartition(std::vector<InfoNode*>& nodes)
@@ -90,6 +97,9 @@ void MetaMapEquation::initMetaNodes(InfoNode& root)
           // TODO: Use flow here and move weightByFlow choice to metaCollection, using flowCount?
           double flow = weightByFlow ? node.data.flow : m_unweightedNodeFlow;
           node.parent->ensureMetaCollection().add(node.metaData()[0], flow);
+        } else if (node.hasMetaCollection()) {
+          // A collapsed hard module is a leaf with its nodes' meta data already collected.
+          node.parent->ensureMetaCollection().add(node.metaCollection());
         } else {
           throw std::length_error("A node is missing meta data using MetaMapEquation");
         }

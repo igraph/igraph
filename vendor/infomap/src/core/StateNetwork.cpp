@@ -86,6 +86,7 @@ StateNetwork::PhysNode& StateNetwork::addPhysicalNode(unsigned int physId, doubl
 {
   auto& physNode = addPhysicalNode(physId);
   physNode.weight = weight;
+  physNode.hasWeight = true;
   m_sumNodeWeight += weight;
   return physNode;
 }
@@ -102,6 +103,7 @@ StateNetwork::PhysNode& StateNetwork::addPhysicalNode(unsigned int physId, doubl
 {
   auto& physNode = addPhysicalNode(physId);
   physNode.weight = weight;
+  physNode.hasWeight = true;
   m_sumNodeWeight += weight;
   m_names[physId] = name;
   return physNode;
@@ -172,6 +174,7 @@ bool StateNetwork::addLinkToMap(unsigned int sourceId, unsigned int targetId, do
   if (m_linksFinalized) {
     // A link added after a CSR build: the map is still the source of truth in
     // mode B, so just invalidate the cached CSR for the next finalize.
+    restoreEnteredLinks();
     m_linksFinalized = false;
   }
 
@@ -179,8 +182,8 @@ bool StateNetwork::addLinkToMap(unsigned int sourceId, unsigned int targetId, do
 
   bool addedNewLink = true;
 
-  // Aggregate link weights if they are defined more than once
-  // TODO: Sort source/target order if undirected?
+  // Aggregate link weights if they are defined more than once. A link a b and its opposite
+  // link b a stay two links: an undirected run sums them in its view (useUndirectedLinkView).
   auto& outLinks = m_nodeLinkMap[sourceId];
   if (outLinks.empty()) {
     outLinks[targetId] = weight;
@@ -306,6 +309,8 @@ void StateNetwork::clearLinks()
   std::vector<double>().swap(m_linkWeights);
   std::vector<double>().swap(m_linkFlows);
   std::map<unsigned int, double>().swap(m_outWeights);
+  std::deque<DroppedOppositeLink>().swap(m_droppedOppositeLinks);
+  m_haveUndirectedLinkView = false;
   // Mark finalized (CSR is "built" -- it's just empty) and zero the raw count so a
   // lazy finalize triggered after clearLinks() can't rebuild a bogus CSR or compute
   // m_numAggregatedLinks = m_rawLinkCount - 0. m_numLinks/m_numAggregatedLinks keep
@@ -331,6 +336,8 @@ void StateNetwork::clear()
   std::vector<unsigned int>().swap(m_linkTargets);
   std::vector<double>().swap(m_linkWeights);
   std::vector<double>().swap(m_linkFlows);
+  std::deque<DroppedOppositeLink>().swap(m_droppedOppositeLinks);
+  m_haveUndirectedLinkView = false;
   m_physNodes.clear();
   m_outWeights.clear();
   m_names.clear();
@@ -471,6 +478,129 @@ unsigned int StateNetwork::indexOfId(unsigned int id) const
       std::lower_bound(m_nodeIds.begin(), m_nodeIds.end(), id) - m_nodeIds.begin());
 }
 
+void StateNetwork::useUndirectedLinkView(bool undirected)
+{
+  // The undirected coding steps along a link in either direction, so a link a b and its
+  // opposite link b a are one link there, summed at the lower source index. The flow model is
+  // chosen per run, after the links are added, so the opposite links are summed in this view
+  // of the CSR rather than on input. Only the dropped half of each pair is set aside: a later
+  // run of the same network with a directed coding rebuilds the links as entered from it.
+  if (!undirected) {
+    restoreEnteredLinks();
+    return;
+  }
+  ensureFinalized();
+  if (m_haveUndirectedLinkView) {
+    return;
+  }
+
+  // In place, in one pass over the rows in order. A link s t with t < s is dropped when its
+  // opposite link t s exists, and its weight is added to t s. Row t is compacted already, as
+  // t < s, and still holds t s, which is not dropped since s > t. Both CSR builds keep each
+  // row sorted on target index, and compacting keeps that order.
+  const unsigned int numNodes = static_cast<unsigned int>(m_nodeIds.size());
+  unsigned int numKept = 0;
+  unsigned int rowBegin = 0;
+  for (unsigned int s = 0; s < numNodes; ++s) {
+    const unsigned int rowEnd = m_linkOffsets[s + 1];
+    m_linkOffsets[s] = numKept;
+    for (unsigned int e = rowBegin; e < rowEnd; ++e) {
+      const auto t = m_linkTargets[e];
+      const auto weight = m_linkWeights[e];
+      if (t < s) {
+        const auto first = m_linkTargets.begin() + m_linkOffsets[t];
+        const auto last = m_linkTargets.begin() + m_linkOffsets[t + 1];
+        const auto opposite = std::lower_bound(first, last, s);
+        if (opposite != last && *opposite == s) {
+          auto& oppositeWeight = m_linkWeights[opposite - m_linkTargets.begin()];
+          m_droppedOppositeLinks.push_back({ s, t, weight, oppositeWeight });
+          oppositeWeight += weight;
+          continue;
+        }
+      }
+      m_linkTargets[numKept] = t;
+      m_linkWeights[numKept] = weight;
+      ++numKept;
+    }
+    rowBegin = rowEnd;
+  }
+  m_linkOffsets[numNodes] = numKept;
+  if (m_droppedOppositeLinks.empty()) {
+    return; // every link stayed in place: the view is the links as entered
+  }
+
+  // Shrinking keeps the allocation, so the view needs no memory of its own
+  m_linkTargets.resize(numKept);
+  m_linkWeights.resize(numKept);
+  std::vector<double>().swap(m_linkFlows); // flow is per run; free it before sizing it for the view
+  m_linkFlows.assign(numKept, 0.0);
+  m_enteredNumLinks = m_numLinks;
+  m_enteredNumAggregatedLinks = m_numAggregatedLinks;
+  m_numLinks = numKept;
+  m_numAggregatedLinks += static_cast<unsigned int>(m_droppedOppositeLinks.size());
+  if (!m_useMapBuild) {
+    m_outWeights.clear(); // mode A derives it from the CSR on demand; mode B keeps the map's
+  }
+  m_haveUndirectedLinkView = true;
+}
+
+void StateNetwork::restoreEnteredLinks()
+{
+  if (!m_haveUndirectedLinkView) {
+    return;
+  }
+  // Give each summed link its weight as entered back. Subtracting the dropped weight would
+  // not, as floating-point addition rounds.
+  for (const auto& dropped : m_droppedOppositeLinks) {
+    const auto first = m_linkTargets.begin() + m_linkOffsets[dropped.target];
+    const auto last = m_linkTargets.begin() + m_linkOffsets[dropped.target + 1];
+    m_linkWeights[std::lower_bound(first, last, dropped.source) - m_linkTargets.begin()] = dropped.oppositeWeight;
+  }
+  std::vector<double>().swap(m_linkFlows); // the view's flows belong to its links
+
+  // Rebuild the rows with the dropped links merged back in target order. They were set aside
+  // in row order, and in target order within a row.
+  const unsigned int numNodes = static_cast<unsigned int>(m_nodeIds.size());
+  std::vector<unsigned int> offsets(numNodes + 1, 0);
+  std::vector<unsigned int> targets;
+  std::vector<double> weights;
+  targets.reserve(m_enteredNumLinks);
+  weights.reserve(m_enteredNumLinks);
+  auto dropped = m_droppedOppositeLinks.cbegin();
+  const auto droppedEnd = m_droppedOppositeLinks.cend();
+  for (unsigned int s = 0; s < numNodes; ++s) {
+    for (unsigned int e = m_linkOffsets[s]; e < m_linkOffsets[s + 1]; ++e) {
+      for (; dropped != droppedEnd && dropped->source == s && dropped->target < m_linkTargets[e]; ++dropped) {
+        targets.push_back(dropped->target);
+        weights.push_back(dropped->weight);
+      }
+      targets.push_back(m_linkTargets[e]);
+      weights.push_back(m_linkWeights[e]);
+    }
+    for (; dropped != droppedEnd && dropped->source == s; ++dropped) {
+      targets.push_back(dropped->target);
+      weights.push_back(dropped->weight);
+    }
+    offsets[s + 1] = static_cast<unsigned int>(targets.size());
+  }
+  m_linkOffsets.swap(offsets);
+  m_linkTargets.swap(targets);
+  m_linkWeights.swap(weights);
+  // Free the view before sizing the flow array
+  std::vector<unsigned int>().swap(offsets);
+  std::vector<unsigned int>().swap(targets);
+  std::vector<double>().swap(weights);
+  std::deque<DroppedOppositeLink>().swap(m_droppedOppositeLinks);
+
+  m_linkFlows.assign(m_linkTargets.size(), 0.0); // the next run computes the flow anew
+  m_numLinks = m_enteredNumLinks;
+  m_numAggregatedLinks = m_enteredNumAggregatedLinks;
+  if (!m_useMapBuild) {
+    m_outWeights.clear();
+  }
+  m_haveUndirectedLinkView = false;
+}
+
 void StateNetwork::finalizeLinks()
 {
   // Idempotent: build the consumed CSR exactly once. A second call would rebuild
@@ -579,6 +709,7 @@ void StateNetwork::definalize()
   // forEachLink()) re-runs the full sort+merge on every addLink-after-finalize.
   // The parse path appends all links first and finalizes once, so this is cheap
   // there; callers doing repeated query/append cycles pay O(L log L) per append.
+  restoreEnteredLinks(); // the buffer holds the links as entered
   m_linkBuffer.clear();
   m_linkBuffer.reserve(m_linkTargets.size()); // final size is known -> single allocation
   m_rawLinkCount = 0;
@@ -642,6 +773,7 @@ void StateNetwork::ensureMapBuild()
     return;
   }
   ensureFinalized();
+  restoreEnteredLinks(); // the map holds the links as entered
   NodeLinkMap().swap(m_nodeLinkMap);
   m_outWeights.clear();
   for (unsigned int s = 0; s < m_nodeIds.size(); ++s) {

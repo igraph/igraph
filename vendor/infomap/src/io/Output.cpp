@@ -249,7 +249,12 @@ void writeTreeLinks(InfomapBase& im, std::ostream& outStream, bool states)
 
   OutputView view(im, im.network(), states);
 
-  outStream << "*Links " << (im.isUndirectedFlow() ? "undirected" : "directed") << "\n";
+  // Follow the clustering, not the flow: under --flow-model undirdir the flow is
+  // undirected but the rows are directed flows, like the enter/exit flow beside them.
+  const bool undirected = im.isUndirectedClustering();
+  outStream << "*Links " << (undirected ? "undirected" : "directed") << "\n";
+  if (undirected)
+    outStream << "# link flow is both directions combined, one row per module pair\n";
   outStream << "#*Links path enterFlow exitFlow numEdges numChildren\n";
 
   view.forEachModule([&](const OutputModuleRow& module) {
@@ -350,7 +355,8 @@ void writeJsonTree(InfomapBase& im, const StateNetwork& network, std::ostream& o
   }
   json["numModules"] = std::move(numModules);
   json["relativeCodelengthSavings"] = im.getRelativeCodelengthSavings();
-  json["directed"] = !im.isUndirectedFlow();
+  // Like the .ftree *Links header: undirdir is clustered, and its module links written, as directed.
+  json["directed"] = !im.isUndirectedClustering();
   json["flowModel"] = flowModelToString(im.flowModel);
   json["higherOrder"] = im.haveMemory();
 

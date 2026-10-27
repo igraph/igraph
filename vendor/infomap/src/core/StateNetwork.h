@@ -11,7 +11,9 @@
 #define STATE_NETWORK_H_
 
 #include "../io/Config.h"
+#include <deque>
 #include <string>
+#include <limits>
 #include <map>
 #include <utility>
 #include <vector>
@@ -49,6 +51,9 @@ public:
   struct PhysNode {
     unsigned int physId = 0;
     double weight = 1.0;
+    // Whether the weight was given, as in a *Vertices record. Only then does it
+    // replace a weight already set on the state node (#1183).
+    bool hasWeight = false;
     PhysNode(unsigned int physId) : physId(physId) {}
     PhysNode(unsigned int physId, double weight) : physId(physId), weight(weight) {}
     PhysNode(double weight = 1.0) : weight(weight) {}
@@ -130,6 +135,20 @@ protected:
   unsigned int m_numLinksIgnoredByWeightThreshold = 0;
   double m_totalLinkWeightIgnored = 0.0;
   std::map<unsigned int, double> m_outWeights;
+  // While the CSR arrays hold the undirected view, which sums each link a b and its opposite
+  // link b a into one link at the lower source index (#1366), the dropped half of each such
+  // pair is set aside here: its source and target index and weight, and the weight as entered
+  // of the opposite link it is summed into. Empty without that view.
+  struct DroppedOppositeLink {
+    unsigned int source;
+    unsigned int target;
+    double weight;
+    double oppositeWeight;
+  };
+  bool m_haveUndirectedLinkView = false;
+  std::deque<DroppedOppositeLink> m_droppedOppositeLinks;
+  unsigned int m_enteredNumLinks = 0;
+  unsigned int m_enteredNumAggregatedLinks = 0;
   bool m_haveNodeWeights = false;
   bool m_haveStateNodeWeights = false;
   bool m_haveFileInput = false;
@@ -149,6 +168,8 @@ protected:
   bool m_flowConverged = true;
   unsigned int m_flowIterations = 0;
   double m_flowError = 0.0;
+  double m_flowRate = std::numeric_limits<double>::quiet_NaN();
+  bool m_flowAccelerated = false;
 
   // Bipartite
   unsigned int m_bipartiteStartId = 0;
@@ -241,6 +262,11 @@ public:
       for (unsigned int e = m_linkOffsets[s]; e < m_linkOffsets[s + 1]; ++e)
         fn(s, m_linkTargets[e], m_linkWeights[e], m_linkFlows[e]);
   }
+  // Duplicate links are summed on input only when they have the same direction, so a link
+  // a b and its opposite link b a are two links of the stored network. A run with the
+  // undirected coding calls this with true before its flow, to read them as one link; any
+  // other run calls it with false and reads the links as entered (#1366).
+  void useUndirectedLinkView(bool undirected);
 #endif
 
   // Mode A (first-order and the main multilayer network) defers dedup to
@@ -297,6 +323,12 @@ public:
   bool flowConverged() const { return m_flowConverged; }
   unsigned int flowIterations() const { return m_flowIterations; }
   double flowError() const { return m_flowError; }
+  //! The plain power iteration's change shrank by this factor per step, before any
+  //! acceleration: an estimate of the walk's second-largest eigenvalue, so how slowly it
+  //! mixes. NaN if no step was measured.
+  double flowRate() const { return m_flowRate; }
+  //! Whether the iteration was slow enough to be accelerated (#1353).
+  bool flowAccelerated() const { return m_flowAccelerated; }
 
   bool haveNodeWeights() const { return m_haveNodeWeights; }
   bool haveStateNodeWeights() const { return m_haveStateNodeWeights; }
@@ -349,6 +381,8 @@ protected:
   // Move CSR rows back into the flat buffer so a finalized network can keep
   // building (mode A accumulate / addLink-after-run).
   void definalize();
+  // Put the CSR as entered back in place of the undirected view, if there is one.
+  void restoreEnteredLinks();
 };
 
 } // namespace infomap

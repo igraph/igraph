@@ -118,6 +118,13 @@ namespace {
       config.recordedTeleportation = true;
     }
 
+    // The flag only reshapes the prior network that --regularized builds. Without it
+    // there is no prior to restrict, and every other multilayer model already treats a
+    // node as absent from the layers whose links never mention it.
+    if (config.multilayerSkipAbsentNodes && !config.regularized) {
+      throw std::runtime_error("--multilayer-skip-absent-nodes requires --regularized");
+    }
+
     if (config.noInfomap) {
       config.numTrials = 1;
     }

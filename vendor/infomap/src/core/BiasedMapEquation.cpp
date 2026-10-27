@@ -47,8 +47,9 @@ void BiasedMapEquation::setNetworkProperties(const StateNetwork& network)
 {
   auto totalDegree = network.sumWeightedDegree();
   // Negative entropy bias is based on discrete counts, if average weight is below 1, use unweighted total degree
-  if (totalDegree < network.sumDegree()) {
-    totalDegree = network.sumDegree();
+  const auto sumDegree = network.sumDegree();
+  if (totalDegree < sumDegree) {
+    totalDegree = sumDegree;
   }
   m_totalDegree = totalDegree;
   m_numNodes = network.numNodes();
@@ -141,8 +142,14 @@ double BiasedMapEquation::calcNumModuleCost(unsigned int numModules) const
 //
 // Equivalently: L is the entropy rate of the Markov chain over codebooks, whose
 // ML estimate is biased by -(free parameters)/(2D) nats.
+//
+// A network without links has D = 0: no walk step was observed, so there is no
+// estimate to correct and the correction is 0, which leaves such a network at the
+// one module and 0 bits it reports without the correction (#1296).
 double BiasedMapEquation::bitsPerFreeParameter() const
 {
+  if (m_totalDegree <= 0)
+    return 0;
   return entropyBiasCorrectionMultiplier / (2 * m_totalDegree * LOG_2);
 }
 
@@ -233,7 +240,8 @@ double BiasedMapEquation::calcCodelengthOnModuleOfModules(const InfoNode& parent
   // whole tree, so it also charges the intermediate module-of-modules codebooks,
   // one free parameter per non-root module-of-modules more. This side is the
   // correct one. The tracked side is left alone here because making it tree-aware
-  // changes what the search minimises, not what it reports.
+  // changes what the search minimises, not what it reports: the recursive search
+  // reports a deep tree from terms priced in that tree, as this function does (#1176).
   return L + bitsPerFreeParameter() * calcCodebookFreeParameters(parent);
 }
 

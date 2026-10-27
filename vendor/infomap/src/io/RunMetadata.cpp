@@ -15,7 +15,8 @@
 #include "../utils/format.h"
 #include "../version.h"
 
-#include <fstream>
+#include <cstdio>
+#include <memory>
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -24,6 +25,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <cstdint>
 
 namespace infomap {
 
@@ -56,36 +58,134 @@ namespace {
     return out.str();
   }
 
-  // FNV-1a 64 over the whole file, one streaming pass. It used to hash the size
+  // XXH64 (seed 0), the 64-bit xxHash: https://github.com/Cyan4973/xxHash
+  // It consumes the input eight bytes at a time in four independent lanes, where
+  // byte-at-a-time FNV-1a cost about 7.5 instructions per input byte on every run
+  // (#1167). The value is the one `xxhsum -H64` prints for the same file.
+  constexpr std::uint64_t XXH_PRIME1 = 11400714785074694791ull;
+  constexpr std::uint64_t XXH_PRIME2 = 14029467366897019727ull;
+  constexpr std::uint64_t XXH_PRIME3 = 1609587929392839161ull;
+  constexpr std::uint64_t XXH_PRIME4 = 9650029242287828579ull;
+  constexpr std::uint64_t XXH_PRIME5 = 2870177450012600261ull;
+  constexpr std::size_t XXH_STRIPE = 32;
+
+  inline std::uint64_t rotl64(std::uint64_t x, int r) { return (x << r) | (x >> (64 - r)); }
+
+  // Little-endian on every host; compilers fold this into a single load.
+  inline std::uint64_t readLE64(const unsigned char* p)
+  {
+    std::uint64_t v = 0;
+    for (int i = 7; i >= 0; --i)
+      v = (v << 8) | p[i];
+    return v;
+  }
+
+  inline std::uint32_t readLE32(const unsigned char* p)
+  {
+    return static_cast<std::uint32_t>(p[0]) | (static_cast<std::uint32_t>(p[1]) << 8) | (static_cast<std::uint32_t>(p[2]) << 16) | (static_cast<std::uint32_t>(p[3]) << 24);
+  }
+
+  inline std::uint64_t xxhRound(std::uint64_t acc, std::uint64_t input)
+  {
+    acc += input * XXH_PRIME2;
+    acc = rotl64(acc, 31);
+    return acc * XXH_PRIME1;
+  }
+
+  inline std::uint64_t xxhMergeRound(std::uint64_t acc, std::uint64_t val)
+  {
+    acc ^= xxhRound(0, val);
+    return acc * XXH_PRIME1 + XXH_PRIME4;
+  }
+
+  class Xxh64 {
+  public:
+    // Whole stripes only; the caller passes any remainder to finish().
+    void stripes(const unsigned char* p, std::size_t size)
+    {
+      for (const auto* end = p + size; p != end; p += XXH_STRIPE) {
+        m_v1 = xxhRound(m_v1, readLE64(p));
+        m_v2 = xxhRound(m_v2, readLE64(p + 8));
+        m_v3 = xxhRound(m_v3, readLE64(p + 16));
+        m_v4 = xxhRound(m_v4, readLE64(p + 24));
+      }
+      m_length += size;
+    }
+
+    std::uint64_t finish(const unsigned char* p, std::size_t size) const
+    {
+      std::uint64_t h;
+      if (m_length >= XXH_STRIPE) {
+        h = rotl64(m_v1, 1) + rotl64(m_v2, 7) + rotl64(m_v3, 12) + rotl64(m_v4, 18);
+        h = xxhMergeRound(h, m_v1);
+        h = xxhMergeRound(h, m_v2);
+        h = xxhMergeRound(h, m_v3);
+        h = xxhMergeRound(h, m_v4);
+      } else {
+        h = XXH_PRIME5;
+      }
+      h += m_length + size;
+
+      for (; size >= 8; p += 8, size -= 8)
+        h = rotl64(h ^ xxhRound(0, readLE64(p)), 27) * XXH_PRIME1 + XXH_PRIME4;
+      if (size >= 4) {
+        h = rotl64(h ^ (readLE32(p) * XXH_PRIME1), 23) * XXH_PRIME2 + XXH_PRIME3;
+        p += 4;
+        size -= 4;
+      }
+      for (; size > 0; ++p, --size)
+        h = rotl64(h ^ (*p * XXH_PRIME5), 11) * XXH_PRIME1;
+
+      h ^= h >> 33;
+      h *= XXH_PRIME2;
+      h ^= h >> 29;
+      h *= XXH_PRIME3;
+      h ^= h >> 32;
+      return h;
+    }
+
+  private:
+    std::uint64_t m_v1 = XXH_PRIME1 + XXH_PRIME2;
+    std::uint64_t m_v2 = XXH_PRIME2;
+    std::uint64_t m_v3 = 0;
+    std::uint64_t m_v4 = 0 - XXH_PRIME1;
+    std::uint64_t m_length = 0;
+  };
+
+  // A hash of the whole file, one streaming pass. It used to hash the size
   // plus the first and last 64 KiB, which was blind to a same-size edit anywhere
   // in the interior of a file larger than 128 KiB -- precisely the edit-and-rerun
-  // workflow the fingerprint exists to catch (#1026). A full pass costs one read
-  // of data the run is about to parse anyway.
+  // workflow the fingerprint exists to catch (#1026).
   std::string fileContentFingerprint(const std::string& path)
   {
-    std::ifstream input(path.c_str(), std::ios_base::binary);
+    // stdio, unbuffered: std::ifstream::read copied every byte through the
+    // stream's own buffer, which cost more than the hash itself (#1167).
+    const std::unique_ptr<std::FILE, int (*)(std::FILE*)> input(std::fopen(path.c_str(), "rb"), &std::fclose);
     if (!input) {
       throw std::runtime_error(fmt::format(FMT_STRING("Cannot open input file '{}'. Check that the path points to a file and that you have read permissions."), path));
     }
+    std::setvbuf(input.get(), nullptr, _IONBF, 0);
 
-    auto hash = FNV_OFFSET;
-    constexpr std::streamsize CHUNK_SIZE = 65536;
-    std::vector<char> buffer(static_cast<std::size_t>(CHUNK_SIZE));
-    while (true) {
-      input.read(buffer.data(), CHUNK_SIZE);
-      const auto got = input.gcount();
-      if (got > 0)
-        hashBytes(hash, buffer.data(), got);
-      if (got < CHUNK_SIZE)
-        break;
-    }
+    // A multiple of the stripe size, so only the last chunk leaves a remainder.
+    constexpr std::size_t CHUNK_SIZE = 65536;
+    static_assert(CHUNK_SIZE % XXH_STRIPE == 0, "chunks must hold whole stripes");
+    std::vector<unsigned char> buffer(CHUNK_SIZE);
+    Xxh64 hasher;
+    std::size_t got = 0;
+    std::size_t whole = 0;
+    do {
+      got = std::fread(buffer.data(), 1, CHUNK_SIZE, input.get());
+      whole = got - got % XXH_STRIPE;
+      hasher.stripes(buffer.data(), whole);
+    } while (got == CHUNK_SIZE);
     // A short read is EOF *or* an I/O error, and the two must not be confused:
     // hashing only the readable prefix would publish a valid-looking identity
     // for content nobody read.
-    if (input.bad()) {
+    if (std::ferror(input.get())) {
       throw std::runtime_error(fmt::format(FMT_STRING("Cannot read input file '{}': the read failed partway through."), path));
     }
 
+    const auto hash = hasher.finish(buffer.data() + whole, got - whole);
     std::ostringstream out;
     out << std::hex << std::setw(16) << std::setfill('0') << hash;
     return out.str();
@@ -149,6 +249,9 @@ std::string canonicalConfigJson(const Config& config)
   json["no_infomap"] = config.noInfomap;
   json["regularized"] = config.regularized;
   addCanonicalNumber(json, "regularization_strength", config.regularizationStrength);
+  addCanonicalNumber(json, "intra_regularization_strength", config.intraRegularizationStrength);
+  addCanonicalNumber(json, "inter_regularization_strength", config.interRegularizationStrength);
+  json["multilayer_skip_absent_nodes"] = config.multilayerSkipAbsentNodes;
   json["recorded_teleportation"] = config.recordedTeleportation;
   addCanonicalNumber(json, "teleportation_probability", config.teleportationProbability);
   addCanonicalNumber(json, "markov_time", config.markovTime);

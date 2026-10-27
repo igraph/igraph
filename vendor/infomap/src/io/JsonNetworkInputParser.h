@@ -583,10 +583,10 @@ namespace input {
       // flag governs the flow model. Multilayer flow handles direction itself.
       if (header.hasDirected && header.type != "multilayer") {
         const bool fileDirected = header.directed;
-        const bool runDirected = !options.undirectedFlow;
+        const bool runDirected = !options.undirectedLinks;
         if (fileDirected != runDirected) {
           Log() << "\n";
-          Console::note(0, "JSON 'directed': {} but flow parsed as {}.", fileDirected ? "true" : "false", runDirected ? "directed" : "undirected");
+          Console::note(0, "JSON 'directed': {} but links parsed as {}.", fileDirected ? "true" : "false", runDirected ? "directed" : "undirected");
         }
       }
 
