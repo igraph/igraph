@@ -240,7 +240,7 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  *    of the same length as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ * \param value If not a null pointer, then when using \c IGRAPH_PAGERANK_ALGO_ARPACK,
  *    the eigenvalue corresponding to the PageRank vector is stored here. It is
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
@@ -322,7 +322,7 @@ igraph_error_t igraph_pagerank(
  *    as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ * \param value If not a null pointer, then when using \c IGRAPH_PAGERANK_ALGO_ARPACK,
  *    the eigenvalue corresponding to the PageRank vector is stored here. It is
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
@@ -419,7 +419,7 @@ igraph_error_t igraph_personalized_pagerank_vs(
  *    of the same length as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ * \param value If not a null pointer, then when using \c IGRAPH_PAGERANK_ALGO_ARPACK,
  *    the eigenvalue corresponding to the PageRank vector is stored here. It is
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.

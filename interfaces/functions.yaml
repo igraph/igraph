@@ -729,7 +729,7 @@ igraph_harmonic_centrality_cutoff:
 igraph_pagerank:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
-        OUT VERTEX_QTY vector, OUT REAL value,
+        OUT VERTEX_QTY vector, OPTIONAL OUT REAL value,
         REAL damping=0.85, BOOLEAN directed=True,
         VERTEX_SELECTOR vids=ALL,
         PAGERANKALGO algo=PRPACK,
@@ -741,7 +741,7 @@ igraph_pagerank:
 igraph_personalized_pagerank:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
-        OUT VERTEX_QTY vector, OUT REAL value,
+        OUT VERTEX_QTY vector, OPTIONAL OUT REAL value,
         OPTIONAL VECTOR reset,
         REAL damping=0.85, BOOLEAN directed=True,
         VERTEX_SELECTOR vids=ALL,
@@ -754,7 +754,7 @@ igraph_personalized_pagerank:
 igraph_personalized_pagerank_vs:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
-        PRIMARY OUT VERTEX_QTY vector, OUT REAL value,
+        PRIMARY OUT VERTEX_QTY vector, OPTIONAL OUT REAL value,
         VERTEX_SELECTOR reset_vids,
         REAL damping=0.85, BOOLEAN directed=True,
         VERTEX_SELECTOR vids=ALL,
@@ -914,7 +914,7 @@ igraph_add_edge:
 
 igraph_eigenvector_centrality:
     PARAMS: |-
-        GRAPH graph, OUT ALL_VERTEX_QTY vector, OUT REAL value,
+        GRAPH graph, OUT ALL_VERTEX_QTY vector, OPTIONAL OUT REAL value,
         NEIMODE mode=OUT,
         OPTIONAL EDGE_WEIGHTS weights,
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
@@ -923,7 +923,7 @@ igraph_eigenvector_centrality:
 igraph_hub_and_authority_scores:
     PARAMS: |-
         GRAPH graph, OUT ALL_VERTEX_QTY hub_vector, OUT ALL_VERTEX_QTY authority_vector,
-        OUT REAL value, OPTIONAL EDGE_WEIGHTS weights,
+        OPTIONAL OUT REAL value, OPTIONAL EDGE_WEIGHTS weights,
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, hub_vector ON graph, authority_vector ON graph
 
@@ -1028,7 +1028,7 @@ igraph_centralization_closeness_tmax:
 
 igraph_centralization_eigenvector_centrality:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR vector, OUT REAL value,
+        GRAPH graph, OUT VECTOR vector, OPTIONAL OUT REAL value,
         NEIMODE mode=OUT,
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
         OUT REAL centralization, OUT REAL theoretical_max,
