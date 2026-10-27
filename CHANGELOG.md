@@ -45,6 +45,7 @@
 - `igraph_community_label_propagation()` accepted initial labels equal to the vertex count, which led to out-of-bounds memory access. It also terminated the process when given the null graph and an initial labeling.
 - `igraph_lcf()` and `igraph_lcf_small()` terminated the process with a division by zero when given zero vertices together with shifts, and with a failed assertion when given a negative vertex count. These now return an error.
 - `igraph_extended_chordal_ring()` terminated the process with a division by zero when the matrix `W` had no columns. An empty `W` now produces a cycle graph, while a `W` with rows but no columns is rejected.
+- `igraph_eccentricity()` leaked memory when called with weights and with a vertex selector created by `igraph_vs_adj()` or `igraph_vs_nonadj()`, or when an error occurred during the computation.
 
 ### Other
 
