@@ -377,6 +377,37 @@ int main(void) {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
+    /* Undirected self-loops act as two directed self-loops. */
+
+    printf("\nSmall undirected graph with self-loop (unweighted)\n");
+
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0,1, 1,1, 1,2,
+                 -1);
+
+    igraph_pagerank(&g, NULL, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_ARPACK, &arpack_options);
+    printf("ARPACK: "); print_vector(&res);
+
+    igraph_pagerank(&g, NULL, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
+    printf("PRPACK: "); print_vector(&res);
+
+    printf("\nSmall undirected graph with self-loop (weighted)\n");
+
+    igraph_vector_init_real(&weights, 3, 1.0, 2.0, 3.0);
+
+    igraph_pagerank(&g, &weights, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_ARPACK, &arpack_options);
+    printf("ARPACK: "); print_vector(&res);
+
+    igraph_pagerank(&g, &weights, &res, NULL, 0.85, 1,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
+    printf("PRPACK: "); print_vector(&res);
+
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
     igraph_vector_destroy(&res);
 
     /* Graph with more than 127 vertices. PRPACK uses a different method above this size. */
@@ -475,6 +506,33 @@ int main(void) {
             igraph_destroy(&g);
         }
         igraph_vector_destroy(&res);
+    }
+
+    /* Invalid weights are rejected by both algorithms, both with and without
+     * considering edge directions. */
+    {
+        const igraph_real_t invalid_weights[] = { -1.0, IGRAPH_NAN, IGRAPH_INFINITY };
+        const igraph_pagerank_algo_t algos[] = { IGRAPH_PAGERANK_ALGO_ARPACK, IGRAPH_PAGERANK_ALGO_PRPACK };
+
+        igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, -1);
+        igraph_vector_init(&res, 0);
+        igraph_vector_init(&weights, 2);
+        VECTOR(weights)[0] = 1;
+
+        for (int i = 0; i < 3; i++) {
+            VECTOR(weights)[1] = invalid_weights[i];
+            for (int directed = 0; directed < 2; directed++) {
+                for (int j = 0; j < 2; j++) {
+                    CHECK_ERROR(igraph_pagerank(&g, &weights, &res, &value, 0.85, directed,
+                                                igraph_vss_all(), algos[j], NULL),
+                                IGRAPH_EINVAL);
+                }
+            }
+        }
+
+        igraph_vector_destroy(&weights);
+        igraph_vector_destroy(&res);
+        igraph_destroy(&g);
     }
 
     VERIFY_FINALLY_STACK();
