@@ -25,26 +25,26 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     printf("No vertices:\n");
-    IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/0, /*fw_prob*/ 0.0,
-                  /*bw_factor*/ 0.0, /*ambs*/1, /*directed*/ 0) == IGRAPH_SUCCESS);
+    igraph_forest_fire_game(&g, /*number of vertices*/0, /*fw_prob*/ 0.0,
+                            /*bw_factor*/ 0.0, /*ambs*/1, /*directed*/ 0);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("No ambassadors:\n");
-    IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/10, /*fw_prob*/ 0.0,
-                  /*bw_factor*/ 0.0, /*ambs*/0, /*directed*/ 0) == IGRAPH_SUCCESS);
+    igraph_forest_fire_game(&g, /*number of vertices*/10, /*fw_prob*/ 0.0,
+                            /*bw_factor*/ 0.0, /*ambs*/0, /*directed*/ 0);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("More ambassadors than nodes:\n");
-    IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/5, /*fw_prob*/ 0.0,
-                  /*bw_factor*/ 0.0, /*ambs*/100, /*directed*/ 1) == IGRAPH_SUCCESS);
+    igraph_forest_fire_game(&g, /*number of vertices*/5, /*fw_prob*/ 0.0,
+                            /*bw_factor*/ 0.0, /*ambs*/100, /*directed*/ 1);
     print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("Some normal inputs, just to check for memory problems, no output checking.\n");
-    IGRAPH_ASSERT(igraph_forest_fire_game(&g, /*number of vertices*/50, /*fw_prob*/ 0.5,
-                  /*bw_factor*/ 0.5, /*ambs*/3, /*directed*/ 1) == IGRAPH_SUCCESS);
+    igraph_forest_fire_game(&g, /*number of vertices*/50, /*fw_prob*/ 0.5,
+                            /*bw_factor*/ 0.5, /*ambs*/3, /*directed*/ 1);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
