@@ -60,6 +60,14 @@ int main(void) {
     igraph_vector_int_destroy(&roots);
 
     igraph_vector_int_destroy(&rootlevel);
+    igraph_destroy(&g);
+
+    /* Automatic root selection in small graphs uses the lowest eccentricity
+     * (vertex 2 or 3), not the highest degree (vertex 4). */
+    igraph_small(&g, 8, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, 3,4, 4,5, 4,6, 4,7, -1);
+    igraph_layout_reingold_tilford(&g, &res, IGRAPH_ALL, NULL, NULL);
+    IGRAPH_ASSERT(MATRIX(res, 2, 1) == 0 || MATRIX(res, 3, 1) == 0);
+
     igraph_matrix_destroy(&res2);
     igraph_matrix_destroy(&res);
     igraph_destroy(&g);

@@ -757,7 +757,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&myroots, 0);
         IGRAPH_CHECK(igraph_roots_for_tree_layout(
             graph, mode, &myroots,
-            no_of_nodes < 500 ? IGRAPH_ROOT_CHOICE_DEGREE : IGRAPH_ROOT_CHOICE_ECCENTRICITY));
+            no_of_nodes < 500 ? IGRAPH_ROOT_CHOICE_ECCENTRICITY : IGRAPH_ROOT_CHOICE_DEGREE));
         proots = &myroots;
 
     } else if (rootlevel && igraph_vector_int_size(rootlevel) > 0 &&
