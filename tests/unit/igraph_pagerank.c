@@ -457,6 +457,33 @@ int main(void) {
         igraph_destroy(&g);
     }
 
+    /* Invalid weights are rejected by both algorithms, both with and without
+     * considering edge directions. */
+    {
+        const igraph_real_t invalid_weights[] = { -1.0, IGRAPH_NAN, IGRAPH_INFINITY };
+        const igraph_pagerank_algo_t algos[] = { IGRAPH_PAGERANK_ALGO_ARPACK, IGRAPH_PAGERANK_ALGO_PRPACK };
+
+        igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, -1);
+        igraph_vector_init(&res, 0);
+        igraph_vector_init(&weights, 2);
+        VECTOR(weights)[0] = 1;
+
+        for (int i = 0; i < 3; i++) {
+            VECTOR(weights)[1] = invalid_weights[i];
+            for (int directed = 0; directed < 2; directed++) {
+                for (int j = 0; j < 2; j++) {
+                    CHECK_ERROR(igraph_pagerank(&g, &weights, &res, &value, 0.85, directed,
+                                                igraph_vss_all(), algos[j], NULL),
+                                IGRAPH_EINVAL);
+                }
+            }
+        }
+
+        igraph_vector_destroy(&weights);
+        igraph_vector_destroy(&res);
+        igraph_destroy(&g);
+    }
+
     VERIFY_FINALLY_STACK();
 
     return 0;
