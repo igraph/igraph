@@ -133,7 +133,7 @@ igraph_error_t igraph_edgelist_percolation(
 
     igraph_vector_int_minmax(edges, &lower, &upper);
 
-    if (lower < 0) {
+    if (lower < 0 || upper >= IGRAPH_VCOUNT_MAX) {
         IGRAPH_ERROR("Invalid vertex ID.", IGRAPH_EINVVID);
     }
 
@@ -228,24 +228,29 @@ igraph_error_t igraph_bond_percolation(
         igraph_vector_int_shuffle(&i_edge_order);
         p_edge_order = &i_edge_order;
     } else {
-        // Verify that there are no duplicates.
+        // Verify that edge IDs are valid and there are no duplicates.
+        const igraph_int_t ecount = igraph_ecount(graph);
         const igraph_int_t no_of_added_edges = igraph_vector_int_size(edge_order);
         igraph_bitset_t present_edges;
 
-        IGRAPH_BITSET_INIT_FINALLY(&present_edges, no_of_added_edges);
+        IGRAPH_BITSET_INIT_FINALLY(&present_edges, ecount);
 
         for (igraph_int_t i = 0; i < no_of_added_edges; i++) {
-            if (IGRAPH_BIT_TEST(present_edges, VECTOR(*edge_order)[i])) {
+            const igraph_int_t eid = VECTOR(*edge_order)[i];
+            if (eid < 0 || eid >= ecount) {
+                IGRAPH_ERROR("Invalid edge ID in edge order vector.", IGRAPH_EINVEID);
+            }
+            if (IGRAPH_BIT_TEST(present_edges, eid)) {
                 IGRAPH_ERROR("Duplicate edges in edge order vector.", IGRAPH_EINVAL);
             }
-            IGRAPH_BIT_SET(present_edges, VECTOR(*edge_order)[i]);
+            IGRAPH_BIT_SET(present_edges, eid);
         }
         igraph_bitset_destroy(&present_edges);
         IGRAPH_FINALLY_CLEAN(1);
         p_edge_order = edge_order;
     }
 
-    // Initialize edge list. igraph_edges() will validate edge IDs.
+    // Initialize edge list.
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * igraph_vector_int_size(p_edge_order));
     IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges, /* bycol = */ 0));
 
