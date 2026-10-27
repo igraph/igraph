@@ -488,6 +488,26 @@ int main(void) {
         igraph_destroy(&g);
     }
 
+    /* The 'value' output is optional. Exercise both the trivial
+     * (edgeless) and the general code paths. */
+    {
+        igraph_pagerank_algo_t algos[] = { IGRAPH_PAGERANK_ALGO_ARPACK, IGRAPH_PAGERANK_ALGO_PRPACK };
+
+        igraph_vector_init(&res, 0);
+        for (int i = 0; i < 2; i++) {
+            igraph_empty(&g, 3, IGRAPH_DIRECTED);
+            igraph_pagerank(&g, NULL, &res, NULL, 0.85, 1, igraph_vss_all(), algos[i], NULL);
+            igraph_destroy(&g);
+
+            igraph_ring(&g, 5, IGRAPH_DIRECTED, false, false);
+            igraph_pagerank(&g, NULL, &res, NULL, 0.85, 1, igraph_vss_all(), algos[i], NULL);
+            igraph_personalized_pagerank_vs(&g, NULL, &res, NULL, igraph_vss_1(0), 0.85, 1,
+                                            igraph_vss_all(), algos[i], NULL);
+            igraph_destroy(&g);
+        }
+        igraph_vector_destroy(&res);
+    }
+
     /* Invalid weights are rejected by both algorithms, both with and without
      * considering edge directions. */
     {
