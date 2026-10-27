@@ -326,10 +326,10 @@ igraph_error_t igraph_is_potentially_connected(
     const igraph_bool_t directed = in_degrees != NULL;
     const igraph_bool_t multigraph = !!(allowed_edge_types & IGRAPH_MULTI_SW);
     const igraph_bool_t loopy = !!(allowed_edge_types & IGRAPH_LOOPS_SW);
-    const igraph_integer_t n = igraph_vector_int_size(out_degrees);
-    igraph_integer_t m;
-    igraph_integer_t min_d = IGRAPH_INTEGER_MAX;
-    igraph_integer_t min_outd = IGRAPH_INTEGER_MAX, min_ind = IGRAPH_INTEGER_MAX;
+    const igraph_int_t n = igraph_vector_int_size(out_degrees);
+    igraph_int_t m;
+    igraph_int_t min_d = IGRAPH_INTEGER_MAX;
+    igraph_int_t min_outd = IGRAPH_INTEGER_MAX, min_ind = IGRAPH_INTEGER_MAX;
 
     if (!directed) {
         mode = IGRAPH_WEAK;
@@ -347,11 +347,11 @@ igraph_error_t igraph_is_potentially_connected(
         if (igraph_vector_int_size(in_degrees) != n) {
             IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
         }
-        igraph_integer_t outdegsum = 0, indegsum = 0;
+        igraph_int_t outdegsum = 0, indegsum = 0;
 
-        for (igraph_integer_t i=0; i < n; i++) {
-            const igraph_integer_t outd = VECTOR(*out_degrees)[i];
-            const igraph_integer_t ind =  VECTOR(*in_degrees)[i];
+        for (igraph_int_t i=0; i < n; i++) {
+            const igraph_int_t outd = VECTOR(*out_degrees)[i];
+            const igraph_int_t ind =  VECTOR(*in_degrees)[i];
             if (outd < 0) {
                 IGRAPH_ERROR("Out-degrees must not be negative.", IGRAPH_EINVAL);
             }
@@ -372,10 +372,10 @@ igraph_error_t igraph_is_potentially_connected(
         m = outdegsum;
     }
     else /* undirected */ {
-        igraph_integer_t degsum = 0;
+        igraph_int_t degsum = 0;
 
-        for (igraph_integer_t i=0; i < n; i++) {
-            const igraph_integer_t d = VECTOR(*out_degrees)[i];
+        for (igraph_int_t i=0; i < n; i++) {
+            const igraph_int_t d = VECTOR(*out_degrees)[i];
             if (d < 0) {
                 IGRAPH_ERROR("Degrees must not be negative.", IGRAPH_EINVAL);
             }
