@@ -259,6 +259,35 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * as input, the result will only be meaningful if the sequence was graphical.
  * This can be checked using \ref igraph_is_graphical().
  *
+ * For undirected graphs, it suffices that the sequence satisfies two conditions.
+ * Each degree must be positive, otherwise there would be an isolated vertex.
+ * The sum of degrees must be large enough to support n - 1 edges, that is, at least form a tree.
+ *
+ * For weak connectivity in directed graphs, the same conditions apply,
+ * essentially treating edges as if they were undirected.
+ * 
+ * For strong connectivity, there are difference between simple graphs and multigraphs.
+ * In multigraphs, it is sufficient that each in-degree and out-degree is positive.
+ * In simple graphs, an additional condition must be satisfied, given by Beineke-Harary,
+ * and later also by Hong-Liu-Lai.
+ * 
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Horvát, Sz. and Modes, C.D., Connectedness matters: construction and exact random sampling of connected networks. J. Phys. Complex. 2 015008 (2021).
+ * https://doi.org/10.1088/2632-072x/abced5
+ *
+ * </para><para>
+ * Hong, Y., Liu, Q. and Lai, H.-J., 
+ * Characterization of Digraphic Sequences with Strongly Connected Realizations. J. Graph Theory, 84: 191-201 (2017).
+ * https://doi.org/10.1002/jgt.22020
+ *
+ * </para><para>
+ * Beineke, L.W. and Harary, F., Local Restrictions for Various Classes of Directed Graphs. 
+ * Journal of the London Mathematical Society, s1-40: 87-95 (1965).
+ * https://doi.org/10.1112/jlms/s1-40.1.87
+ *
  * \param out_degrees A vector of integers specifying the degree sequence for
  *     undirected graphs or the out-degree sequence for directed graphs.
  * \param in_degrees A vector of integers specifying the in-degree sequence for
