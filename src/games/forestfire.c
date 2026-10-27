@@ -62,8 +62,11 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  *
  * </para><para>
  * The network is generated in the following way. One vertex is added at
- * a time. This vertex connects to (cites) <code>ambs</code> vertices already
- * present in the network, chosen uniformly at random. Now, for each cited
+ * a time. This vertex connects to (cites) one or more vertices already
+ * present in the network, called ambassadors. These are chosen by drawing
+ * \p ambs vertices uniformly at random, with replacement. Vertices that are
+ * drawn more than once are cited only once, therefore the number of distinct
+ * ambassadors may be smaller than \p ambs. Now, for each cited
  * vertex <code>v</code> we do the following procedure:
  * \olist
  * \oli We generate two random numbers, <code>x</code> and <code>y</code>, that are
@@ -98,7 +101,10 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * \param fw_prob The forward burning probability.
  * \param bw_factor The backward burning ratio. The backward burning
       probability is calculated as <code>bw_factor * fw_prob</code>.
- * \param pambs The number of ambassador vertices.
+ * \param ambs The number of random draws used to select the ambassador
+ *        vertices of each new vertex. Since draws are made with replacement,
+ *        the number of distinct ambassadors may be smaller. If zero, the
+ *        result is a graph with no edges.
  * \param directed Whether to create a directed graph.
  * \return Error code.
  *
@@ -107,7 +113,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
 
 igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_int_t nodes,
                             igraph_real_t fw_prob, igraph_real_t bw_factor,
-                            igraph_int_t pambs, igraph_bool_t directed) {
+                            igraph_int_t ambs, igraph_bool_t directed) {
 
     igraph_vector_int_t visited;
     igraph_int_t no_of_nodes = nodes, actnode, i;
@@ -115,7 +121,6 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_int_t nodes,
     igraph_vector_int_t *inneis, *outneis;
     igraph_i_forest_fire_data_t data;
     igraph_dqueue_int_t neiq;
-    igraph_int_t ambs = pambs;
     igraph_real_t param_geom_out = 1 - fw_prob;
     igraph_real_t param_geom_in = 1 - fw_prob * bw_factor;
 
