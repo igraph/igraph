@@ -315,6 +315,7 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  *     with self-loops allowed but multi-edges disallowed is not implemented
  *     and returns \c IGRAPH_UNIMPLEMENTED.
  * \param res Pointer to a Boolean. The result will be stored here.
+ *     This function assumes that the degree sequence is graphical for the given allowed_edge_types, and does not check it.
  *     For non-graphical input the result is unspecified.
  *     The function will not crash or take excessive time, but the value it returns has no meaning.
  *     If graphicality is not known to hold, check it with \ref igraph_is_graphical() first.
