@@ -187,7 +187,9 @@ igraph_i_fundamental_cycles_bfs(
  * Edge directions are ignored. Multi-edges and self-loops are supported.
  *
  * \param graph The graph object.
- * \param weights Currently unused.
+ * \param weights Must be \c NULL. Weighted fundamental cycle bases are not yet
+ *   supported, and passing a non-null weight vector results in an
+ *   \c IGRAPH_UNIMPLEMENTED error.
  * \param result An initialized integer vector list. The result will be stored here,
  *   each vector containing the edge IDs of a basis element.
  * \param start_vid If negative, a complete fundamental cycle basis is returned.
@@ -215,7 +217,9 @@ igraph_error_t igraph_fundamental_cycles(
     igraph_inclist_t inclist;
     igraph_vector_int_t visited; /* see comments before igraph_i_fundamental_cycles_bfs() */
 
-    IGRAPH_UNUSED(weights);
+    if (weights) {
+        IGRAPH_ERROR("Weighted fundamental cycle bases are not implemented yet.", IGRAPH_UNIMPLEMENTED);
+    }
 
     if (start_vid >= no_of_nodes) {
         IGRAPH_ERROR("Vertex ID out of range.", IGRAPH_EINVVID);
@@ -389,7 +393,9 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * https://doi.org/10.1137%2F0216026
  *
  * \param graph The graph object.
- * \param weights Currently unused.
+ * \param weights Must be \c NULL. Weighted minimum cycle bases are not yet
+ *   supported, and passing a non-null weight vector results in an
+ *   \c IGRAPH_UNIMPLEMENTED error.
  * \param result An initialized integer vector list, the elements of the cycle
  *   basis will be stored here as vectors of edge IDs.
  * \param bfs_cutoff If negative, an exact minimum cycle basis is returned. Otherwise
@@ -424,7 +430,9 @@ igraph_error_t igraph_minimum_cycle_basis(
     igraph_int_t rank;
     igraph_vector_int_list_t candidates;
 
-    IGRAPH_UNUSED(weights);
+    if (weights) {
+        IGRAPH_ERROR("Weighted minimum cycle bases are not implemented yet.", IGRAPH_UNIMPLEMENTED);
+    }
 
     /* Compute candidate elements for the minimum weight basis. */
     {
