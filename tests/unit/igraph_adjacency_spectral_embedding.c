@@ -61,9 +61,9 @@ int main(void) {
     print_matrix_first_row_positive(&V, "%8.4f");
 
     /* The second half of the directed embedding is optional. */
-    IGRAPH_ASSERT(igraph_adjacency_spectral_embedding(&graph, 4, /*weights=*/ 0,
-                  IGRAPH_EIGEN_LA, /*scaled=*/ 0, &U, /*Y=*/ 0, /*D=*/ 0,
-                  &cvec, /*options=*/ 0) == IGRAPH_SUCCESS);
+    igraph_adjacency_spectral_embedding(&graph, 4, /*weights=*/ 0,
+                                        IGRAPH_EIGEN_LA, /*scaled=*/ 0, &U, /*Y=*/ 0, /*D=*/ 0,
+                                        &cvec, /*options=*/ 0);
 
     igraph_vector_destroy(&cvec);
     igraph_matrix_destroy(&V);

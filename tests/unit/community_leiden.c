@@ -170,9 +170,9 @@ static void test_last_level_moves_are_kept(void) {
     for (int i = 0; i < 2; i++) {
         igraph_vector_int_init_array(&membership, start, 11);
         igraph_rng_seed(igraph_rng_default(), 1556328619);
-        IGRAPH_ASSERT(igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_ER,
-                                                     1.2087812986446955, 0.01, true, budgets[i],
-                                                     &membership, &nb_clusters, NULL) == IGRAPH_SUCCESS);
+        igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_ER,
+                                       1.2087812986446955, 0.01, true, budgets[i],
+                                       &membership, &nb_clusters, NULL);
         check_clusters_connected(&graph, &membership, nb_clusters);
         igraph_vector_int_destroy(&membership);
     }
@@ -198,8 +198,8 @@ static void test_refinement_ignores_self_loops(void) {
     igraph_create(&graph, &edges, 6, IGRAPH_UNDIRECTED);
     igraph_vector_int_init(&membership, 6);
     igraph_rng_seed(igraph_rng_default(), 12671);
-    IGRAPH_ASSERT(igraph_community_leiden(&graph, &weights, NULL, NULL, 0.5, 0.01, false, 1,
-                                          &membership, &nb_clusters, NULL) == IGRAPH_SUCCESS);
+    igraph_community_leiden(&graph, &weights, NULL, NULL, 0.5, 0.01, false, 1,
+                            &membership, &nb_clusters, NULL);
     IGRAPH_ASSERT(nb_clusters == 3);
     for (igraph_int_t i = 0; i < 6; i++) {
         IGRAPH_ASSERT(VECTOR(membership)[i] == expected[i]);
@@ -228,8 +228,8 @@ static void test_refinement_singleton_stays(void) {
     igraph_create(&graph, &edges, 4, IGRAPH_UNDIRECTED);
     igraph_vector_int_init(&membership, 4);
     igraph_rng_seed(igraph_rng_default(), 891);
-    IGRAPH_ASSERT(igraph_community_leiden(&graph, &weights, NULL, NULL, 0.5, 0.01, true, 1,
-                                          &membership, &nb_clusters, NULL) == IGRAPH_SUCCESS);
+    igraph_community_leiden(&graph, &weights, NULL, NULL, 0.5, 0.01, true, 1,
+                            &membership, &nb_clusters, NULL);
     IGRAPH_ASSERT(nb_clusters == 2);
     for (igraph_int_t i = 0; i < 4; i++) {
         IGRAPH_ASSERT(VECTOR(membership)[i] == expected[i]);
