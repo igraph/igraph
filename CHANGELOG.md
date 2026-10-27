@@ -34,6 +34,8 @@
 - `igraph_adjlist_init()` and `igraph_lazy_adjlist_init()` now validate their `loops` argument.
 - `igraph_degree_1()`, `igraph_get_widest_paths()` and `igraph_bfs_simple()` did not validate their vertex ID argument, reading out of bounds for invalid IDs. `igraph_get_widest_path()` and `igraph_layout_lgl()` were affected as well.
 - `igraph_count_multiple_1()` did not validate its edge ID argument, reading out of bounds for invalid IDs.
+- `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` did not reject negative or NaN weights when using `IGRAPH_PAGERANK_ALGO_PRPACK` on undirected graphs, or on directed graphs with `directed=false`. Negative-weight edges were silently ignored, and NaN weights led to NaN results. The ARPACK method, and PRPACK with directed graphs and `directed=true`, were not affected.
+- `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` did not reject infinite weights, regardless of the algorithm or the graph's directedness. `IGRAPH_PAGERANK_ALGO_PRPACK` returned NaN results, while `IGRAPH_PAGERANK_ALGO_ARPACK` terminated the process.
 
 ### Other
 
