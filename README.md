@@ -1,5 +1,5 @@
 [![Build Status on Azure Pipelines](https://dev.azure.com/igraph-team/igraph/_apis/build/status/igraph.igraph?branchName=main)](https://dev.azure.com/igraph-team/igraph/_build/latest?definitionId=1&branchName=main)
-![Build Status on GitHub Actions](https://github.com/igraph/igraph/workflows/MINGW/badge.svg?branch=main)
+![Build Status on GitHub Actions](https://github.com/igraph/igraph/workflows/MSYS2/badge.svg?branch=main)
 [![codecov](https://codecov.io/gh/igraph/igraph/branch/main/graph/badge.svg?token=xGFabHJE2I)](https://codecov.io/gh/igraph/igraph)
 [![DOI](https://zenodo.org/badge/8546198.svg)](https://zenodo.org/badge/latestdoi/8546198)
 
