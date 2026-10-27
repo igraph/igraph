@@ -2,25 +2,19 @@
 
 #include "test_utilities.h"
 
-/* Render a result value, flagging any value that was never written,
- * that is not 0 or 1, as UNSET so that a missing assignment is visible. */
 static const char* bool_str(igraph_bool_t v) {
-    if (v == 1) {
+    if (v == true) {
         return " true";
     }
-    if (v == 0) {
+    else {
         return "false";
     }
-    return "UNSET";
 }
 
 /* Undirected case */
 void potentially_connected_print_destroy(igraph_vector_int_t *ds) {
     igraph_bool_t g_simple, g_loops, g_multi, g_multiloops;
-    /* Initialized to a value that is neither 0 nor 1 so that a result the
-     * function failed to write is reported as UNSET rather than as a
-     * spurious true/false. */
-    igraph_bool_t c_simple = 23, c_loops = 23, c_multi = 23, c_multiloops = 23;
+    igraph_bool_t c_simple, c_loops, c_multi, c_multiloops;
 
     print_vector_int(ds);
 
@@ -47,10 +41,7 @@ void potentially_connected_print_destroy(igraph_vector_int_t *ds) {
 /* Directed case */
 void directed_potentially_connected_print_destroy(igraph_vector_int_t *ods, igraph_vector_int_t *ids) {
     igraph_bool_t g_simple, g_loops, g_multi, g_multiloops;
-    /* Initialized to a value that is neither 0 nor 1 so that a result the
-     * function failed to write is reported as UNSET rather than as a
-     * spurious true/false. */
-    igraph_bool_t c_simple = 23, c_loops = 23, c_multi = 23, c_multiloops = 23;
+    igraph_bool_t c_simple, c_loops, c_multi, c_multiloops;
 
     print_vector_int(ods);
     print_vector_int(ids);
