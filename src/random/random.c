@@ -123,6 +123,7 @@
  * <section id="random-example"><title>Example</title>
  * <para>
  * \example examples/simple/random_seed.c
+ * \example examples/simple/igraph_rng_init.c
  * </para>
  * </section>
  *
