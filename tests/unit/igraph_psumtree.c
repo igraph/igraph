@@ -188,6 +188,29 @@ int main(void) {
     igraph_psumtree_destroy(&tree);
 
     /****************************************************/
+    /* Internal sums must not accumulate round-off      */
+    /****************************************************/
+
+    /* Small values must not be lost after cancellation with a large one. */
+    igraph_psumtree_init(&tree, 2);
+    igraph_psumtree_update(&tree, 0, 1e20);
+    igraph_psumtree_update(&tree, 1, 1.0);
+    igraph_psumtree_update(&tree, 0, 0.0);
+    IGRAPH_ASSERT(igraph_psumtree_sum(&tree) == 1.0);
+    igraph_psumtree_destroy(&tree);
+
+    /* The sum must be exactly zero once all values are reset to zero. */
+    igraph_psumtree_init(&tree, 3);
+    igraph_psumtree_update(&tree, 0, 0.1);
+    igraph_psumtree_update(&tree, 1, 0.2);
+    igraph_psumtree_update(&tree, 2, 0.3);
+    igraph_psumtree_update(&tree, 0, 0.0);
+    igraph_psumtree_update(&tree, 1, 0.0);
+    igraph_psumtree_update(&tree, 2, 0.0);
+    IGRAPH_ASSERT(igraph_psumtree_sum(&tree) == 0.0);
+    igraph_psumtree_destroy(&tree);
+
+    /****************************************************/
     /* Error handling                                   */
     /****************************************************/
 
