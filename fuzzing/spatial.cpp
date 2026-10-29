@@ -148,8 +148,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_destroy(&graph);
     }
 
-    /* Re-enable after https://github.com/qhull/qhull/issues/166 is fixed. */
-    /*
     if (igraph_delaunay_graph(&graph, &points1d) == IGRAPH_SUCCESS) {
         igraph_destroy(&graph);
     }
@@ -162,7 +160,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     if (igraph_delaunay_graph(&graph, &points4d) == IGRAPH_SUCCESS) {
         igraph_destroy(&graph);
     }
-    */
 
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
 

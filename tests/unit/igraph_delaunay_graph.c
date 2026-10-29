@@ -45,6 +45,32 @@ igraph_error_t delaunay(
 
 #define PTCOUNT(points, dim) sizeof(points) / sizeof(points[0]) / dim
 
+/* Checks that translating and uniformly scaling a point set does not change
+ * its Delaunay graph. */
+void check_transformed(
+        const igraph_real_t *points, igraph_int_t numpoints, igraph_int_t dim,
+        igraph_real_t offset, igraph_real_t scale) {
+
+    igraph_matrix_t mat, mat_tr;
+    igraph_t g, g_tr;
+    igraph_bool_t same;
+
+    igraph_matrix_init_array(&mat, points, numpoints, dim, IGRAPH_ROW_MAJOR);
+    igraph_matrix_init_copy(&mat_tr, &mat);
+    igraph_matrix_scale(&mat_tr, scale);
+    igraph_matrix_add_constant(&mat_tr, offset);
+
+    igraph_delaunay_graph(&g, &mat);
+    igraph_delaunay_graph(&g_tr, &mat_tr);
+    igraph_is_same_graph(&g, &g_tr, &same);
+    IGRAPH_ASSERT(same);
+
+    igraph_destroy(&g_tr);
+    igraph_destroy(&g);
+    igraph_matrix_destroy(&mat_tr);
+    igraph_matrix_destroy(&mat);
+}
+
 int main(void) {
     igraph_real_t points_raw[] = {
         0.311138, 0.59391, 0.67498, 0.1694, 0.822953, 0.904456, 0.129484,
@@ -169,6 +195,27 @@ int main(void) {
 
     printf("10 point cloud in 4d\n");
     delaunay(point_cloud_4d, PTCOUNT(point_cloud_4d, 4), 4, true);
+
+    /* Geographic coordinates in degrees. Without normalizing the coordinates
+     * before passing them to Qhull, the result contained the edge 0-3
+     * instead of 1-2, which is not a Delaunay edge. */
+    igraph_real_t points_geo[] = {
+        47.5004735, 19.0501087,
+        47.5008634, 19.0501723,
+        47.5002108, 19.0504575,
+        47.5004938, 19.0508714,
+        47.5003169, 19.0509038
+    };
+
+    printf("5 points with geographic coordinates\n");
+    delaunay(points_geo, PTCOUNT(points_geo, 2), 2, true);
+
+    /* Points far from the origin compared to their extent, or with very
+     * large or small coordinates, used to cause wrong results or errors. */
+    check_transformed(points_raw, PTCOUNT(points_raw, 2), 2, 1e6, 1);
+    check_transformed(points_raw, PTCOUNT(points_raw, 2), 2, 0, 1e200);
+    check_transformed(points_raw, PTCOUNT(points_raw, 2), 2, 0, 1e-200);
+    check_transformed(point_cloud_3d, PTCOUNT(point_cloud_3d, 3), 3, 1e5, 1);
 
     printf("3x3 square lattice\n");
     delaunay(points_lattice, PTCOUNT(points_lattice, 2), 2, true);
