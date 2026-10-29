@@ -27,6 +27,7 @@
 #include "core/exceptions.h"
 #include "spatial/nanoflann_internal.hpp"
 #include "spatial/spatial_internal.h"
+#include <algorithm>
 #include <cfloat>
 
 #define TOLERANCE (128 * DBL_EPSILON)
@@ -334,10 +335,16 @@ static bool is_intersection_empty(
     for (igraph_int_t i = 0; i < dims; i++) {
         midpoint[i] =  0.5 * (a_centre[i] + b_centre[i]);
     }
-    // squared half-height of lune
-    igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(midpoint, a_centre);
+    // Squared radius of the intersection's bounding sphere around the midpoint.
+    // This is the larger of the squared half-height of the intersection,
+    // R^2 - |midpoint - centre|^2 with circle radius R = r * d, and the squared
+    // half-distance d^2 / 4 between a and b. For the perpendicular construction,
+    // the two are mathematically equal, but the former suffers from cancellation
+    // at small beta; for the lune construction, the former is never smaller.
+    igraph_real_t sqr_radius = sqr_dist * r * r;
+    igraph_real_t bounding_sqr_radius = std::max(sqr_radius - vec_vec_sqr_dist(midpoint, a_centre), 0.25 * sqr_dist);
     igraph_real_t tol = is_closed ? 1 + TOLERANCE : 1 - TOLERANCE;
-    IntersectionCounts intersections(lune_height * tol * tol, sqr_dist * r * r * tol * tol, true, a, b, a_centre, b_centre, points);
+    IntersectionCounts intersections(bounding_sqr_radius * tol * tol, sqr_radius * tol * tol, true, a, b, a_centre, b_centre, points);
 
     tree.findNeighbors(intersections, midpoint.data());
     return intersections.size() == 0;
