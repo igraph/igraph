@@ -197,6 +197,16 @@ int main(void) {
     igraph_psumtree_update(&tree, 1, 1.0);
     igraph_psumtree_update(&tree, 0, 0.0);
     IGRAPH_ASSERT(igraph_psumtree_sum(&tree) == 1.0);
+    igraph_psumtree_search(&tree, &idx, 0.5);
+    IGRAPH_ASSERT(idx == 1);
+    igraph_psumtree_destroy(&tree);
+
+    /* Single-item tree, where the leaf is the root. */
+    igraph_psumtree_init(&tree, 1);
+    igraph_psumtree_update(&tree, 0, 3.0);
+    IGRAPH_ASSERT(igraph_psumtree_sum(&tree) == 3.0);
+    igraph_psumtree_update(&tree, 0, 0.0);
+    IGRAPH_ASSERT(igraph_psumtree_sum(&tree) == 0.0);
     igraph_psumtree_destroy(&tree);
 
     /* The sum must be exactly zero once all values are reset to zero. */
