@@ -35,8 +35,7 @@ zip $OUT/read_dimacs_flow_seed_corpus.zip \
 
 zip $OUT/read_dl_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.dl \
-        $SRC/igraph/tests/unit/*.dl \
-        $SRC/igraph/fuzzing/test_inputs/*.dl
+        $SRC/igraph/tests/unit/*.dl
 
 zip $OUT/read_gml_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.gml \
@@ -47,7 +46,8 @@ zip $OUT/read_gml_seed_corpus.zip \
 zip $OUT/read_graphdb_seed_corpus.zip \
         $SRC/igraph/fuzzing/test_inputs/*.A?? \
         $SRC/igraph/fuzzing/test_inputs/*.B?? \
-        $SRC/igraph/examples/simple/*.A??
+        $SRC/igraph/examples/simple/*.A?? \
+        $SRC/igraph/tests/unit/*.A??
 
 zip $OUT/read_graphml_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.graphml \
@@ -56,21 +56,15 @@ zip $OUT/read_graphml_seed_corpus.zip \
         $SRC/igraph/fuzzing/test_inputs/*.graphml
 
 zip $OUT/read_lgl_seed_corpus.zip \
-        $SRC/igraph/examples/simple/*.lgl \
-        $SRC/igraph/tests/unit/*.lgl \
-        $SRC/igraph/fuzzing/test_inputs/*.lgl
+        $SRC/igraph/examples/simple/*.lgl
 
 zip $OUT/read_ncol_seed_corpus.zip \
-        $SRC/igraph/examples/simple/*.ncol \
-        $SRC/igraph/tests/unit/*.ncol \
         $SRC/igraph/fuzzing/test_inputs/*.ncol
 
 zip $OUT/read_pajek_seed_corpus.zip \
         $SRC/igraph/examples/simple/links.net \
-        $SRC/igraph/tests/unit/bipartite.net \
-        $SRC/igraph/tests/unit/pajek*.net \
-        $SRC/igraph/tests/regression/*.net \
-        $SRC/igraph/fuzzing/test_inputs/*.net
+        $SRC/igraph/tests/unit/*.net \
+        $SRC/igraph/tests/regression/*.net
 
 zip $OUT/write_all_gml_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.gml \
@@ -98,6 +92,10 @@ if [ "$SANITIZER" != "undefined" ]
 then
   TARGETS="$TARGETS read_dimacs_flow write_all_gml write_all_graphml"
 fi
+
+# The round-trip fuzzers parse GML and GraphML input, respectively.
+cp ./fuzzing/read_gml.dict $OUT/write_all_gml.dict
+cp ./fuzzing/read_graphml.dict $OUT/write_all_graphml.dict
 
 for TARGET in $TARGETS
 do
