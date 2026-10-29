@@ -37,7 +37,7 @@ extern "C" size_t LLVMFuzzerCustomMutator(uint8_t *Data, size_t Size,
     std::minstd_rand gen(Seed);
 
     auto rfp = [&]() {
-        if (gen() < std::bernoulli_distribution(0.8)(gen)) {
+        if (std::bernoulli_distribution(0.8)(gen)) {
             std::normal_distribution<> dist(0.0, 10);
             return dist(gen);
         } else {
