@@ -1480,7 +1480,7 @@ igraph_error_t igraph_bipartite_iea_game(
 
     return igraph_bipartite_game_gnm(
         graph, types, n1, n2, m, directed, mode,
-        IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
+        IGRAPH_MULTI_SW, IGRAPH_EDGE_LABELED);
 }
 
 

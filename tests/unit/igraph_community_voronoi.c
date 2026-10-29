@@ -44,6 +44,12 @@ int main(void) {
     printf("Membership: "); print_vector_int(&membership);
     printf("Generators: "); print_vector_int(&generators);
 
+    {
+        igraph_real_t modularity = 0;
+        igraph_community_voronoi(&graph, NULL, NULL, &modularity, NULL, NULL, IGRAPH_ALL, -1);
+        IGRAPH_ASSERT(isnan(modularity));
+    }
+
     igraph_destroy(&graph);
 
     printf("\nZachary:\n");
@@ -107,6 +113,25 @@ int main(void) {
 
         printf("Membership: "); print_vector_int(&membership);
         printf("Generators: "); print_vector_int(&generators);
+
+        igraph_destroy(&graph);
+    }
+
+    /* Modularity with a fixed radius must not depend on whether membership is requested. */
+    {
+        igraph_real_t mod1, mod2;
+
+        igraph_famous(&graph, "Zachary");
+
+        igraph_rng_seed(igraph_rng_default(), 137);
+        igraph_community_voronoi(&graph, &membership, NULL, &mod1, NULL, NULL, IGRAPH_ALL, 0.5);
+
+        igraph_rng_seed(igraph_rng_default(), 137);
+        igraph_community_voronoi(&graph, NULL, NULL, &mod2, NULL, NULL, IGRAPH_ALL, 0.5);
+
+        IGRAPH_ASSERT(igraph_vector_int_max(&membership) > 0);
+        IGRAPH_ASSERT(mod1 > 0);
+        IGRAPH_ASSERT(mod1 == mod2);
 
         igraph_destroy(&graph);
     }
