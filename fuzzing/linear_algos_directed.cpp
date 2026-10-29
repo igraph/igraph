@@ -38,6 +38,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         VECTOR(edges)[i] = Data[i+1];
     }
 
+    igraph_rng_seed(igraph_rng_default(), 42);
+
     /* Directed */
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_vector_int_list_t ivl1, ivl2;
