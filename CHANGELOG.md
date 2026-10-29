@@ -14,6 +14,7 @@
 
 ### Fixed
 
+- `igraph_community_infomap()` now returns `IGRAPH_INTERRUPTED` when interrupted. Previously, an interruption was reported as a generic failure (`IGRAPH_FAILURE`).
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was directed with some mutual edges, but no multi-edges; the `mode=IGRAPH_ALL` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set. An incorrect cache entry may cause various igraph functions to return invalid results.
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was undirected with some self-loops, but no multi-edges; the `loops=IGRAPH_LOOPS_TWICE` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set; it was not yet cached whether the graph had multi-edges. An incorrect cache entry may cause various igraph functions to return invalid results.
 - When `igraph_adjlist_init()` or `igraph_lazy_adjlist_init()` were called with `multiple=IGRAPH_NO_MULTIPLE`, they would not remove all multi-edges under the following conditions: the input was directed, had some mutual edges, but no multi-edges; `mode=IGRAPH_ALL` was set, meaning that mutual edges effectively act like multi-edges; it was already cached that the graph had no multi-edges; This could have caused several igraph functions that ignore edge directions in directed graphs to return invalid results in some cases.
@@ -49,6 +50,7 @@
 - The documentation of `igraph_forest_fire_game()` now states correctly that the `ambs` ambassador vertices are drawn with replacement, so a new vertex may have fewer than `ambs` distinct ambassadors (#2959).
 - Proofread the documentation and error/warning message texts, correcting spelling, grammar, and formatting, using AI assistance.
 - nanoflann was updated to version 2.0.1
+- Infomap was updated to version 2.16.0. The vendored copy is now unmodified upstream source.
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 - Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
 

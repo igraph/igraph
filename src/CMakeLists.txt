@@ -440,6 +440,10 @@ endif()
 if(MSVC)
   # Add MSVC-specific include path for some headers that are missing on Windows
   target_include_directories(igraph PRIVATE ${PROJECT_SOURCE_DIR}/msvc/include)
+
+  # Infomap's headers include {fmt}, which requires the UTF-8 source and
+  # execution character set on MSVC.
+  set_property(SOURCE community/infomap.cpp APPEND PROPERTY COMPILE_OPTIONS /utf-8)
 endif()
 
 # Turn on all warnings for GCC, clang and MSVC
