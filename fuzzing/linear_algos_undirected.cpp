@@ -46,7 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
         igraph_int_t i, i2;
-        igraph_bool_t b, b2, loop, multi, graphical;
+        igraph_bool_t b, b2, connected, loop, multi, graphical, potentially_connected;
         igraph_real_t r;
         igraph_t g;
 
@@ -74,50 +74,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_mean_degree(&graph, &r, IGRAPH_NO_LOOPS);
 
         /* Graphicality and graph realization based on the degrees of 'graph'. */
-        igraph_has_loop(&graph, &loop);
-        igraph_has_multiple(&graph, &multi);
-        igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
-        igraph_is_graphical(&iv1, NULL, IGRAPH_SIMPLE_SW, &b);
-        if (!loop && !multi) {
-            IGRAPH_ASSERT(b);
-            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-            igraph_destroy(&g);
-            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-            igraph_destroy(&g);
-            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-            igraph_destroy(&g);
-        }
-        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW, &b);
-        if (!multi) {
-            IGRAPH_ASSERT(b);
-            /* Undirected realization is not yet implemented. */
-        }
-        igraph_is_graphical(&iv1, NULL, IGRAPH_MULTI_SW, &b);
-        if (!loop) {
-            IGRAPH_ASSERT(b);
-            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-            igraph_destroy(&g);
-            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-            igraph_destroy(&g);
-            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-            igraph_destroy(&g);
-        }
-        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &b);
-        IGRAPH_ASSERT(b);
-        igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-        igraph_destroy(&g);
-        igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-        igraph_destroy(&g);
-        igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-        igraph_destroy(&g);
-
-        /* Graphicality and graph realization based on the degrees of 'graph'. */
+        igraph_is_connected(&graph, &connected, IGRAPH_WEAK);
         igraph_has_loop(&graph, &loop);
         igraph_has_multiple(&graph, &multi);
         igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
         igraph_is_graphical(&iv1, NULL, IGRAPH_SIMPLE_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_WEAK, &potentially_connected);
         if (!loop && !multi) {
             IGRAPH_ASSERT(graphical);
+            if (connected) IGRAPH_ASSERT(potentially_connected);
         }
         if (graphical) {
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
@@ -138,13 +103,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 IGRAPH_EINVAL);
         }
         igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, NULL, IGRAPH_LOOPS_SW, IGRAPH_WEAK, &potentially_connected);
         if (!multi) {
             IGRAPH_ASSERT(graphical);
+            if (connected) IGRAPH_ASSERT(potentially_connected);
             /* Undirected realization is not yet implemented. */
         }
         igraph_is_graphical(&iv1, NULL, IGRAPH_MULTI_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_WEAK, &potentially_connected);
         if (!loop) {
             IGRAPH_ASSERT(graphical);
+            if (connected) IGRAPH_ASSERT(potentially_connected);
         }
         if (graphical) {
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
@@ -165,7 +134,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 IGRAPH_EINVAL);
         }
         igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_WEAK, &potentially_connected);
         IGRAPH_ASSERT(graphical);
+        if (connected) IGRAPH_ASSERT(potentially_connected);
         igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
         igraph_destroy(&g);
         igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
