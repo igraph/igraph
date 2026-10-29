@@ -299,6 +299,7 @@ igraph_error_t igraph_eccentricity(
 
     IGRAPH_CHECK(igraph_vector_resize(res, 0));
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(
@@ -307,8 +308,9 @@ igraph_error_t igraph_eccentricity(
         ));
         IGRAPH_CHECK(igraph_vector_push_back(res, ecc));
     }
+    igraph_vit_destroy(&vit);
     igraph_lazy_inclist_destroy(&inclist);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
 

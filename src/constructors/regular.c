@@ -894,7 +894,8 @@ igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_int_t h, igraph_int_t
  *   graph. It must be at least 3.
  * \param W The matrix specifying the extra edges. The number of
  *   columns should divide the number of total vertices. The elements
- *   are allowed to be negative.
+ *   are allowed to be negative. If \p W has no rows, no chords are
+ *   added and the result is a cycle graph.
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
@@ -915,7 +916,12 @@ igraph_error_t igraph_extended_chordal_ring(
         IGRAPH_ERROR("An extended chordal ring has at least 3 nodes.", IGRAPH_EINVAL);
     }
 
-    if (nodes % period != 0) {
+    if (period == 0) {
+        if (nrow > 0) {
+            IGRAPH_ERROR("The matrix W must have at least one column when it has rows.",
+                         IGRAPH_EINVAL);
+        }
+    } else if (nodes % period != 0) {
         IGRAPH_ERROR("The period (number of columns in W) should divide the number of nodes.",
                      IGRAPH_EINVAL);
     }

@@ -42,6 +42,11 @@
 - `igraph_count_multiple_1()` did not validate its edge ID argument, reading out of bounds for invalid IDs.
 - `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` did not reject negative or NaN weights when using `IGRAPH_PAGERANK_ALGO_PRPACK` on undirected graphs, or on directed graphs with `directed=false`. Negative-weight edges were silently ignored, and NaN weights led to NaN results. The ARPACK method, and PRPACK with directed graphs and `directed=true`, were not affected.
 - `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` did not reject infinite weights, regardless of the algorithm or the graph's directedness. `IGRAPH_PAGERANK_ALGO_PRPACK` returned NaN results, while `IGRAPH_PAGERANK_ALGO_ARPACK` terminated the process.
+- `igraph_hrg_dendrogram()` wrote out of bounds on every call, which could crash. This bug was introduced in 1.0.0.
+- `igraph_community_label_propagation()` accepted initial labels equal to the vertex count, which led to out-of-bounds memory access. It also terminated the process when given the null graph and an initial labeling.
+- `igraph_lcf()` and `igraph_lcf_small()` terminated the process with a division by zero when given zero vertices together with shifts, and with a failed assertion when given a negative vertex count. These now return an error.
+- `igraph_extended_chordal_ring()` terminated the process with a division by zero when the matrix `W` had no columns. An empty `W` now produces a cycle graph, while a `W` with rows but no columns is rejected.
+- `igraph_eccentricity()` leaked memory when called with weights and with a vertex selector created by `igraph_vs_adj()` or `igraph_vs_nonadj()`, or when an error occurred during the computation.
 
 ### Other
 
