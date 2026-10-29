@@ -261,6 +261,7 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * The function will not crash or take excessive time, but the value it returns has no meaning.
  * If graphicality is not known to hold, check it with \ref igraph_is_graphical() first.
  *
+ * </para><para>
  * For undirected graphs, it suffices that the sequence satisfies two conditions.
  * Each degree must be positive, otherwise there would be an isolated vertex.
  * The sum of degrees must be large enough to support n - 1 edges, that is, at least form a tree.
@@ -269,9 +270,11 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * but placing them in such a way would require multiedges.
  * Therefore, the only possible realization of two self-loops is disconnected.
  *
+ * </para><para>
  * For weak connectivity in directed graphs, the same conditions apply,
  * essentially treating edges as if they were undirected.
  *
+ * </para><para>
  * For strong connectivity, there are differences between simple graphs and multigraphs.
  * In multigraphs, it is sufficient that each in-degree and out-degree is positive.
  * In simple graphs, an additional condition must be satisfied, given by Beineke-Harary,
