@@ -111,6 +111,42 @@ static igraph_error_t delaunay_edges_1d(igraph_vector_int_t *edges, const igraph
     return IGRAPH_SUCCESS;
 }
 
+/* Copies the points to a row-major array for Qhull, translating them so that
+ * the centre of their bounding box is at the origin, and scaling them uniformly
+ * so that the largest half-width of the bounding box is 1. The Delaunay
+ * triangulation is invariant under these transformations. Without them,
+ * Qhull may return an incorrect triangulation, or fail, when the point set
+ * is far from the origin compared to its extent: the coordinate that Qhull
+ * adds when lifting points to a paraboloid then dominates its roundoff
+ * estimates. This function assumes that there is at least one point. */
+static void copy_normalized_points(const igraph_matrix_t *points, coordT *qhull_points) {
+    const igraph_int_t numpoints = igraph_matrix_nrow(points);
+    const igraph_int_t dim = igraph_matrix_ncol(points);
+    igraph_real_t scale = 0;
+
+    for (igraph_int_t k = 0; k < dim; k++) {
+        igraph_real_t lo, hi;
+        const igraph_vector_t coords = igraph_vector_view(&MATRIX(*points, 0, k), numpoints);
+        igraph_vector_minmax(&coords, &lo, &hi);
+        /* Halving first prevents overflow. */
+        const igraph_real_t mid = lo / 2 + hi / 2;
+        const igraph_real_t halfwidth = hi / 2 - lo / 2;
+        if (halfwidth > scale) {
+            scale = halfwidth;
+        }
+        for (igraph_int_t i = 0; i < numpoints; i++) {
+            qhull_points[i*dim + k] = MATRIX(*points, i, k) - mid;
+        }
+    }
+
+    /* scale == 0 when all points coincide. */
+    if (scale > 0) {
+        for (igraph_int_t i = 0; i < numpoints*dim; i++) {
+            qhull_points[i] /= scale;
+        }
+    }
+}
+
 igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
     const igraph_int_t numpoints = igraph_matrix_nrow(points) ;
     const igraph_int_t dim = igraph_matrix_ncol(points);
@@ -144,12 +180,12 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
     }
 
-    /* Prepare point set in row-major format for Qhull */
+    /* Prepare normalized point set in row-major format for Qhull */
 
     coordT *qhull_points = IGRAPH_CALLOC(dim*numpoints, igraph_real_t);
     IGRAPH_CHECK_OOM(qhull_points, "Insufficient memory for constructing Delaunay graph.");
     IGRAPH_FINALLY(igraph_free, qhull_points);
-    igraph_matrix_copy_to(points, qhull_points, IGRAPH_ROW_MAJOR);
+    copy_normalized_points(points, qhull_points);
 
     /* Call Qhull.
      *
@@ -213,7 +249,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
             IGRAPH_BIT_SET(in_edge_list, VECTOR(*edges)[i]);
         }
         if (igraph_bitset_is_any_zero(&in_edge_list)) {
-            IGRAPH_ERROR("Duplicate points for Delaunay triangulation.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Duplicate or nearly coincident points for Delaunay triangulation.", IGRAPH_EINVAL);
         }
 
         igraph_bitset_destroy(&in_edge_list);
