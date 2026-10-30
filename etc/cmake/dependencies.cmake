@@ -141,7 +141,7 @@ macro(find_dependencies)
   set(HAVE_GLPK ${GLPK_FOUND})
   set(HAVE_INFOMAP ${INFOMAP_FOUND})
   set(HAVE_GMP ${GMP_FOUND})
-  set(HAVE_LIBXML ${LIBXML2_FOUND})
+  set(HAVE_LIBXML ${LibXml2_FOUND})
 
   # Check whether we need to link to the math library
   if(NOT DEFINED CACHE{NEED_LINKING_AGAINST_LIBM})
