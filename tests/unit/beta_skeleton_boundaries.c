@@ -451,6 +451,31 @@ int main(void) {
     }
 
     {
+        /* Edge 0-1 with a point close to endpoint 0, outside the regions of 0-1
+         * for small beta. The tolerance of these regions must not grow as beta
+         * decreases: otherwise a smaller beta removes 0-1 while a larger beta keeps it. */
+        const igraph_real_t cases[][6] = {
+            { 1e6, 1e6,  1e6 + 1, 1e6,  1e6 + 2.5e-9, 1e6 + 5e-9 },
+            { 1e6, 1e6,  1e6 + 1, 1e6,  1e6 + 1.25e-5, 1e6 + 5e-7 },
+            { 1e6, 1e6,  1e6 + 1e-5, 1e6,  1e6 + 0.5e-5, 1e6 + 0.6e-5 },
+            { 0, 0,  1, 0,  1e-9, 1.2e-11 }
+        };
+        const skeleton_t types[] = { LUNE, LUNE, LUNE, LUNE, LUNE, LUNE, LUNE, LUNE, LUNE };
+        const igraph_real_t betas[] = { 1e-4, 1e-3, 2e-3, 0.01, 0.02, 0.1, 0.2, 0.5, 1 };
+        igraph_bool_t adj;
+
+        for (size_t c = 0; c < sizeof(cases) / sizeof(cases[0]); c++) {
+            igraph_matrix_init_array(&points, cases[c], 3, 2, IGRAPH_ROW_MAJOR);
+            check_sequence(&points, types, betas, sizeof(betas) / sizeof(betas[0]), 2);
+            igraph_lune_beta_skeleton(&graph, &points, 1e-4);
+            igraph_are_adjacent(&graph, 0, 1, &adj);
+            IGRAPH_ASSERT(adj);
+            igraph_destroy(&graph);
+            igraph_matrix_destroy(&points);
+        }
+    }
+
+    {
         /* A thin rectangle in 4D, which uses all pairs of points as candidates. */
         const igraph_real_t rect[] = {
             0, 0, 0, 0,

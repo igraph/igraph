@@ -35,12 +35,18 @@
 #define TOLERANCE (128 * DBL_EPSILON)
 
 // The exclusion regions of beta skeletons are bounded by spheres through the
-// endpoints a and b of the tested edge. Membership is tested using the
-// differences p - a, p - b and b - a, instead of constructing the sphere centres
-// in absolute coordinates. Differences of nearby points have small relative
-// errors even when the points are far from the origin, so points on the boundary
-// of a closed region are detected reliably. The k-d tree is only used to find
-// candidate points, so its search radii include a margin for rounding errors.
+// endpoints a and b of the tested edge. There are three cases. For beta < 1, the
+// region is the intersection of two discs, the same for both families. For
+// beta >= 1, the lune-based region is the intersection of two balls, and the
+// circle-based region is the union of two discs. For beta = 1, both are the
+// Gabriel ball.
+//
+// Membership is tested using the differences p - a, p - b and b - a, instead of
+// constructing the sphere centres in absolute coordinates. Differences of nearby
+// points have small relative errors even when the points are far from the
+// origin, so points on the boundary of a closed region are detected reliably.
+// The k-d tree is only used to find candidate points, so its search radii
+// include a margin for rounding errors.
 //
 // Points close to a sphere count as lying on it: inside closed regions and
 // outside open ones. The allowed distance is TOLERANCE relative to the radius,
@@ -48,16 +54,19 @@
 // accounts for the rounding of the input coordinates: points that are on a
 // sphere before the coordinates are rounded to floating point, such as the
 // vertices of an equilateral triangle in a lattice that is far from the origin,
-// still count as on the sphere after rounding.
+// still count as on the sphere after rounding. For beta < 1, the tolerance of the
+// Gabriel sphere is used, see CircleIntersectionRegion.
 //
-// For beta < 2, every point of a closed region other than a and b is closer to
-// both a and b than they are to each other. Near a and b, the tolerance adds
-// points that are not: a point at distance h from a, perpendicular to b - a, is
-// within about h^2 / |b - a| of the Gabriel sphere. Such points must not remove
-// a-b, as it may be an edge of the minimum spanning tree. Therefore, for beta < 2,
-// a point only removes a-b if it also removes it from the relative neighborhood
-// graph, with the same test. Then the skeletons for beta < 2 contain the relative
-// neighborhood graph, which is connected.
+// For beta < 1, and for lune-based regions with 1 <= beta < 2, every point of a
+// closed region other than a and b is closer to both a and b than they are to
+// each other. Near a and b, the tolerance adds points that are not: a point at
+// distance h from a, perpendicular to b - a, is within about h^2 / |b - a| of the
+// Gabriel sphere. Such points must not remove a-b, as it may be an edge of the
+// minimum spanning tree. Therefore, in these cases, a point only removes a-b if
+// it also removes it from the relative neighborhood graph, with the same test.
+// Then these skeletons contain the relative neighborhood graph, which is
+// connected. Circle-based skeletons with beta > 1 need not be connected, and have
+// no such condition.
 
 // Squared radius of a k-d tree search ball around 'centre' that contains all
 // points within sqrt(sqr_radius) of the exact centre. The margin accounts for
@@ -258,14 +267,25 @@ protected:
 };
 
 // The closed intersection of the two discs, used for both lune-based and
-// circle-based skeletons with beta < 1. As for LuneRegion with beta < 2,
-// points must also be in the lune of the relative neighborhood graph.
+// circle-based skeletons with beta < 1. It is bounded by the arcs between a and b,
+// which rounding moves no more than the Gabriel circle, so it uses the tolerance
+// of the Gabriel circle for all beta. A tolerance relative to the radius of the
+// discs would grow like 1 / beta, and a smaller beta could then give a larger
+// region. As for LuneRegion with beta < 2, points must also be in the lune of
+// the relative neighborhood graph.
 class CircleIntersectionRegion : public CircleRegion {
 public:
     static const int query_count = 1;
 
     CircleIntersectionRegion(const igraph_matrix_t *points, igraph_real_t beta) :
         CircleRegion(points, beta) { }
+
+    void set_edge(igraph_int_t a, igraph_int_t b) {
+        EdgeRegion::set_edge(a, b);
+        const igraph_real_t radius = r * sqrt(uu);
+        const igraph_real_t d = std::min(TOLERANCE * 0.5 * sqrt(uu) + sphere_fuzz(dim, magnitude, 0.5), radius);
+        band = d * (2 * radius + d);
+    }
 
     bool contains(igraph_int_t p) const {
         if (p == a || p == b) {
