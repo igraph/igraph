@@ -720,7 +720,8 @@ public:
  * Therefore, keeping the edges with a weight larger than β gives the lune-based
  * β-skeleton only up to points within this tolerance of a region boundary.
  * As in \ref igraph_lune_beta_skeleton(), a point that is not closer to both
- * endpoints than they are to each other does not give a threshold below 2.
+ * endpoints than they are to each other, up to the tolerance used by
+ * \ref igraph_relative_neighborhood_graph(), does not give a threshold below 2.
  *
  * \param graph A pointer to the graph that will be created.
  * \param weights Will contain the edge weights corresponding to the edge

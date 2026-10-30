@@ -418,6 +418,7 @@ int main(void) {
         const igraph_real_t mm_km[] = { 1e6, 1e6,  1e6 + 1000, 1e6,  1e6, 1e6 + 0.001 };
         const igraph_real_t cm_100km[] = { 5e6, 5e6,  5.1e6, 5e6,  5e6, 5e6 + 0.01 };
         const igraph_real_t *cases[] = { mm_km, cm_100km };
+        const igraph_real_t cutoffs[] = { 1, 1.99, 2, IGRAPH_INFINITY };
         igraph_int_t eid;
 
         for (size_t c = 0; c < sizeof(cases) / sizeof(cases[0]); c++) {
@@ -427,10 +428,17 @@ int main(void) {
             igraph_destroy(&graph);
             check_nesting(&points);
 
-            igraph_beta_weighted_gabriel_graph(&graph, &weights, &points, IGRAPH_INFINITY);
-            igraph_get_eid(&graph, &eid, 0, 1, IGRAPH_UNDIRECTED, true);
-            IGRAPH_ASSERT(VECTOR(weights)[eid] == IGRAPH_INFINITY);
-            igraph_destroy(&graph);
+            /* Point 2 gives no finite threshold for 0-1. Point 0 is on the Gabriel
+             * circle of 1-2, but it is not closer to 1 than 2 is, up to the
+             * tolerance, so its threshold for 1-2 is 2, not 1. */
+            for (size_t i = 0; i < sizeof(cutoffs) / sizeof(cutoffs[0]); i++) {
+                igraph_beta_weighted_gabriel_graph(&graph, &weights, &points, cutoffs[i]);
+                igraph_get_eid(&graph, &eid, 0, 1, IGRAPH_UNDIRECTED, true);
+                IGRAPH_ASSERT(VECTOR(weights)[eid] == IGRAPH_INFINITY);
+                igraph_get_eid(&graph, &eid, 1, 2, IGRAPH_UNDIRECTED, true);
+                IGRAPH_ASSERT(VECTOR(weights)[eid] == (cutoffs[i] < 2 ? IGRAPH_INFINITY : 2));
+                igraph_destroy(&graph);
+            }
             igraph_matrix_destroy(&points);
         }
     }
