@@ -23,6 +23,8 @@
 - `igraph_community_leiden()` and `igraph_community_leiden_simple()` lost the vertex moves made on the last aggregation level of an iteration. The result could then contain disconnected clusters, and with a negative `n_iterations` the functions could run forever (#2934). Thanks to Lucas Lopes Felipe @lucaslopes for fixing this (PR #2935)!
 - `igraph_community_leiden()` and `igraph_community_leiden_simple()` incorrectly kept track of edge weights during refinement. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this (fixed in #2939)!
 - Fixed compatibility with some Linux distros that include a patched version of libxml2 2.9.x that changed the `xmlEntity` struct layout. Notably, RHEL 8 and derivatives, as well as Ubuntu 22.04 and 24.04 LTS are affected when recent security patches are applied. See issues #2698 and #2931.
+- When CMake found libxml2 through some of libxml2's own CMake package files instead of CMake's `FindLibXml2` module, which can happen with `CMAKE_FIND_PACKAGE_PREFER_CONFIG=ON`, igraph was built without GraphML support even though the configuration summary reported it as enabled.
+- With the default `IGRAPH_GRAPHML_SUPPORT=AUTO`, GraphML support was turned off when CMake could only use libxml2's own CMake package, as with vcpkg, and that package came from a CMake build of libxml2 2.9.11 to 2.12.9 or 2.13.0 to 2.13.5. These packages accept only a request for their exact version, so igraph no longer passes a minimum libxml2 version to `find_package()`. The default lookup through CMake's `FindLibXml2` module was not affected.
 - `igraph_lapack_dsyevr()` incorrectly reported an internal failure in the `dsyevr` LAPACK routine as an invalid argument error. The issued error message now separates invalid argument errors from internal errors.
 - `igraph_eigen_matrix_symmetric()` now uses `abstol=DBL_MIN` when calling `igraph_lapack_dsyevr()`, to achieve high relative accuracy. Previously it used `1e-14`, which is not suitable for matrices with eigenvalues close to zero. This fixed a convergence issue in `igraph_layout_mds()` when using BLIS as the BLAS implementation.
 - `igraph_hrg_fit()` returned an invalid, all-zero HRG model when `steps` was positive and none of the MCMC moves improved the likelihood of the initial dendrogram, e.g. for complete graphs. Using such a model in other HRG functions could crash igraph. The initial dendrogram is now returned in this case.
@@ -51,6 +53,7 @@
 - nanoflann was updated to version 2.0.1
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 - Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
+- The build system now uses the behaviour of CMake policies up to CMake 4.5.
 
 ## [1.0.1]
 
