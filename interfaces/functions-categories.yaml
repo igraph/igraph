@@ -1,0 +1,1914 @@
+# Functions ordered by category
+igraph_add_edge:
+    category: basicigraph
+    subcategory: adding-and-deleting-vertices-and-edges
+
+igraph_add_edges:
+    category: basicigraph
+    subcategory: adding-and-deleting-vertices-and-edges
+
+igraph_add_vertices:
+    category: basicigraph
+    subcategory: adding-and-deleting-vertices-and-edges
+
+igraph_delete_edges:
+    category: basicigraph
+    subcategory: adding-and-deleting-vertices-and-edges
+
+igraph_delete_vertices:
+    category: basicigraph
+    subcategory: adding-and-deleting-vertices-and-edges
+
+igraph_delete_vertices_map:
+    category: basicigraph
+    subcategory: adding-and-deleting-vertices-and-edges
+
+igraph_degree:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_ecount:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_edge:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_edges:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_get_all_eids_between:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_get_eid:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_get_eids:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_incident:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_is_directed:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_neighbors:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_vcount:
+    category: basicigraph
+    subcategory: basic-query-operations
+
+igraph_copy:
+    category: basicigraph
+    subcategory: graph-constructors-and-destructors
+
+igraph_empty:
+    category: basicigraph
+    subcategory: graph-constructors-and-destructors
+
+igraph_empty_attrs:
+    category: basicigraph
+    subcategory: graph-constructors-and-destructors
+
+igraph_expand_path_to_pairs:
+    category: basicigraph
+    subcategory: misc-helper-functions
+
+igraph_invalidate_cache:
+    category: basicigraph
+    subcategory: misc-helper-functions
+
+igraph_is_same_graph:
+    category: basicigraph
+    subcategory: misc-helper-functions
+
+igraph_biadjacency:
+    category: bipartite
+    subcategory: bipartite-adjacency-matrices
+
+igraph_get_biadjacency:
+    category: bipartite
+    subcategory: bipartite-adjacency-matrices
+
+igraph_weighted_biadjacency:
+    category: bipartite
+    subcategory: bipartite-adjacency-matrices
+
+igraph_bipartite_game_gnm:
+    category: bipartite
+    subcategory: create-two-mode-networks
+
+igraph_bipartite_game_gnp:
+    category: bipartite
+    subcategory: create-two-mode-networks
+
+igraph_bipartite_iea_game:
+    category: bipartite
+    subcategory: create-two-mode-networks
+
+igraph_create_bipartite:
+    category: bipartite
+    subcategory: create-two-mode-networks
+
+igraph_full_bipartite:
+    category: bipartite
+    subcategory: create-two-mode-networks
+
+igraph_is_bipartite:
+    category: bipartite
+    subcategory: other-operations-on-bipartite-graphs
+
+igraph_bipartite_projection:
+    category: bipartite
+    subcategory: project-two-mode-graphs
+
+igraph_bipartite_projection_size:
+    category: bipartite
+    subcategory: project-two-mode-graphs
+
+igraph_clique_number:
+    category: cliques
+    subcategory: cliques
+
+igraph_clique_size_hist:
+    category: cliques
+    subcategory: cliques
+
+igraph_cliques:
+    category: cliques
+    subcategory: cliques
+
+igraph_cliques_callback:
+    category: cliques
+    subcategory: cliques
+
+igraph_is_clique:
+    category: cliques
+    subcategory: cliques
+
+igraph_is_complete:
+    category: cliques
+    subcategory: cliques
+
+igraph_largest_cliques:
+    category: cliques
+    subcategory: cliques
+
+igraph_maximal_cliques:
+    category: cliques
+    subcategory: cliques
+
+igraph_maximal_cliques_callback:
+    category: cliques
+    subcategory: cliques
+
+igraph_maximal_cliques_count:
+    category: cliques
+    subcategory: cliques
+
+igraph_maximal_cliques_file:
+    category: cliques
+    subcategory: cliques
+
+igraph_maximal_cliques_hist:
+    category: cliques
+    subcategory: cliques
+
+igraph_maximal_cliques_subset:
+    category: cliques
+    subcategory: cliques
+
+igraph_independence_number:
+    category: cliques
+    subcategory: independent-vertex-sets
+
+igraph_independent_vertex_sets:
+    category: cliques
+    subcategory: independent-vertex-sets
+
+igraph_is_independent_vertex_set:
+    category: cliques
+    subcategory: independent-vertex-sets
+
+igraph_largest_independent_vertex_sets:
+    category: cliques
+    subcategory: independent-vertex-sets
+
+igraph_maximal_independent_vertex_sets:
+    category: cliques
+    subcategory: independent-vertex-sets
+
+igraph_largest_weighted_cliques:
+    category: cliques
+    subcategory: weighted-cliques
+
+igraph_weighted_clique_number:
+    category: cliques
+    subcategory: weighted-cliques
+
+igraph_weighted_cliques:
+    category: cliques
+    subcategory: weighted-cliques
+
+igraph_is_bipartite_coloring:
+    category: coloring
+
+igraph_is_edge_coloring:
+    category: coloring
+
+igraph_is_perfect:
+    category: coloring
+
+igraph_is_vertex_coloring:
+    category: coloring
+
+igraph_vertex_coloring_greedy:
+    category: coloring
+
+igraph_community_optimal_modularity:
+    category: community
+    subcategory: common-functions-related-to-community-detection
+
+igraph_community_to_membership:
+    category: community
+    subcategory: common-functions-related-to-community-detection
+
+igraph_compare_communities:
+    category: community
+    subcategory: common-functions-related-to-community-detection
+
+igraph_modularity:
+    category: community
+    subcategory: common-functions-related-to-community-detection
+
+igraph_modularity_matrix:
+    category: community
+    subcategory: common-functions-related-to-community-detection
+
+igraph_reindex_membership:
+    category: community
+    subcategory: common-functions-related-to-community-detection
+
+igraph_split_join_distance:
+    category: community
+    subcategory: common-functions-related-to-community-detection
+
+igraph_community_spinglass:
+    category: community
+    subcategory: community-detection-based-on-statistical-mechanics
+
+igraph_community_spinglass_single:
+    category: community
+    subcategory: community-detection-based-on-statistical-mechanics
+
+igraph_community_leading_eigenvector:
+    category: community
+    subcategory: community-structure-based-on-eigenvectors-of-matrices
+
+igraph_le_community_to_membership:
+    category: community
+    subcategory: community-structure-based-on-eigenvectors-of-matrices
+
+igraph_community_fastgreedy:
+    category: community
+    subcategory: community-structure-based-on-the-optimization-of-modularity
+
+igraph_community_leiden:
+    category: community
+    subcategory: community-structure-based-on-the-optimization-of-modularity
+
+igraph_community_leiden_simple:
+    category: community
+    subcategory: community-structure-based-on-the-optimization-of-modularity
+
+igraph_community_multilevel:
+    category: community
+    subcategory: community-structure-based-on-the-optimization-of-modularity
+
+igraph_community_eb_get_merges:
+    category: community
+    subcategory: edge-betweenness-based-community-detection
+
+igraph_community_edge_betweenness:
+    category: community
+    subcategory: edge-betweenness-based-community-detection
+
+igraph_community_fluid_communities:
+    category: community
+    subcategory: fluid-communities
+
+igraph_community_infomap:
+    category: community
+    subcategory: infomap-algorithm
+
+igraph_community_label_propagation:
+    category: community
+    subcategory: label-propagation
+
+igraph_community_voronoi:
+    category: community
+    subcategory: voronoi-communities
+
+igraph_community_walktrap:
+    category: community
+    subcategory: walktrap-community-structure-based-on-random-walks
+
+igraph_feedback_arc_set:
+    category: cycles
+    subcategory: acyclic-graphs-feedback-sets
+
+igraph_feedback_vertex_set:
+    category: cycles
+    subcategory: acyclic-graphs-feedback-sets
+
+igraph_is_acyclic:
+    category: cycles
+    subcategory: acyclic-graphs-feedback-sets
+
+igraph_is_dag:
+    category: cycles
+    subcategory: acyclic-graphs-feedback-sets
+
+igraph_topological_sorting:
+    category: cycles
+    subcategory: acyclic-graphs-feedback-sets
+
+igraph_fundamental_cycles:
+    category: cycles
+    subcategory: cycle-bases
+
+igraph_minimum_cycle_basis:
+    category: cycles
+    subcategory: cycle-bases
+
+igraph_eulerian_cycle:
+    category: cycles
+    subcategory: eulerian-cycles
+
+igraph_eulerian_path:
+    category: cycles
+    subcategory: eulerian-cycles
+
+igraph_is_eulerian:
+    category: cycles
+    subcategory: eulerian-cycles
+
+igraph_find_cycle:
+    category: cycles
+    subcategory: finding-cycles
+
+igraph_simple_cycles:
+    category: cycles
+    subcategory: finding-cycles
+
+igraph_simple_cycles_callback:
+    category: cycles
+    subcategory: finding-cycles
+
+igraph_adjacency_spectral_embedding:
+    category: embedding
+    subcategory: spectral-embedding
+
+igraph_dim_select:
+    category: embedding
+    subcategory: spectral-embedding
+
+igraph_laplacian_spectral_embedding:
+    category: embedding
+    subcategory: spectral-embedding
+
+igraph_strerror:
+    category: error
+    subcategory: error-codes
+
+igraph_cohesive_blocks:
+    category: flows
+    subcategory: cohesive-blocks
+
+igraph_edge_connectivity:
+    category: flows
+    subcategory: connectivity
+
+igraph_st_edge_connectivity:
+    category: flows
+    subcategory: connectivity
+
+igraph_st_vertex_connectivity:
+    category: flows
+    subcategory: connectivity
+
+igraph_vertex_connectivity:
+    category: flows
+    subcategory: connectivity
+
+igraph_all_st_cuts:
+    category: flows
+    subcategory: cuts-and-minimum-cuts
+
+igraph_all_st_mincuts:
+    category: flows
+    subcategory: cuts-and-minimum-cuts
+
+igraph_gomory_hu_tree:
+    category: flows
+    subcategory: cuts-and-minimum-cuts
+
+igraph_mincut:
+    category: flows
+    subcategory: cuts-and-minimum-cuts
+
+igraph_mincut_value:
+    category: flows
+    subcategory: cuts-and-minimum-cuts
+
+igraph_st_mincut:
+    category: flows
+    subcategory: cuts-and-minimum-cuts
+
+igraph_st_mincut_value:
+    category: flows
+    subcategory: cuts-and-minimum-cuts
+
+igraph_edge_disjoint_paths:
+    category: flows
+    subcategory: edge-and-vertex-disjoint-paths
+
+igraph_vertex_disjoint_paths:
+    category: flows
+    subcategory: edge-and-vertex-disjoint-paths
+
+igraph_adhesion:
+    category: flows
+    subcategory: graph-adhesion-and-cohesion
+
+igraph_cohesion:
+    category: flows
+    subcategory: graph-adhesion-and-cohesion
+
+igraph_dominator_tree:
+    category: flows
+    subcategory: maximum-flows
+
+igraph_maxflow:
+    category: flows
+    subcategory: maximum-flows
+
+igraph_maxflow_value:
+    category: flows
+    subcategory: maximum-flows
+
+igraph_read_graph_graphdb:
+    category: foreign
+    subcategory: binary-formats
+
+igraph_read_graph_gml:
+    category: foreign
+    subcategory: gml-format
+
+igraph_write_graph_gml:
+    category: foreign
+    subcategory: gml-format
+
+igraph_read_graph_graphml:
+    category: foreign
+    subcategory: graphml-format
+
+igraph_write_graph_graphml:
+    category: foreign
+    subcategory: graphml-format
+
+igraph_write_graph_dot:
+    category: foreign
+    subcategory: graphviz-format
+
+igraph_write_graph_leda:
+    category: foreign
+    subcategory: leda-format
+
+igraph_read_graph_pajek:
+    category: foreign
+    subcategory: pajek-format
+
+igraph_write_graph_pajek:
+    category: foreign
+    subcategory: pajek-format
+
+igraph_read_graph_dimacs_flow:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_read_graph_edgelist:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_read_graph_lgl:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_read_graph_ncol:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_write_graph_dimacs_flow:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_write_graph_edgelist:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_write_graph_lgl:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_write_graph_ncol:
+    category: foreign
+    subcategory: simple-edge-list-and-similar-formats
+
+igraph_read_graph_dl:
+    category: foreign
+    subcategory: ucinets-dl-file-format
+
+igraph_chung_lu_game:
+    category: games
+    subcategory: degree-constrained-games
+
+igraph_degree_sequence_game:
+    category: games
+    subcategory: degree-constrained-games
+
+igraph_k_regular_game:
+    category: games
+    subcategory: degree-constrained-games
+
+igraph_rewire:
+    category: games
+    subcategory: degree-constrained-games
+
+igraph_static_fitness_game:
+    category: games
+    subcategory: degree-constrained-games
+
+igraph_static_power_law_game:
+    category: games
+    subcategory: degree-constrained-games
+
+igraph_rewire_directed_edges:
+    category: games
+    subcategory: edge-rewiring-games
+
+igraph_rewire_edges:
+    category: games
+    subcategory: edge-rewiring-games
+
+igraph_watts_strogatz_game:
+    category: games
+    subcategory: edge-rewiring-games
+
+igraph_asymmetric_preference_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_correlated_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_correlated_pair_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_erdos_renyi_game_gnm:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_erdos_renyi_game_gnp:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_hsbm_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_hsbm_list_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_iea_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_preference_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_sbm_game:
+    category: games
+    subcategory: erdos-renyi-games
+
+igraph_callaway_traits_game:
+    category: games
+    subcategory: growing-random-games
+
+igraph_cited_type_game:
+    category: games
+    subcategory: growing-random-games
+
+igraph_citing_cited_type_game:
+    category: games
+    subcategory: growing-random-games
+
+igraph_establishment_game:
+    category: games
+    subcategory: growing-random-games
+
+igraph_forest_fire_game:
+    category: games
+    subcategory: growing-random-games
+
+igraph_growing_random_game:
+    category: games
+    subcategory: growing-random-games
+
+igraph_dot_product_game:
+    category: games
+    subcategory: other-random-games
+
+igraph_grg_game:
+    category: games
+    subcategory: other-random-games
+
+igraph_simple_interconnected_islands_game:
+    category: games
+    subcategory: other-random-games
+
+igraph_tree_game:
+    category: games
+    subcategory: other-random-games
+
+igraph_barabasi_aging_game:
+    category: games
+    subcategory: preferential-attachment-games
+
+igraph_barabasi_game:
+    category: games
+    subcategory: preferential-attachment-games
+
+igraph_lastcit_game:
+    category: games
+    subcategory: preferential-attachment-games
+
+igraph_recent_degree_aging_game:
+    category: games
+    subcategory: preferential-attachment-games
+
+igraph_recent_degree_game:
+    category: games
+    subcategory: preferential-attachment-games
+
+igraph_adjacency:
+    category: generators
+    subcategory: adjacency-generators
+
+igraph_adjlist:
+    category: generators
+    subcategory: adjacency-generators
+
+igraph_sparse_adjacency:
+    category: generators
+    subcategory: adjacency-generators
+
+igraph_sparse_weighted_adjacency:
+    category: generators
+    subcategory: adjacency-generators
+
+igraph_weighted_adjacency:
+    category: generators
+    subcategory: adjacency-generators
+
+igraph_create:
+    category: generators
+    subcategory: basic-generators
+
+igraph_full:
+    category: generators
+    subcategory: complete-graph-generators
+
+igraph_full_citation:
+    category: generators
+    subcategory: complete-graph-generators
+
+igraph_full_multipartite:
+    category: generators
+    subcategory: complete-graph-generators
+
+igraph_turan:
+    category: generators
+    subcategory: complete-graph-generators
+
+igraph_realize_bipartite_degree_sequence:
+    category: generators
+    subcategory: degree-graph-generators
+
+igraph_realize_degree_sequence:
+    category: generators
+    subcategory: degree-graph-generators
+
+igraph_de_bruijn:
+    category: generators
+    subcategory: other-generators
+
+igraph_generalized_petersen:
+    category: generators
+    subcategory: other-generators
+
+igraph_kautz:
+    category: generators
+    subcategory: other-generators
+
+igraph_mycielski_graph:
+    category: generators
+    subcategory: other-generators
+
+igraph_atlas:
+    category: generators
+    subcategory: pre-defined-generators
+
+igraph_famous:
+    category: generators
+    subcategory: pre-defined-generators
+
+igraph_circulant:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_cycle_graph:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_extended_chordal_ring:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_hamming:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_hypercube:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_lcf:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_path_graph:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_ring:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_square_lattice:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_star:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_triangular_lattice:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_wheel:
+    category: generators
+    subcategory: regular-structre-generators
+
+igraph_from_prufer:
+    category: generators
+    subcategory: tree-generators
+
+igraph_kary_tree:
+    category: generators
+    subcategory: tree-generators
+
+igraph_regular_tree:
+    category: generators
+    subcategory: tree-generators
+
+igraph_symmetric_tree:
+    category: generators
+    subcategory: tree-generators
+
+igraph_tree_from_parent_vector:
+    category: generators
+    subcategory: tree-generators
+
+igraph_graphlets:
+    category: graphlets
+    subcategory: performing-graphlet-decomposition
+
+igraph_graphlets_candidate_basis:
+    category: graphlets
+    subcategory: performing-graphlet-decomposition
+
+igraph_graphlets_project:
+    category: graphlets
+    subcategory: performing-graphlet-decomposition
+
+igraph_from_hrg_dendrogram:
+    category: hrg
+    subcategory: conversion-to-and-from-igraph-graphs
+
+igraph_hrg_create:
+    category: hrg
+    subcategory: conversion-to-and-from-igraph-graphs
+
+igraph_hrg_consensus:
+    category: hrg
+    subcategory: fitting-hrgs
+
+igraph_hrg_fit:
+    category: hrg
+    subcategory: fitting-hrgs
+
+igraph_hrg_game:
+    category: hrg
+    subcategory: hrg-sampling
+
+igraph_hrg_sample:
+    category: hrg
+    subcategory: hrg-sampling
+
+igraph_hrg_predict:
+    category: hrg
+    subcategory: predicting-missing-edges
+
+igraph_hrg_resize:
+    category: hrg
+    subcategory: representing-hrgs
+
+igraph_hrg_size:
+    category: hrg
+    subcategory: representing-hrgs
+
+igraph_automorphism_group_bliss:
+    category: isomorphism
+    subcategory: bliss-algorithm
+
+igraph_canonical_permutation_bliss:
+    category: isomorphism
+    subcategory: bliss-algorithm
+
+igraph_count_automorphisms_bliss:
+    category: isomorphism
+    subcategory: bliss-algorithm
+
+igraph_isomorphic_bliss:
+    category: isomorphism
+    subcategory: bliss-algorithm
+
+igraph_graph_count:
+    category: isomorphism
+    subcategory: functions-for-graphs-with-3-or-4-vertices
+
+igraph_isoclass:
+    category: isomorphism
+    subcategory: functions-for-graphs-with-3-or-4-vertices
+
+igraph_isoclass_create:
+    category: isomorphism
+    subcategory: functions-for-graphs-with-3-or-4-vertices
+
+igraph_isoclass_subgraph:
+    category: isomorphism
+    subcategory: functions-for-graphs-with-3-or-4-vertices
+
+igraph_automorphism_group:
+    category: isomorphism
+    subcategory: isomorphism-simple-interface
+
+igraph_canonical_permutation:
+    category: isomorphism
+    subcategory: isomorphism-simple-interface
+
+igraph_count_automorphisms:
+    category: isomorphism
+    subcategory: isomorphism-simple-interface
+
+igraph_isomorphic:
+    category: isomorphism
+    subcategory: isomorphism-simple-interface
+
+igraph_subisomorphic:
+    category: isomorphism
+    subcategory: isomorphism-simple-interface
+
+igraph_permute_vertices:
+    category: isomorphism
+    subcategory: isomorphism-utility-functions
+
+igraph_simplify_and_colorize:
+    category: isomorphism
+    subcategory: isomorphism-utility-functions
+
+igraph_subisomorphic_lad:
+    category: isomorphism
+    subcategory: lad-algorithm
+
+igraph_count_isomorphisms_vf2:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_count_subisomorphisms_vf2:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_get_isomorphisms_vf2:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_get_isomorphisms_vf2_callback:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_get_subisomorphisms_vf2:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_get_subisomorphisms_vf2_callback:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_isomorphic_vf2:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_subisomorphic_vf2:
+    category: isomorphism
+    subcategory: vf2-algorithm
+
+igraph_layout_drl:
+    category: layout
+    subcategory: drl-layout-generator
+
+igraph_layout_drl_3d:
+    category: layout
+    subcategory: drl-layout-generator
+
+igraph_layout_reingold_tilford:
+    category: layout
+    subcategory: layouts-for-trees-and-acyclic-graphs
+
+igraph_layout_reingold_tilford_circular:
+    category: layout
+    subcategory: layouts-for-trees-and-acyclic-graphs
+
+igraph_layout_sugiyama:
+    category: layout
+    subcategory: layouts-for-trees-and-acyclic-graphs
+
+igraph_layout_umap:
+    category: layout
+    subcategory: layouts-for-trees-and-acyclic-graphs
+
+igraph_layout_umap_compute_weights:
+    category: layout
+    subcategory: layouts-for-trees-and-acyclic-graphs
+
+igraph_roots_for_tree_layout:
+    category: layout
+    subcategory: layouts-for-trees-and-acyclic-graphs
+
+igraph_layout_align:
+    category: layout
+    subcategory: pp-layouts
+
+igraph_layout_merge_dla:
+    category: layout
+    subcategory: pp-layouts
+
+igraph_layout_fruchterman_reingold_3d:
+    category: layout
+    subcategory: three-d-layout-generators
+
+igraph_layout_grid_3d:
+    category: layout
+    subcategory: three-d-layout-generators
+
+igraph_layout_kamada_kawai_3d:
+    category: layout
+    subcategory: three-d-layout-generators
+
+igraph_layout_random_3d:
+    category: layout
+    subcategory: three-d-layout-generators
+
+igraph_layout_sphere:
+    category: layout
+    subcategory: three-d-layout-generators
+
+igraph_layout_umap_3d:
+    category: layout
+    subcategory: three-d-layout-generators
+
+igraph_layout_bipartite:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_circle:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_davidson_harel:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_fruchterman_reingold:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_gem:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_graphopt:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_grid:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_kamada_kawai:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_lgl:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_mds:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_random:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_layout_star:
+    category: layout
+    subcategory: two-d-layout-generators
+
+igraph_count_adjacent_triangles:
+    category: motifs
+    subcategory: finding-triangles
+
+igraph_count_triangles:
+    category: motifs
+    subcategory: finding-triangles
+
+igraph_list_triangles:
+    category: motifs
+    subcategory: finding-triangles
+
+igraph_motifs_randesu:
+    category: motifs
+    subcategory: graph-motifs
+
+igraph_motifs_randesu_estimate:
+    category: motifs
+    subcategory: graph-motifs
+
+igraph_motifs_randesu_no:
+    category: motifs
+    subcategory: graph-motifs
+
+igraph_dyad_census:
+    category: motifs
+
+igraph_triad_census:
+    category: motifs
+
+igraph_almost_equals:
+    category: nongraph
+    subcategory: compare-floats-with-tolerance
+
+igraph_cmp_epsilon:
+    category: nongraph
+    subcategory: compare-floats-with-tolerance
+
+igraph_power_law_fit:
+    category: nongraph
+    subcategory: fitting-powerlaw-distributions-to-empirical-data
+
+igraph_version:
+    category: nongraph
+    subcategory: igraph-version-number
+
+igraph_random_sample:
+    category: nongraph
+    subcategory: random-sampling-from-very-long-sequences
+
+igraph_running_mean:
+    category: nongraph
+    subcategory: running-mean-of-a-time-series
+
+igraph_connect_neighborhood:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_contract_vertices:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_graph_power:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_induced_subgraph:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_induced_subgraph_map:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_linegraph:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_mycielskian:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_product:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_reverse_edges:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_rooted_product:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_simplify:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_subgraph_from_edges:
+    category: operators
+    subcategory: miscellaneous-operators
+
+igraph_complementer:
+    category: operators
+    subcategory: other-setlike-operators
+
+igraph_compose:
+    category: operators
+    subcategory: other-setlike-operators
+
+igraph_difference:
+    category: operators
+    subcategory: other-setlike-operators
+
+igraph_disjoint_union:
+    category: operators
+    subcategory: union-and-intersection
+
+igraph_disjoint_union_many:
+    category: operators
+    subcategory: union-and-intersection
+
+igraph_intersection:
+    category: operators
+    subcategory: union-and-intersection
+
+igraph_intersection_many:
+    category: operators
+    subcategory: union-and-intersection
+
+igraph_join:
+    category: operators
+    subcategory: union-and-intersection
+
+igraph_union:
+    category: operators
+    subcategory: union-and-intersection
+
+igraph_union_many:
+    category: operators
+    subcategory: union-and-intersection
+
+igraph_sir:
+    category: processes
+    subcategory: epidemic-models
+
+igraph_progress:
+    category: progress
+    subcategory: invoking-the-progress-handler
+
+igraph_all_minimal_st_separators:
+    category: separators
+
+igraph_even_tarjan_reduction:
+    category: separators
+
+igraph_is_minimal_separator:
+    category: separators
+
+igraph_is_separator:
+    category: separators
+
+igraph_minimum_size_separators:
+    category: separators
+
+igraph_convex_hull_2d:
+    category: spatial
+    subcategory: nongraph-spatial
+
+igraph_beta_weighted_gabriel_graph:
+    category: spatial
+    subcategory: spatial-generators
+
+igraph_circle_beta_skeleton:
+    category: spatial
+    subcategory: spatial-generators
+
+igraph_delaunay_graph:
+    category: spatial
+    subcategory: spatial-generators
+
+igraph_gabriel_graph:
+    category: spatial
+    subcategory: spatial-generators
+
+igraph_lune_beta_skeleton:
+    category: spatial
+    subcategory: spatial-generators
+
+igraph_nearest_neighbor_graph:
+    category: spatial
+    subcategory: spatial-generators
+
+igraph_relative_neighborhood_graph:
+    category: spatial
+    subcategory: spatial-generators
+
+igraph_spatial_edge_lengths:
+    category: spatial
+    subcategory: spatial-properties
+
+igraph_status:
+    category: status
+    subcategory: invoking-the-status-handler
+
+igraph_are_adjacent:
+    category: structural
+    subcategory: basic-properties
+
+igraph_betweenness:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_closeness:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_constraint:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_convergence_degree:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_edge_betweenness:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_eigenvector_centrality:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_harmonic_centrality:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_hub_and_authority_scores:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_maxdegree:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_pagerank:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_personalized_pagerank:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_personalized_pagerank_vs:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_strength:
+    category: structural
+    subcategory: centrality-measures
+
+igraph_centralization:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_betweenness:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_betweenness_tmax:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_closeness:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_closeness_tmax:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_degree:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_degree_tmax:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_eigenvector_centrality:
+    category: structural
+    subcategory: centralization
+
+igraph_centralization_eigenvector_centrality_tmax:
+    category: structural
+    subcategory: centralization
+
+igraph_is_bigraphical:
+    category: structural
+    subcategory: degree-sequences
+
+igraph_is_graphical:
+    category: structural
+    subcategory: degree-sequences
+
+igraph_to_directed:
+    category: structural
+    subcategory: directedness-conversion
+
+igraph_to_undirected:
+    category: structural
+    subcategory: directedness-conversion
+
+igraph_average_local_efficiency:
+    category: structural
+    subcategory: efficiency-measures
+
+igraph_global_efficiency:
+    category: structural
+    subcategory: efficiency-measures
+
+igraph_local_efficiency:
+    category: structural
+    subcategory: efficiency-measures
+
+igraph_articulation_points:
+    category: structural
+    subcategory: graph-components
+
+igraph_biconnected_components:
+    category: structural
+    subcategory: graph-components
+
+igraph_bridges:
+    category: structural
+    subcategory: graph-components
+
+igraph_connected_components:
+    category: structural
+    subcategory: graph-components
+
+igraph_count_reachable:
+    category: structural
+    subcategory: graph-components
+
+igraph_decompose:
+    category: structural
+    subcategory: graph-components
+
+igraph_is_biconnected:
+    category: structural
+    subcategory: graph-components
+
+igraph_is_connected:
+    category: structural
+    subcategory: graph-components
+
+igraph_subcomponent:
+    category: structural
+    subcategory: graph-components
+
+igraph_transitive_closure:
+    category: structural
+    subcategory: graph-components
+
+igraph_coreness:
+    category: structural
+    subcategory: k-cores
+
+igraph_trussness:
+    category: structural
+    subcategory: k-cores
+
+igraph_is_matching:
+    category: structural
+    subcategory: matchings
+
+igraph_is_maximal_matching:
+    category: structural
+    subcategory: matchings
+
+igraph_maximum_bipartite_matching:
+    category: structural
+    subcategory: matchings
+
+igraph_is_chordal:
+    category: structural
+    subcategory: maximum-cardinality-search-chordal-graphs
+
+igraph_maximum_cardinality_search:
+    category: structural
+    subcategory: maximum-cardinality-search-chordal-graphs
+
+igraph_assortativity:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_assortativity_degree:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_assortativity_nominal:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_avg_nearest_neighbor_degree:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_degree_correlation_vector:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_joint_degree_distribution:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_joint_degree_matrix:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_joint_type_distribution:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_rich_club_sequence:
+    category: structural
+    subcategory: mixing-patterns
+
+igraph_neighborhood:
+    category: structural
+    subcategory: neighborhood-of-a-vertex
+
+igraph_neighborhood_graphs:
+    category: structural
+    subcategory: neighborhood-of-a-vertex
+
+igraph_neighborhood_size:
+    category: structural
+    subcategory: neighborhood-of-a-vertex
+
+igraph_count_loops:
+    category: structural
+    subcategory: non-simple-graphs-multiple-and-loop-edges
+
+igraph_count_multiple:
+    category: structural
+    subcategory: non-simple-graphs-multiple-and-loop-edges
+
+igraph_has_loop:
+    category: structural
+    subcategory: non-simple-graphs-multiple-and-loop-edges
+
+igraph_has_multiple:
+    category: structural
+    subcategory: non-simple-graphs-multiple-and-loop-edges
+
+igraph_is_loop:
+    category: structural
+    subcategory: non-simple-graphs-multiple-and-loop-edges
+
+igraph_is_multiple:
+    category: structural
+    subcategory: non-simple-graphs-multiple-and-loop-edges
+
+igraph_is_simple:
+    category: structural
+    subcategory: non-simple-graphs-multiple-and-loop-edges
+
+igraph_density:
+    category: structural
+    subcategory: other-operations
+
+igraph_diversity:
+    category: structural
+    subcategory: other-operations
+
+igraph_get_adjacency:
+    category: structural
+    subcategory: other-operations
+
+igraph_get_adjacency_sparse:
+    category: structural
+    subcategory: other-operations
+
+igraph_get_edgelist:
+    category: structural
+    subcategory: other-operations
+
+igraph_get_stochastic:
+    category: structural
+    subcategory: other-operations
+
+igraph_get_stochastic_sparse:
+    category: structural
+    subcategory: other-operations
+
+igraph_has_mutual:
+    category: structural
+    subcategory: other-operations
+
+igraph_is_mutual:
+    category: structural
+    subcategory: other-operations
+
+igraph_mean_degree:
+    category: structural
+    subcategory: other-operations
+
+igraph_reciprocity:
+    category: structural
+    subcategory: other-operations
+
+igraph_bond_percolation:
+    category: structural
+    subcategory: percolation
+
+igraph_edgelist_percolation:
+    category: structural
+    subcategory: percolation
+
+igraph_site_percolation:
+    category: structural
+    subcategory: percolation
+
+igraph_local_scan_neighborhood_ecount:
+    category: structural
+    subcategory: pre-calculated-subsets
+
+igraph_local_scan_subset_ecount:
+    category: structural
+    subcategory: pre-calculated-subsets
+
+igraph_betweenness_cutoff:
+    category: structural
+    subcategory: range-limited-centrality-measures
+
+igraph_closeness_cutoff:
+    category: structural
+    subcategory: range-limited-centrality-measures
+
+igraph_edge_betweenness_cutoff:
+    category: structural
+    subcategory: range-limited-centrality-measures
+
+igraph_harmonic_centrality_cutoff:
+    category: structural
+    subcategory: range-limited-centrality-measures
+
+igraph_average_path_length:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_diameter:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_distances:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_distances_bellman_ford:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_distances_cutoff:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_distances_dijkstra:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_distances_dijkstra_cutoff:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_distances_floyd_warshall:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_distances_johnson:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_eccentricity:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_all_shortest_paths:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_all_shortest_paths_dijkstra:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_all_simple_paths:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_k_shortest_paths:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_shortest_path:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_shortest_path_astar:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_shortest_path_bellman_ford:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_shortest_path_dijkstra:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_shortest_paths:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_shortest_paths_bellman_ford:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_get_shortest_paths_dijkstra:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_girth:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_graph_center:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_path_length_hist:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_pseudo_diameter:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_radius:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_vertex_path_from_edge_path:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_voronoi:
+    category: structural
+    subcategory: shortest-path-related-functions
+
+igraph_bibcoupling:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_cocitation:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_similarity_dice:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_similarity_dice_es:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_similarity_dice_pairs:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_similarity_inverse_log_weighted:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_similarity_jaccard:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_similarity_jaccard_es:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_similarity_jaccard_pairs:
+    category: structural
+    subcategory: similarity-measures
+
+igraph_spanner:
+    category: structural
+    subcategory: Sparsifiers
+
+igraph_get_laplacian:
+    category: structural
+    subcategory: spectral-properties
+
+igraph_get_laplacian_sparse:
+    category: structural
+    subcategory: spectral-properties
+
+igraph_betweenness_subset:
+    category: structural
+    subcategory: subset-limited-centrality-measures
+
+igraph_edge_betweenness_subset:
+    category: structural
+    subcategory: subset-limited-centrality-measures
+
+igraph_local_scan_0_them:
+    category: structural
+    subcategory: them-statistics
+
+igraph_local_scan_1_ecount_them:
+    category: structural
+    subcategory: them-statistics
+
+igraph_local_scan_k_ecount_them:
+    category: structural
+    subcategory: them-statistics
+
+igraph_ecc:
+    category: structural
+    subcategory: transitivity-or-clustering-coefficient
+
+igraph_transitivity_avglocal_undirected:
+    category: structural
+    subcategory: transitivity-or-clustering-coefficient
+
+igraph_transitivity_barrat:
+    category: structural
+    subcategory: transitivity-or-clustering-coefficient
+
+igraph_transitivity_local_undirected:
+    category: structural
+    subcategory: transitivity-or-clustering-coefficient
+
+igraph_transitivity_undirected:
+    category: structural
+    subcategory: transitivity-or-clustering-coefficient
+
+igraph_is_forest:
+    category: structural
+    subcategory: trees
+
+igraph_is_tree:
+    category: structural
+    subcategory: trees
+
+igraph_minimum_spanning_tree:
+    category: structural
+    subcategory: trees
+
+igraph_random_spanning_tree:
+    category: structural
+    subcategory: trees
+
+igraph_to_prufer:
+    category: structural
+    subcategory: trees
+
+igraph_unfold_tree:
+    category: structural
+    subcategory: unfolding-a-graph-into-a-tree
+
+igraph_local_scan_0:
+    category: structural
+    subcategory: us-statistics
+
+igraph_local_scan_1_ecount:
+    category: structural
+    subcategory: us-statistics
+
+igraph_local_scan_k_ecount:
+    category: structural
+    subcategory: us-statistics
+
+igraph_get_widest_path:
+    category: structural
+    subcategory: widest-path-related-functions
+
+igraph_get_widest_paths:
+    category: structural
+    subcategory: widest-path-related-functions
+
+igraph_widest_path_widths_dijkstra:
+    category: structural
+    subcategory: widest-path-related-functions
+
+igraph_widest_path_widths_floyd_warshall:
+    category: structural
+    subcategory: widest-path-related-functions
+
+igraph_bfs:
+    category: visitors
+    subcategory: breadth-first-search
+
+igraph_bfs_simple:
+    category: visitors
+    subcategory: breadth-first-search
+
+igraph_dfs:
+    category: visitors
+    subcategory: depth-first-search
+
+igraph_random_walk:
+    category: visitors
+    subcategory: random-walks
+
+# Functions not found in any .xxml file
+igraph_eigen_adjacency:
+    category: undocumented
+
+igraph_eigen_matrix:
+    category: undocumented
+
+igraph_eigen_matrix_symmetric:
+    category: undocumented
+
+igraph_has_attribute_table:
+    category: undocumented
+
+igraph_hrg_sample_many:
+    category: undocumented
+
+igraph_residual_graph:
+    category: undocumented
+
+igraph_reverse_residual_graph:
+    category: undocumented
+
+igraph_solve_lsap:
+    category: undocumented
+
