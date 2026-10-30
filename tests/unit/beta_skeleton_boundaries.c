@@ -33,6 +33,16 @@ static void check_edges(const igraph_t *graph, const igraph_int_t *edges, igraph
     }
 }
 
+/* Checks that two graphs on the same vertices have the same edges, in any order. */
+static void check_same_edges(const igraph_t *graph1, const igraph_t *graph2) {
+    IGRAPH_ASSERT(igraph_ecount(graph1) == igraph_ecount(graph2));
+    for (igraph_int_t e = 0; e < igraph_ecount(graph1); e++) {
+        igraph_bool_t adj;
+        igraph_are_adjacent(graph2, IGRAPH_FROM(graph1, e), IGRAPH_TO(graph1, e), &adj);
+        IGRAPH_ASSERT(adj);
+    }
+}
+
 /* Checks that the Gabriel graph, the beta = 1 skeletons and the weighted Gabriel
  * graph with several cutoffs are identical, and returns the Gabriel graph. */
 static void gabriel_identity(const igraph_matrix_t *points, igraph_t *gabriel) {
@@ -222,6 +232,90 @@ int main(void) {
         }
         gabriel_identity(&points, &graph);
         igraph_destroy(&graph);
+        igraph_matrix_destroy(&points);
+        igraph_vector_int_destroy(&cells);
+    }
+
+    {
+        /* Triangular lattices far from the origin. The rounded coordinates are no
+         * longer exactly equilateral, but are treated as such: the relative
+         * neighborhood graph keeps the triangles, the beta = 2 skeleton has no edges. */
+        const igraph_real_t offsets[][3] = {
+            /* x, y, spacing */
+            { 0, 0, 1 }, { 47.5, 19.05, 1e-3 }, { 47.5, 19.05, 1e-4 }, { 5e6, 3e5, 10 }
+        };
+        const igraph_int_t k = 6;
+
+        igraph_matrix_init(&points, k * k, 2);
+        for (size_t c = 0; c < sizeof(offsets) / sizeof(offsets[0]); c++) {
+            const igraph_real_t h = offsets[c][2];
+            for (igraph_int_t i = 0; i < k; i++) {
+                for (igraph_int_t j = 0; j < k; j++) {
+                    MATRIX(points, i * k + j, 0) = offsets[c][0] + (i + 0.5 * (j % 2)) * h;
+                    MATRIX(points, i * k + j, 1) = offsets[c][1] + j * h * sqrt(3.0) / 2;
+                }
+            }
+
+            igraph_delaunay_graph(&graph, &points);
+            IGRAPH_ASSERT(igraph_ecount(&graph) == 89);
+            igraph_destroy(&graph);
+
+            gabriel_identity(&points, &graph);
+            IGRAPH_ASSERT(igraph_ecount(&graph) == 85);
+            igraph_destroy(&graph);
+
+            igraph_relative_neighborhood_graph(&graph, &points);
+            IGRAPH_ASSERT(igraph_ecount(&graph) == 85);
+            igraph_destroy(&graph);
+
+            igraph_lune_beta_skeleton(&graph, &points, 2);
+            IGRAPH_ASSERT(igraph_ecount(&graph) == 0);
+            igraph_destroy(&graph);
+        }
+        igraph_matrix_destroy(&points);
+    }
+
+    {
+        /* Random cells of a grid, in longitude and latitude and in integer
+         * coordinates. The skeletons must not depend on the coordinates. */
+        const igraph_real_t betas[] = { 1, 1.5, 2, 3 };
+        igraph_vector_int_t cells;
+        igraph_matrix_t int_points;
+        igraph_t graph2;
+
+        igraph_rng_seed(igraph_rng_default(), 137);
+        igraph_vector_int_init_range(&cells, 0, 400);
+        igraph_vector_int_shuffle(&cells);
+        igraph_matrix_init(&points, 100, 2);
+        igraph_matrix_init(&int_points, 100, 2);
+        for (igraph_int_t i = 0; i < 100; i++) {
+            MATRIX(int_points, i, 0) = VECTOR(cells)[i] % 20;
+            MATRIX(int_points, i, 1) = VECTOR(cells)[i] / 20;
+            MATRIX(points, i, 0) = 19.05 + MATRIX(int_points, i, 0) / 120;
+            MATRIX(points, i, 1) = 47.5 + MATRIX(int_points, i, 1) / 120;
+        }
+
+        for (size_t i = 0; i < sizeof(betas) / sizeof(betas[0]); i++) {
+            igraph_lune_beta_skeleton(&graph, &points, betas[i]);
+            igraph_lune_beta_skeleton(&graph2, &int_points, betas[i]);
+            check_same_edges(&graph, &graph2);
+            igraph_destroy(&graph2);
+            igraph_destroy(&graph);
+
+            igraph_circle_beta_skeleton(&graph, &points, betas[i]);
+            igraph_circle_beta_skeleton(&graph2, &int_points, betas[i]);
+            check_same_edges(&graph, &graph2);
+            igraph_destroy(&graph2);
+            igraph_destroy(&graph);
+        }
+
+        igraph_relative_neighborhood_graph(&graph, &points);
+        igraph_relative_neighborhood_graph(&graph2, &int_points);
+        check_same_edges(&graph, &graph2);
+        igraph_destroy(&graph2);
+        igraph_destroy(&graph);
+
+        igraph_matrix_destroy(&int_points);
         igraph_matrix_destroy(&points);
         igraph_vector_int_destroy(&cells);
     }

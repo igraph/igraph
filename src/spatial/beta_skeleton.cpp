@@ -41,6 +41,14 @@
 // errors even when the points are far from the origin, so points on the boundary
 // of a closed region are detected reliably. The k-d tree is only used to find
 // candidate points, so its search radii include a margin for rounding errors.
+//
+// Points close to a sphere count as lying on it: inside closed regions and
+// outside open ones. The allowed distance is TOLERANCE relative to the radius,
+// plus a term proportional to the magnitude of the coordinates. The latter
+// accounts for the rounding of the input coordinates: points that are on a
+// sphere before the coordinates are rounded to floating point, such as the
+// vertices of an equilateral triangle in a lattice that is far from the origin,
+// still count as on the sphere after rounding.
 
 // Squared radius of a k-d tree search ball around 'centre' that contains all
 // points within sqrt(sqr_radius) of the exact centre. The margin accounts for
@@ -56,11 +64,20 @@ static igraph_real_t search_sqr_radius(const std::vector<igraph_real_t> &centre,
 }
 
 // The allowed value of |p - c|^2 - R^2 for points p in a ball of squared radius
-// sqr_radius = R^2. It is positive for closed regions and negative for open ones,
-// and corresponds to scaling the radius by 1 + TOLERANCE or 1 - TOLERANCE.
-static inline igraph_real_t boundary_band(igraph_real_t sqr_radius, bool is_closed) {
-    const igraph_real_t tol = is_closed ? 1 + TOLERANCE : 1 - TOLERANCE;
-    return (tol * tol - 1) * sqr_radius;
+// sqr_radius = R^2, when points within TOLERANCE * R + fuzz of the sphere count
+// as on it. It is positive for closed regions and negative for open ones.
+static inline igraph_real_t boundary_band(igraph_real_t sqr_radius, igraph_real_t fuzz, bool is_closed) {
+    const igraph_real_t radius = sqrt(sqr_radius);
+    const igraph_real_t d = std::min(TOLERANCE * radius + fuzz, radius);
+    return is_closed ? d * (2 * radius + d) : -d * (2 * radius - d);
+}
+
+// The 'fuzz' for a sphere of radius r |b - a| through a and b. Rounding the
+// coordinates of a, b and p moves each by at most DBL_EPSILON / 2 * sqrt(dim) * magnitude,
+// where magnitude is the largest absolute coordinate. This moves p relative
+// to the sphere by at most (2 + 4 r) times that amount.
+static inline igraph_real_t sphere_fuzz(igraph_int_t dim, igraph_real_t magnitude, igraph_real_t r) {
+    return 4 * DBL_EPSILON * sqrt((igraph_real_t) dim) * magnitude * std::max(r, 1.0);
 }
 
 static inline igraph_real_t calculate_r(igraph_real_t beta) {
@@ -79,6 +96,7 @@ protected:
     igraph_int_t a = -1, b = -1;
     std::vector<igraph_real_t> u; // b - a
     igraph_real_t uu = 0;         // |b - a|^2
+    igraph_real_t magnitude = 0;  // largest absolute coordinate of a and b
 
     explicit EdgeRegion(const igraph_matrix_t *points) :
         points(points), dim(igraph_matrix_ncol(points)), u(dim) { }
@@ -87,9 +105,11 @@ protected:
         a = a_;
         b = b_;
         uu = 0;
+        magnitude = 0;
         for (igraph_int_t i = 0; i < dim; i++) {
             u[i] = MATRIX(*points, b, i) - MATRIX(*points, a, i);
             uu += u[i] * u[i];
+            magnitude = std::max(magnitude, std::max(fabs(MATRIX(*points, a, i)), fabs(MATRIX(*points, b, i))));
         }
     }
 
@@ -134,7 +154,7 @@ public:
 
     void set_edge(igraph_int_t a, igraph_int_t b) {
         EdgeRegion::set_edge(a, b);
-        band = boundary_band(0.25 * beta * beta * uu, is_closed);
+        band = boundary_band(0.25 * beta * beta * uu, sphere_fuzz(dim, magnitude, 0.5 * beta), is_closed);
     }
 
     bool contains(igraph_int_t p) const {
@@ -163,7 +183,7 @@ class CircleRegion : public EdgeRegion {
 public:
     void set_edge(igraph_int_t a, igraph_int_t b) {
         EdgeRegion::set_edge(a, b);
-        band = boundary_band(r * r * uu, true);
+        band = boundary_band(r * r * uu, sphere_fuzz(dim, magnitude, r), true);
     }
 
 protected:
@@ -365,11 +385,18 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
  * Values of β &lt; 1 are only supported in 2D, and are considerably slower.
  *
  * </para><para>
+ * The regions are closed: a point on the boundary of the region of A and B
+ * removes the edge AB. Points within a small tolerance of the boundary count
+ * as on it. The tolerance is relative to the size of the region and to the
+ * magnitude of the coordinates, so that rounding of the input coordinates
+ * does not change the result.
+ *
+ * </para><para>
  * The Gabriel graph is a special case of beta skeleton where <code>β = 1</code>.
  *
  * </para><para>
- * The Relative Neighborhood graph is a special case of beta skeleton where
- * β approaches
+ * The relative neighborhood graph is the limit of the beta skeleton as β
+ * approaches 2 from below, see \ref igraph_relative_neighborhood_graph().
  *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create the
@@ -420,6 +447,13 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
  * </para><para>
  * A larger \p beta value results in a larger region, and a sparser graph.
  * Values of beta &lt; 1 are considerably slower.
+ *
+ * </para><para>
+ * The regions are closed: a point on the boundary of the region of A and B
+ * removes the edge AB. Points within a small tolerance of the boundary count
+ * as on it. The tolerance is relative to the size of the region and to the
+ * magnitude of the coordinates, so that rounding of the input coordinates
+ * does not change the result.
  *
  * \param graph A pointer to the graph that will be created.
  * \param points An n-by-2 matrix containing the points that will be used to
@@ -478,7 +512,8 @@ class BetaFinder : public EdgeRegion {
         if (beta == IGRAPH_INFINITY) {
             return IGRAPH_INFINITY;
         }
-        return search_sqr_radius(centre, 0.25 * (2 * beta - 1) * uu + boundary_band(0.25 * beta * beta * uu, true));
+        return search_sqr_radius(centre, 0.25 * (2 * beta - 1) * uu +
+                                 boundary_band(0.25 * beta * beta * uu, sphere_fuzz(dim, magnitude, 0.5 * beta), true));
     }
 
 public:
@@ -490,7 +525,7 @@ public:
 
     void set_edge(igraph_int_t a, igraph_int_t b) {
         EdgeRegion::set_edge(a, b);
-        gabriel_band = boundary_band(0.25 * uu, true);
+        gabriel_band = boundary_band(0.25 * uu, sphere_fuzz(dim, magnitude, 0.5), true);
         midpoint(centre);
         init();
     }
@@ -672,6 +707,11 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
  * computing the Gabriel graph of point sets of arbitrary dimension.
  *
  * </para><para>
+ * Points within a small tolerance of the boundary of the ball count as on it.
+ * The tolerance is relative to the distance AB and to the magnitude of the
+ * coordinates, so that rounding of the input coordinates does not change the result.
+ *
+ * </para><para>
  * The Gabriel graph is a special case of lune-based and circle-based β-skeletons
  * with <code>β=1</code>.
  *
@@ -717,6 +757,8 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
  * The relative neighborhood graph is constructed from a set of points in space.
  * Two points A and B are connected if and only if there is no other point C so
  * that AC &lt; AB and BC &lt; AB, with the inequalities being strict.
+ * Distances that are equal up to a small tolerance, relative to AB and to the
+ * magnitude of the coordinates, are treated as equal.
  *
  * </para><para>
  * Most authors define the relative neighborhood graph to coincide with a
