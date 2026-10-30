@@ -5,7 +5,7 @@
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 #  * cmake -E cat (3.18)
-cmake_minimum_required(VERSION 3.18...3.31)
+cmake_minimum_required(VERSION 3.18...4.5)
 
 # CMake 3.31.0 issues warnings due to the following bug:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/26449
