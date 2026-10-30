@@ -271,20 +271,16 @@ static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser
     }
 
     if (state->blank_entity) {
-        /* Only libxml2 2.12 and later expose xmlFreeEntity().
-         * In earlier versions, xmlFreeNode() can be used to free an
-         * xmlEntityPtr. The structs xmlNode and xmlEntity have an identical
-         * layout at the start, and xmlFreeNode() uses their type member
-         * to determine how to free the structure.
+        /* xmlFreeNode() can free an xmlEntityPtr. The structs xmlNode and
+         * xmlEntity have an identical layout at the start, and xmlFreeNode()
+         * uses their type member to determine how to free the structure.
+         * Starting with libxml2 2.13.1, it passes entities to xmlFreeEntity().
          *
-         * In later libxml2 versions we use xmlFreeEntity() as a means
-         * of future proofing.
+         * We do not call xmlFreeEntity() directly: it is only available
+         * since libxml2 2.12, so igraph compiled with newer libxml2 headers
+         * could then not be used with an older libxml2 library.
          */
-#if LIBXML_VERSION < 21200
         xmlFreeNode((xmlNodePtr) state->blank_entity);
-#else
-        xmlFreeEntity(state->blank_entity);
-#endif
         state->blank_entity = NULL;
     }
 }
