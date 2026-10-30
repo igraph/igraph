@@ -49,11 +49,21 @@
 // sphere before the coordinates are rounded to floating point, such as the
 // vertices of an equilateral triangle in a lattice that is far from the origin,
 // still count as on the sphere after rounding.
+//
+// For beta < 2, every point of a closed region other than a and b is closer to
+// both a and b than they are to each other. Near a and b, the tolerance adds
+// points that are not: a point at distance h from a, perpendicular to b - a, is
+// within about h^2 / |b - a| of the Gabriel sphere. Such points must not remove
+// a-b, as it may be an edge of the minimum spanning tree. Therefore, for beta < 2,
+// a point only removes a-b if it also removes it from the relative neighborhood
+// graph, with the same test. Then the skeletons for beta < 2 contain the relative
+// neighborhood graph, which is connected.
 
 // Squared radius of a k-d tree search ball around 'centre' that contains all
 // points within sqrt(sqr_radius) of the exact centre. The margin accounts for
 // rounding errors in computing the centre from the input coordinates, which are
 // proportional to the magnitude of the coordinates, and in nanoflann's distances.
+// It is a generous allowance for modest dimensions, not a proven bound.
 static igraph_real_t search_sqr_radius(const std::vector<igraph_real_t> &centre, igraph_real_t sqr_radius) {
     igraph_real_t magnitude = 0;
     for (const igraph_real_t c : centre) {
@@ -75,7 +85,9 @@ static inline igraph_real_t boundary_band(igraph_real_t sqr_radius, igraph_real_
 // The 'fuzz' for a sphere of radius r |b - a| through a and b. Rounding the
 // coordinates of a, b and p moves each by at most DBL_EPSILON / 2 * sqrt(dim) * magnitude,
 // where magnitude is the largest absolute coordinate. This moves p relative
-// to the sphere by at most (2 + 4 r) times that amount.
+// to the sphere by at most (2 + 4 r) times that amount. Only the coordinates of
+// a and b are used; points in the region have similar coordinates unless the
+// region is large compared to the distance from the origin.
 static inline igraph_real_t sphere_fuzz(igraph_int_t dim, igraph_real_t magnitude, igraph_real_t r) {
     return 4 * DBL_EPSILON * sqrt((igraph_real_t) dim) * magnitude * std::max(r, 1.0);
 }
@@ -97,6 +109,7 @@ protected:
     std::vector<igraph_real_t> u; // b - a
     igraph_real_t uu = 0;         // |b - a|^2
     igraph_real_t magnitude = 0;  // largest absolute coordinate of a and b
+    igraph_real_t rng_band = 0;   // band of the open lune of the relative neighborhood graph
 
     explicit EdgeRegion(const igraph_matrix_t *points) :
         points(points), dim(igraph_matrix_ncol(points)), u(dim) { }
@@ -111,6 +124,7 @@ protected:
             uu += u[i] * u[i];
             magnitude = std::max(magnitude, std::max(fabs(MATRIX(*points, a, i)), fabs(MATRIX(*points, b, i))));
         }
+        rng_band = boundary_band(uu, sphere_fuzz(dim, magnitude, 1), false);
     }
 
     void midpoint(std::vector<igraph_real_t> &centre) const {
@@ -131,6 +145,43 @@ protected:
             vw += v * w;
         }
     }
+
+    // Whether a point with |p-a|^2 = vv and |p-b|^2 = ww removes a-b from the
+    // relative neighborhood graph: it is closer to both a and b than |b - a|.
+    // These are the two balls of the lune for beta = 2, see LuneRegion.
+    bool in_rng_lune(igraph_real_t vv, igraph_real_t ww) const {
+        return vv - uu < rng_band && ww - uu < rng_band;
+    }
+
+    bool in_rng_lune(igraph_int_t p) const {
+        igraph_real_t vv, ww, vw;
+        local_products(p, vv, ww, vw);
+        return in_rng_lune(vv, ww);
+    }
+};
+
+// The open lune of a-b for beta = 2, used for the relative neighborhood graph.
+class RNGRegion : public EdgeRegion {
+public:
+    static const int query_count = 1;
+
+    RNGRegion(const igraph_matrix_t *points, igraph_real_t) :
+        EdgeRegion(points) { }
+
+    using EdgeRegion::set_edge;
+
+    bool contains(igraph_int_t p) const {
+        if (p == a || p == b) {
+            return false;
+        }
+        return in_rng_lune(p);
+    }
+
+    // The lune lies within sqrt(3) |b - a| / 2 of the midpoint.
+    igraph_real_t query(int, std::vector<igraph_real_t> &centre) const {
+        midpoint(centre);
+        return 0.75 * uu;
+    }
 };
 
 // The lune of a-b for beta >= 1, in any dimension: the intersection of two
@@ -140,8 +191,9 @@ protected:
 // beta v.w - (beta - 1) |w|^2 <= 0, and in the second when
 // beta v.w - (beta - 1) |v|^2 <= 0. These expressions equal |p - c|^2 - R^2
 // for the ball centre c and radius R. For beta = 1, both reduce to v.w <= 0,
-// the test for the Gabriel ball.
-template<bool is_closed>
+// the test for the Gabriel ball. For beta = 2, they reduce to |v|^2 <= |b - a|^2
+// and |w|^2 <= |b - a|^2. For beta < 2, points must also be in the lune of the
+// relative neighborhood graph, see above.
 class LuneRegion : public EdgeRegion {
     const igraph_real_t beta;
     igraph_real_t band = 0;
@@ -154,7 +206,7 @@ public:
 
     void set_edge(igraph_int_t a, igraph_int_t b) {
         EdgeRegion::set_edge(a, b);
-        band = boundary_band(0.25 * beta * beta * uu, sphere_fuzz(dim, magnitude, 0.5 * beta), is_closed);
+        band = boundary_band(0.25 * beta * beta * uu, sphere_fuzz(dim, magnitude, 0.5 * beta), true);
     }
 
     bool contains(igraph_int_t p) const {
@@ -164,13 +216,13 @@ public:
         igraph_real_t vv, ww, vw;
         local_products(p, vv, ww, vw);
         const igraph_real_t f1 = beta * vw - (beta - 1) * ww, f2 = beta * vw - (beta - 1) * vv;
-        return is_closed ? (f1 <= band && f2 <= band) : (f1 < band && f2 < band);
+        return f1 <= band && f2 <= band && (beta >= 2 || in_rng_lune(vv, ww));
     }
 
     // The lune lies within sqrt(2 beta - 1) |b - a| / 2 of the midpoint.
     igraph_real_t query(int, std::vector<igraph_real_t> &centre) const {
         midpoint(centre);
-        return 0.25 * (2 * beta - 1) * uu + std::max(band, 0.0);
+        return 0.25 * (2 * beta - 1) * uu + band;
     }
 };
 
@@ -206,7 +258,8 @@ protected:
 };
 
 // The closed intersection of the two discs, used for both lune-based and
-// circle-based skeletons with beta < 1.
+// circle-based skeletons with beta < 1. As for LuneRegion with beta < 2,
+// points must also be in the lune of the relative neighborhood graph.
 class CircleIntersectionRegion : public CircleRegion {
 public:
     static const int query_count = 1;
@@ -220,7 +273,7 @@ public:
         }
         igraph_real_t dot, cross;
         circle_products(p, dot, cross);
-        return dot + 2 * s * fabs(cross) <= band;
+        return dot + 2 * s * fabs(cross) <= band && in_rng_lune(p);
     }
 
     // The intersection lies within |b - a| / 2 of the midpoint.
@@ -230,7 +283,8 @@ public:
     }
 };
 
-// The closed union of the two discs, used for circle-based skeletons with beta >= 1.
+// The closed union of the two discs, used for circle-based skeletons with beta > 1.
+// These skeletons need not be connected, so there is no further condition.
 class CircleUnionRegion : public CircleRegion {
 public:
     static const int query_count = 2;
@@ -388,8 +442,18 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
  * The regions are closed: a point on the boundary of the region of A and B
  * removes the edge AB. Points within a small tolerance of the boundary count
  * as on it. The tolerance is relative to the size of the region and to the
- * magnitude of the coordinates, so that rounding of the input coordinates
- * does not change the result.
+ * magnitude of the coordinates. This makes the result less sensitive to the
+ * rounding of input coordinates, particularly for constructed point sets
+ * such as lattices.
+ *
+ * </para><para>
+ * For β &lt; 2, a point removes the edge AB only if it is closer to both A and B
+ * than they are to each other, up to the tolerance used by
+ * \ref igraph_relative_neighborhood_graph(). This holds for all points of the
+ * region except near A and B, where the tolerance could otherwise include
+ * points that are farther away. As a result, the β-skeleton contains the
+ * β'-skeleton for β &lt; β', the relative neighborhood graph is contained in
+ * the β-skeletons with β &lt; 2, and these are connected.
  *
  * </para><para>
  * The Gabriel graph is a special case of beta skeleton where <code>β = 1</code>.
@@ -417,7 +481,7 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-        IGRAPH_CHECK((filter_edges<LuneRegion<true>>(&potential_edges, points, beta)));
+        IGRAPH_CHECK(filter_edges<LuneRegion>(&potential_edges, points, beta));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
@@ -452,8 +516,16 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
  * The regions are closed: a point on the boundary of the region of A and B
  * removes the edge AB. Points within a small tolerance of the boundary count
  * as on it. The tolerance is relative to the size of the region and to the
- * magnitude of the coordinates, so that rounding of the input coordinates
- * does not change the result.
+ * magnitude of the coordinates. This makes the result less sensitive to the
+ * rounding of input coordinates, particularly for constructed point sets
+ * such as lattices.
+ *
+ * </para><para>
+ * For β &lt; 1, the circle-based and lune-based β-skeletons are the same, see
+ * \ref igraph_lune_beta_skeleton(). For β = 1, both are the Gabriel graph.
+ * For β &gt; 1, the circle-based β-skeleton is contained in the Gabriel graph
+ * and in the lune-based β-skeleton, and need not be connected. It has no
+ * triangles for β ≥ 2/√3 ≈ 1.1547.
  *
  * \param graph A pointer to the graph that will be created.
  * \param points An n-by-2 matrix containing the points that will be used to
@@ -478,7 +550,7 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta == 1) {
         // Same test as igraph_gabriel_graph(), so that the results are identical.
-        IGRAPH_CHECK(filter_edges<LuneRegion<true>>(&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<LuneRegion>(&potential_edges, points, beta));
     } else if (beta >= 1) {
         IGRAPH_CHECK(filter_edges<CircleUnionRegion>(&potential_edges, points, beta));
     } else {
@@ -548,26 +620,33 @@ public:
     }
 
     // The beta at which point p enters the lune of a-b, see LuneRegion.
-    // Returns 0 if p is in the closed Gabriel ball, i.e. a-b is not a Gabriel edge,
-    // using the same test as igraph_gabriel_graph().
+    // Returns 0 if p removes a-b from the Gabriel graph, using the same test as
+    // igraph_gabriel_graph(). As in LuneRegion, a point that is not in the lune
+    // of the relative neighborhood graph does not remove a-b for beta < 2.
     igraph_real_t pointBeta(igraph_int_t p) const {
         if (p == a || p == b) {
             return IGRAPH_INFINITY;
         }
         igraph_real_t vv, ww, vw;
         local_products(p, vv, ww, vw);
-        if (vw <= gabriel_band) {
+        const bool in_rng = in_rng_lune(vv, ww);
+        if (vw <= gabriel_band && in_rng) {
             return 0;
         }
         // p is in the lune when beta >= vv / (vv - vw) and beta >= ww / (ww - vw).
         // When a denominator is not positive, p does not project strictly
-        // between a and b, and is in no lune. Outside of the Gabriel ball,
-        // the larger of the two bounds is the one for the endpoint closer to p.
+        // between a and b, and is in no lune. When vw > 0, the larger of the
+        // two bounds is the one for the endpoint closer to p. Otherwise, both
+        // bounds are at most 1, and p is not in the lune of the relative
+        // neighborhood graph, so the result is 2.
         const igraph_real_t da = vv - vw, db = ww - vw;
+        igraph_real_t beta;
         if (da <= 0 || db <= 0) {
-            return IGRAPH_INFINITY;
+            beta = IGRAPH_INFINITY;
+        } else {
+            beta = vv <= ww ? vv / da : ww / db;
         }
-        return vv <= ww ? vv / da : ww / db;
+        return in_rng ? beta : std::max(beta, 2.0);
     }
 
     bool addPoint(igraph_real_t, igraph_int_t index) {
@@ -614,6 +693,14 @@ public:
  * This parameter serves to improve performance: the smaller this cutoff,
  * the faster the computation. Pass \c IGRAPH_INFINITY to use no cutoff.
  * The cutoff does not affect which edges are part of the result.
+ *
+ * </para><para>
+ * The thresholds are computed from the coordinates, without the tolerance that
+ * \ref igraph_lune_beta_skeleton() applies at the boundaries of the regions.
+ * Therefore, keeping the edges with a weight larger than β gives the lune-based
+ * β-skeleton only up to points within this tolerance of a region boundary.
+ * As in \ref igraph_lune_beta_skeleton(), a point that is not closer to both
+ * endpoints than they are to each other does not give a threshold below 2.
  *
  * \param graph A pointer to the graph that will be created.
  * \param weights Will contain the edge weights corresponding to the edge
@@ -709,7 +796,14 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
  * </para><para>
  * Points within a small tolerance of the boundary of the ball count as on it.
  * The tolerance is relative to the distance AB and to the magnitude of the
- * coordinates, so that rounding of the input coordinates does not change the result.
+ * coordinates. This makes the result less sensitive to the rounding of input
+ * coordinates, particularly for constructed point sets such as lattices.
+ * A point removes the edge AB only if it is closer to both A and B than they
+ * are to each other, up to the tolerance used by
+ * \ref igraph_relative_neighborhood_graph(). This holds for all points of the
+ * ball except near A and B, where the tolerance could otherwise include points
+ * that are farther away. Therefore, the Gabriel graph contains the relative
+ * neighborhood graph.
  *
  * </para><para>
  * The Gabriel graph is a special case of lune-based and circle-based β-skeletons
@@ -736,7 +830,7 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<LuneRegion<true>>(&potential_edges, points, 1)));
+    IGRAPH_CHECK(filter_edges<LuneRegion>(&potential_edges, points, 1));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
@@ -770,7 +864,9 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
  *
  * </para><para>
  * With these definitions, the relative neighborhood graph is always connected,
- * while the <code>β = 2</code> skeleton is always triangle-free.
+ * while the <code>β = 2</code> skeleton is always triangle-free. The relative
+ * neighborhood graph contains the <code>β = 2</code> skeleton, and is contained
+ * in the Gabriel graph and in the lune-based β-skeletons with β &lt; 2.
  *
  * \param graph A pointer to the graph that will be created.
  * \param points The point set that will be used, each row is a point.
@@ -792,7 +888,7 @@ igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<LuneRegion<false>>(&potential_edges, points, 2)));
+    IGRAPH_CHECK(filter_edges<RNGRegion>(&potential_edges, points, 2));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
