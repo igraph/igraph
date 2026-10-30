@@ -301,6 +301,7 @@ add_legacy_tests(
   igraph_average_path_length_dijkstra
   igraph_betweenness
   igraph_betweenness_subset
+  cd_index
   igraph_closeness
   igraph_constraint
   igraph_convergence_degree
