@@ -46,7 +46,7 @@
   <itemizedlist>
     <listitem>
       <para>
-        <ulink url="http://www.xmlsoft.org/">libxml2</ulink>,
+        <ulink url="http://www.xmlsoft.org/">libxml2</ulink> (version 2.7.4 or later),
         required for GraphML support
       </para>
     </listitem>
