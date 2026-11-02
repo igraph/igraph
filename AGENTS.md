@@ -32,7 +32,7 @@ Deciding on fixes to certain issues involve compromises. In these cases we consi
 
 ### PR commit guidelines
 
-Do not rewrite (amend, squash, rebase) commits that have already been pushed to a PR, unless this is explicitly requested by a maintainer with commmit access to the igraph repository. Maintainers must be able to follow the history of changes within PRs.
+Do not rewrite (amend, squash, rebase) commits that have already been pushed to a PR, unless this is explicitly requested by a maintainer with commit access to the igraph repository. Maintainers must be able to follow the history of changes within PRs.
 
 
 ### More is not always better
