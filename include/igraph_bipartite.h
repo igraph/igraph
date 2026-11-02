@@ -27,6 +27,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
+#include "igraph_sparsemat.h"
 
 IGRAPH_BEGIN_C_DECLS
 
@@ -81,6 +82,13 @@ IGRAPH_EXPORT igraph_error_t igraph_get_biadjacency(const igraph_t *graph,
                                                     igraph_matrix_t *res,
                                                     igraph_vector_int_t *row_ids,
                                                     igraph_vector_int_t *col_ids);
+
+IGRAPH_EXPORT igraph_error_t igraph_get_biadjacency_sparse(const igraph_t *graph,
+                                                           const igraph_vector_bool_t *types,
+                                                           const igraph_vector_t *weights,
+                                                           igraph_sparsemat_t *res,
+                                                           igraph_vector_int_t *row_ids,
+                                                           igraph_vector_int_t *col_ids);
 
 IGRAPH_EXPORT igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                                       igraph_bool_t *res,

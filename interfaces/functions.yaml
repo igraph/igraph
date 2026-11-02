@@ -1249,6 +1249,13 @@ igraph_get_biadjacency:
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
     DEPS: types ON graph, weights ON graph
 
+igraph_get_biadjacency_sparse:
+    PARAMS: |-
+        GRAPH graph, BIPARTITE_TYPES types, OPTIONAL EDGE_WEIGHTS weights,
+        OUT SPARSEMAT res,
+        OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
+    DEPS: types ON graph, weights ON graph
+
 igraph_is_bipartite:
     PARAMS: GRAPH graph, OUT BOOLEAN res, OPTIONAL OUT BIPARTITE_TYPES types
 
