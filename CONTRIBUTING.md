@@ -184,40 +184,18 @@ see also [Legal Stuff](#legal).
 
 ### Branching
 
-In short, always ask whether your contribution should target the `main` or
-`develop` branch _before_ starting any work. Read on for more details on how
-this is decided.
+In short, at present, contributions should target the `main` branch.
 
-`igraph` is committed to [semantic versioning](https://semver.org/). We are
-currently still in the development release (0.x), which in principle is a mark
-that the public API is not yet stable. Regardless, we try to maintain semantic
-versioning also for the development releases. We do so as follows. Any released
-minor version (0.x.z) will be API backward-compatible with any previous release
-of the _same_ minor version (0.x.y, with y < z). This means that _if_ there is
-an API-incompatible change, we will increase the minor version. For example,
-release 0.8.1 is API backward-compatible with release 0.8.0, while release
-0.9.0 might be API-incompatible with version 0.8.1. Note that this only concerns
-the _public_ API, internal functions may change also within a minor version.
+`igraph` follows [semantic versioning](https://semver.org/) with a small
+variation to accommodate experimental functions. Please see 
+[`VERSIONING.md`](VERSIONING.md) for a detailed explanation of the versioning
+policy.
 
-There will always be two versions of `igraph`: the most recent released version,
-and the next upcoming minor release, which is by definition not yet released.
-The most recent release version is in the `main` branch, while the next
-upcoming minor release is in the `develop` branch. If you make a change that is
-API-incompatible with the most recent release, it **must** be merged to
-the `develop` branch. If the change is API backward-compatible, it **can** be
-merged to the `main` branch. It is possible that you build on recent
-improvements in the `develop` branch, in which case your change should of course
-target the `develop` branch. If you only add new functionality, but do not
-change anything of the existing API, this should be backward-compatible, and
-can be merged in the `main` branch.
-
-When you make a new pull request, please specify the correct target branch. The
-maintainers of `igraph` may decide to retarget your pull request to the correct
-branch. Retargeting your pull request may result in merge conflicts, so it is
-always good to decide **before** starting to work on something whether you
-should start from the `main` branch or from the `develop` branch. In most
-cases, changes in the `main` branch will also be merged to the `develop`
-branch by the maintainers.
+Current igraph is on the 1.x series. As of version 1.1, development takes place
+on the `main` branch, and changes are expected to be backward-compatible.
+Once work starts towards version 2.0, the `develop` branch will be used for
+breaking changes. Howver, as of 1.1, the `develop` branch is inactive;
+please base your contributions on `main`.
 
 <a name="tips"></a>
 ## Writing igraph Code
