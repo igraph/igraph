@@ -52,7 +52,7 @@ Use standard prefixes in commit messages, such as `fix:`, `feat:`, `docs:`, `tes
 
 Commits produced by AI models (i.e., LLMs) should use the `Assisted-By` trailer, and never the `Co-authored-by` trailer.
 
-Include information on the model, its version, any any relevant analysis or refactoring tools that were used (such as clang-tidy, astyle, libfuzzer, etc.). Do not include basic development tools (such as editors, make, gcc, git, etc.)
+Include information on the model, its version, any relevant analysis or refactoring tools that were used (such as clang-tidy, astyle, libfuzzer, etc.). Do not include basic development tools (such as editors, make, gcc, git, etc.)
 
 An example of an acceptable general format is the following:
 
