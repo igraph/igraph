@@ -1,6 +1,6 @@
 # igraph AI policy
 
-_Working draft. Last updated: 2026-01-03._
+_Working draft. Last updated: 2026-11-03._
 
 We support the use of generative AI tools for contributing to igraph as long as the following guidelines are followed.
 
