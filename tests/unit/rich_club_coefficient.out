@@ -1,0 +1,26 @@
+Test 1: null graph
+( )
+
+Test 2a: singleton without loop
+( NaN )
+Test 2b: singleton with loop (loops=true)
+( 1 1 NaN )
+
+Test 3: complete graph K5
+( 1 1 1 1 NaN )
+
+Test 4: cycle graph C5
+( 0.5 0.5 NaN )
+
+Test 5: star graph S5
+( 0.4 NaN NaN NaN NaN )
+
+Test 6a: directed reciprocal (directed=true)
+( 1 NaN )
+Test 6b: directed reciprocal (directed=false)
+( 2 2 NaN )
+
+Test 7: weighted triangle
+( 3.33333 3.33333 NaN )
+
+Test 8: error handling
