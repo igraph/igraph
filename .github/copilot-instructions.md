@@ -179,3 +179,5 @@ Skip adding this message if the PR was opened by an igraph team member.
  - When performing a code review on a pull request that adds new features, you may comment on adherence to the general design principles of igraph explained at https://github.com/igraph/igraph/wiki/Design-principles-for-functions
 
  - The description of pull requests must retain all checkbox lines present in the pull request template at `.github/pull_request_template.md`. The copyright transfer line present in the template must be retained literally, and the box must be checked. Remind the PR's author that pull request that do not adhere to this will not be merged. Special exception: igraph team members are exempt from this rule.
+
+ - Check that PRs opened by external contributors (i.e. people other than igraph team members) do not modify development configuration files such as `.gitignore`, `.editorconfig`, `.astylerc`, or similar.
