@@ -30,7 +30,7 @@ You must disclose whether you used AI tools while preparing your contribution. E
 
 AI models can perform a tremendous amount of work in a short of time. Thus quantity is cheap and easy to produce, but quality is not. To be able to ensure the quality of work, we expect all contributors to have some familiarity with igraph.
 
-Before submitting code changes, _use igraph first_, and learn the basics of network analysis. igraph is typically used through its high-level interfaces, which we recommend as your first exposure to it. Do not attempt to replace the knowledge you would gain this way by delegating work to AI tools. Before using AI tools to automate work, know how to the work yourself.
+Before submitting code changes, _use igraph first_, and learn the basics of network analysis. igraph is typically used through its high-level interfaces, which we recommend as your first exposure to it. Do not attempt to replace the knowledge you would gain this way by delegating work to AI tools. Know how to do the work on your own before automating it using generative AI.
 
 If you are not familiar with igraph's codebase, organization and development practices, a good way to learn is through one of the issues labelled as `good first issue`.
 
