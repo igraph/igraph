@@ -2,11 +2,35 @@
 
 ## Information on C/igraph development
 
-Information on C/igraph development, design guidelines, notes on the use of development and debugging tools, is found in the igraph wiki at https://github.com/igraph/igraph/wiki/
-
-In particular, make sure you read in full: Checklist for functions, Documentation guidelines, Error reporting guidelines, Guidelines for function argument ordering, How to write unit tests?
+Information on C/igraph development, design guidelines, notes on the use of development and debugging tools, is found in the igraph wiki. See the dedicated section below.
 
 Check `.github/copilot-instructions.md` for how contributions are reviewed. When developing new code, treat the advice there as guidelines, and exercise judgement instead of rigidly adhering to all points.
+
+
+### igraph wiki
+
+The igraph wiki holds the development guidelines that apply to all contributors. It is a separate
+Git repository. Clone it next to the igraph sources and read the Markdown files directly:
+
+    git clone https://github.com/igraph/igraph.wiki.git
+
+Each page is a file named after its title, with spaces replaced by hyphens (e.g. "Tips on writing
+igraph code" is `Tips-on-writing-igraph-code.md`). If you cannot clone, fetch the raw Markdown from
+`https://raw.githubusercontent.com/wiki/igraph/igraph/<file name>` rather than the rendered page
+(`?` in a file name must be written as `%3F`).
+
+Read the pages relevant to your task before starting work:
+
+ - Any change to C/C++ code: "Tips on writing igraph code", "Error reporting guidelines".
+ - New or changed public functions: also "Checklist for new (and old) functions",
+   "Guidelines for function argument ordering", "Documentation guidelines",
+   "Design principles for functions".
+ - Tests: "How to write unit tests?".
+ - Judging the severity of a bug, or choosing what to fix first: "Guidelines for issue prioritization".
+ - Debugging memory errors: "Using sanitizers to find bugs".
+
+The wiki is maintained by hand and can lag behind the code. If a wiki page contradicts the code,
+the build system or this file, follow the code and point out the discrepancy.
 
 
 ## AI policy
