@@ -1,5 +1,7 @@
 # igraph AI policy
 
+_Working draft. Last updated: 2026-01-03._
+
 We support the use of generative AI tools for contributing to igraph as long as the following guidelines are followed.
 
 ## You are responsible for your contributions
@@ -28,7 +30,7 @@ You must disclose whether you used AI tools while preparing your contribution. E
 
 ## Before automating work, know how to do it yourself
 
-AI models can perform a tremendous amount of work in a short of time. Thus quantity is cheap and easy to produce, but quality is not. To be able to ensure the quality of work, we expect all contributors to have some familiarity with igraph.
+AI models can perform a tremendous amount of work in a short time. Thus quantity is cheap and easy to produce, but quality is not. To be able to ensure the quality of work, we expect all contributors to have some familiarity with igraph.
 
 Before submitting code changes, _use igraph first_, and learn the basics of network analysis. igraph is typically used through its high-level interfaces, which we recommend as your first exposure to it. Do not attempt to replace the knowledge you would gain this way by delegating work to AI tools. Know how to do the work on your own before automating it using generative AI.
 
