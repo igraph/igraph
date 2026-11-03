@@ -119,6 +119,8 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - Functions in test sources should not be marked as `static`.
 
+ - Test output, whether printed or asserted, must not depend on `IGRAPH_INTEGER_SIZE`, as CI also runs 32-bit builds.
+
 ## Documentation and error messages
 
  - Check that newly added public functions are documented in detail. Check that the documentation is clear, concise, complete and accurate. When the documentation of public functions is missing or incomplete, point this out.
