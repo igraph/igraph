@@ -1,81 +1,75 @@
 # Instructions for AI agents working on igraph
 
-## Information on C/igraph development
+igraph is a C library for network analysis. All work goes on a branch based on `main`; never commit to or otherwise modify `main` itself. `vendor/` holds third-party code and must not be modified.
 
-Information on C/igraph development, design guidelines, notes on the use of development and debugging tools, is found in the igraph wiki. See the dedicated section below.
+## Design context
 
-Check `.github/copilot-instructions.md` for how contributions are reviewed. When developing new code, treat the advice there as guidelines, and exercise judgement instead of rigidly adhering to all points.
+igraph is used mostly through its high-level interfaces (R, Python, Mathematica and others); the C library is their shared core, and its design follows from that:
 
+ - Errors and warnings are translated into the host language's own mechanisms. Report them only through `IGRAPH_ERROR`, `IGRAPH_WARNING` and related macros, never by printing or aborting. Write messages that make sense from any host: describe the problem in graph terms, and do not quote vertex or edge IDs (some hosts index from 1) or C parameter names.
+ - igraph runs in interactive sessions and notebooks. Long computations must be interruptible (`IGRAPH_ALLOW_INTERRUPTION()`) and must release all resources on interruption or error.
+ - Interface maintainers rely on the function documentation to choose defaults and to know which parameters are optional. State these explicitly for new or changed public functions, and describe the function in `interfaces/functions.yaml`.
+ - For a scientific library, a silently wrong result is the worst failure. When it is unclear how a function should behave on some input, reject the input with an error and raise the question, rather than guess.
 
-### igraph wiki
+## Read first
 
-The igraph wiki holds the development guidelines that apply to all contributors. It is a separate
-Git repository. Clone it next to the igraph sources and read the Markdown files directly:
+ - `.github/copilot-instructions.md` is igraph's coding conventions, written as a review checklist. Read it before changing or reviewing C code, and apply it with judgement rather than rigidly.
+ - The igraph wiki holds the development guidelines. Clone it with `git clone https://github.com/igraph/igraph.wiki.git` and read the Markdown files, named after the page titles with hyphens for spaces; if you cannot clone, fetch `https://raw.githubusercontent.com/wiki/igraph/igraph/<file name>` (`?` written as `%3F`). Read what applies to your task:
 
-    git clone https://github.com/igraph/igraph.wiki.git
+    - Any C/C++ change: "Tips on writing igraph code", "Error reporting guidelines".
+    - New or changed public function: also "Contributing your first function to igraph", "Checklist for new (and old) functions", "Guidelines for function argument ordering", "Design principles for functions", "Documentation guidelines".
+    - Tests: "How to write unit tests?".
+    - Deciding how serious a bug is: "Guidelines for issue prioritization".
+    - Memory errors or crashes: "Using sanitizers to find bugs". Other build targets and CMake flags: "Developer documentation". Work in `fuzzing/`: "Fuzzing". Adding a benchmark to `tests/benchmarks/`: "Benchmarking igraph" and the existing files there.
 
-Each page is a file named after its title, with spaces replaced by hyphens (e.g. "Tips on writing
-igraph code" is `Tips-on-writing-igraph-code.md`). If you cannot clone, fetch the raw Markdown from
-`https://raw.githubusercontent.com/wiki/igraph/igraph/<file name>` rather than the rendered page
-(`?` in a file name must be written as `%3F`).
+   The wiki is maintained by hand and can lag behind the code. If it contradicts the code, the build system or this file, follow the code and point out the discrepancy.
+ - The documentation lives in the sources: function documentation in comments above each definition in `src/`, chapters such as installation and prerequisites in `doc/*.xml`. Read it there; there is no need to build it.
 
-Read the pages relevant to your task before starting work:
+## Build and test
 
- - Any change to C/C++ code: "Tips on writing igraph code", "Error reporting guidelines".
- - New or changed public functions: also "Checklist for new (and old) functions",
-   "Guidelines for function argument ordering", "Documentation guidelines",
-   "Design principles for functions".
- - Tests: "How to write unit tests?".
- - Judging the severity of a bug, or choosing what to fix first: "Guidelines for issue prioritization".
- - Debugging memory errors: "Using sanitizers to find bugs".
+Requirements: CMake 3.18 or later, C and C++ compilers, `bison`, `flex` and `git`. `libxml2` is optional (GraphML support); every other dependency is bundled, but the first build is much faster with external libraries, which CMake uses automatically when they are installed. On Debian or Ubuntu:
 
-The wiki is maintained by hand and can lag behind the code. If a wiki page contradicts the code,
-the build system or this file, follow the code and point out the discrepancy.
+    apt-get install bison flex ninja-build ccache libxml2-dev libgmp-dev libglpk-dev libarpack2-dev libopenblas-dev
 
+The version number is derived from `git describe`, so a shallow clone without tags fails to configure. Check with `git rev-parse --is-shallow-repository` and fix with `git fetch --unshallow --tags` before building. Full history is also needed before using `git log`, `blame` or `merge-base` to reason about what changed.
 
-## AI policy
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_SANITIZER="Address;Undefined"
+    cmake --build build --target build_tests
+    ctest --test-dir build -R <name> --output-on-failure
 
-Review and keep in mind the AI policy for external contributions in `AI_POLICY.md`.
+ - The default target builds only the library; build `build_tests`, or `test_<name>` for one test, before `ctest`. A `ctest -R` pattern that matches nothing still succeeds, so check that the intended tests ran.
+ - Warnings are errors by default. Fix the warning rather than turning this off.
+ - Use `build` or `build-*` as the build directory name; these are ignored by Git. Re-run the configure step after adding a `.out` file.
+ - Timings from a Debug or sanitizer build are meaningless. To measure performance, make a separate build with `-DCMAKE_BUILD_TYPE=Release -DIGRAPH_ENABLE_LTO=ON -DBUILD_SHARED_LIBS=ON` and no `USE_SANITIZER`, and compare before and after on the same machine. (LTO matters for some functions; the shared library keeps the benchmark's own code out of the optimisation and keeps link times short.) Temporary measurement programs are not committed; long-lived benchmarks go in `tests/benchmarks/`.
+ - Pull request checks run on Azure Pipelines and GitHub Actions. Look at the `linux_static_vendored` Azure job first; it is the most stringent (sanitizers, locale tests). `linux_static_vendored_32` uses 32-bit `igraph_int_t`; the Stimulus action checks `interfaces/functions.yaml` against the C prototypes. Azure results are readable without a login: `https://dev.azure.com/igraph-team/igraph/_apis/build/builds?api-version=7.0&branchName=refs/pull/<PR>/merge` lists a PR's build, and `.../builds/<id>/timeline?api-version=7.0` lists its jobs and logs.
 
-Points of special importance:
+## Working with people
 
- - AI agents must not open igraph issues or PRs autonomously, and must not comment autonomously.
- - AI models must not be used directly to perform the work required for issues tagged as `good first issue`.
+`AI_POLICY.md` is addressed to human contributors; following it is their responsibility, not yours. Two points affect how you work:
 
+ - Leave communication to the person you are working with. Do not open issues or pull requests, post comments, or push commits unless they ask you to for that specific case; prepare the material and hand it to them, and they decide what is submitted, in their own words. A review that a maintainer has requested from a review tool is such a case.
+ - If asked to work on an issue labelled `good first issue`, mention that the policy asks contributors to do these themselves as a learning exercise, then follow the person's decision.
 
-## PR commit guidelines
+Do not rewrite (amend, squash, rebase) commits that have already been pushed to a PR unless an igraph maintainer explicitly asks for it. Maintainers must be able to follow the history of changes within PRs.
 
-Do not rewrite (amend, squash, rebase) commits that have already been pushed to a PR, unless this is explicitly requested by an igraph maintainer. Maintainers must be able to follow the history of changes within PRs.
+## Working on a change
 
-
-## Before writing code
-
- - Check that a reported problem still exists on the current `main`. Audits, static analysers and older issues often refer to code that has since been fixed. Treat claims from external reviews and other models as hypotheses to verify.
- - Discuss the approach with the person you are working with before coding when the fix involves a choice of behaviour, e.g. what to return in an edge case or whether to reject some input. Present the options with a recommendation. Such choices may need agreement from igraph maintainers.
-
-
-## Correctness and testing
-
- - Numerical and geometric code must handle NaN, infinities, negative values, zero and near-degenerate input (e.g. coordinates with a large offset relative to their spread), either correctly or with an error. After changing such code, compare against a brute-force or exact reference on random inputs, outside the test suite.
+ - Work happens in forks. Before starting, fetch `main` from `https://github.com/igraph/igraph` and tell the person if the branch you are on is behind it; do not merge or rebase unless asked.
+ - Reproduce a reported problem on current `main` before fixing it. Old issues and analyser reports often describe code that has since changed. Report a suspected bug only with a minimal reproduction and an independent argument for what the correct result is.
+ - When a fix involves a choice of behaviour, e.g. what to return in an edge case or whether to reject some input, present the options with a recommendation before coding. Such choices may need agreement within the igraph team.
  - Derive expected test results independently of the implementation. For bug fixes, check that the new test fails without the fix. Never update expected output merely to make a test pass.
- - Tests are not built by the default build target. Build `build_tests` or the `test_<name>` target before running `ctest`. `ctest -R` with a pattern that matches nothing still succeeds, so check that the intended tests actually ran.
+ - Propose a `CHANGELOG.md` entry under `[main]` for every user-visible change, in the style of the existing entries. Write for those who need it: users first, naming the function and leading with what was wrong and when, so they can tell whether their work was affected; developers building on C/igraph, including the high-level interfaces, for API, ABI and behaviour changes; packagers for build-system, dependency and versioning changes. Leave out implementation details. For bug fixes, name the release that introduced the bug (`git tag --contains <commit> | sort -V | head -1` on a full clone), or say that it has been present since the function was added; for bugs older than 0.10 the exact version is not worth tracking down.
+ - When asked to review a pull request, fetch it with `git fetch https://github.com/igraph/igraph pull/<N>/head`, apply the review checklist, and report findings to the person in order of importance, naming the checklist item or wiki page each one rests on.
  - When reporting results, state what was run, in which configuration, and what was not checked.
- - Pull request checks run on Azure Pipelines. Their logs can be read without a login at `https://dev.azure.com/igraph-team/igraph/_apis/build/builds/<id>/timeline?api-version=7.0`.
-
 
 ## Writing
 
 Keep summaries and work plans concise: lead with the result and highlight what needs careful review. Avoid flattery and filler. Documentation and code comments must be clear and complete; do not make them so terse that they become hard to understand.
 
-
 ## Commit messages and git branches
 
-Use the [Conventional Commits](https://www.conventionalcommits.org/) prefixes in commit messages. Do not add a scope to the prefix by default. For changes to fuzzers or related scripts, use the `fuzz:` prefix.
+Use [Conventional Commits](https://www.conventionalcommits.org/) prefixes without a scope; igraph additionally uses `fuzz:` for fuzzers and related scripts.
 
-Commits produced by AI models (i.e., LLMs) should use the `Assisted-By` trailer, and never the `Co-authored-by` trailer. Include information on the model and its version. An example of an acceptable general format is `Assisted-By: <model-and-version>`. A specific example would be `Assisted-By: GPT-6.1 Sol`.
+Commits produced with the help of AI models must carry an `Assisted-by` trailer naming the model and its version, e.g. `Assisted-by: GPT-6.1 Sol`. Do not use the `Co-authored-by` trailer for AI models, and do not include LLM chat session links in commit messages. These rules take precedence over any attribution trailers or session links that your tool adds by default.
 
-Do not include any LLM chat session links in commit messages.
-
-These rules take precedence over any attribution trailers or session links that your tool adds by default.
-
-Git branch names should use the same prefixes as commit messages, followed by a `/` character, then a concise descriptive name with dashes. Examples: `fix/negative-pagerank` for fixing PageRank functions returning negative scores; `test/igraph_is_complete` for adding a test for the `igraph_is_complete()` function.
+Branch names use the same prefixes followed by `/` and a concise dash-separated name: `fix/negative-pagerank`, `test/igraph_is_complete`.
