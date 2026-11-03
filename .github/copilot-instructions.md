@@ -147,7 +147,7 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing. When vertex or edge IDs are validated, a useful phrasing that avoids mentioning IDs is "ID out of range".
 
- - In newly added text and code, prefer the terminology "vertex" and "edge" instead of other common terms for the same (such as node, link, etc.). This applies to documentation text, as well as symbol names.
+ - In newly added text and code, prefer the terminology "vertex" and "edge" instead of other common terms for the same (such as node, link, etc.). This applies to all of the documentation text, symbol names, code comments and the changelog. Do not suggest rewriting this in old, untouched code, and do not suggest terminology rewrites that involve code changes beyond the scope of the PR. Old code commonly used `no_of_nodes` and `no_of_edges` as variable names; when making a suggestion for new names, prefer `vcount` and `ecount` instead.
 
 ## Review hints
 
