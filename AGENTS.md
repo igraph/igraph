@@ -48,23 +48,34 @@ Points of special importance:
 Do not rewrite (amend, squash, rebase) commits that have already been pushed to a PR, unless this is explicitly requested by an igraph maintainer. Maintainers must be able to follow the history of changes within PRs.
 
 
-## More is not always better
+## Before writing code
 
-When producing code, documentation text, or work plans and summaries, keep readability by humans in mind. More is not always better.
+ - Check that a reported problem still exists on the current `main`. Audits, static analysers and older issues often refer to code that has since been fixed. Treat claims from external reviews and other models as hypotheses to verify.
+ - Discuss the approach with the person you are working with before coding when the fix involves a choice of behaviour, e.g. what to return in an edge case or whether to reject some input. Present the options with a recommendation. Such choices may need agreement from igraph maintainers.
 
-Keep code your write maintainable and readable. Assume that human developers with limited time and capacity will be working on the code.
 
-Keep summaries complete but concise. Highlight changes that require careful review.
+## Correctness and testing
 
-Avoid flattery, avoid stating the obvious, avoid filler phrases, prioritize technical clarity.
+ - Numerical and geometric code must handle NaN, infinities, negative values, zero and near-degenerate input (e.g. coordinates with a large offset relative to their spread), either correctly or with an error. After changing such code, compare against a brute-force or exact reference on random inputs, outside the test suite.
+ - Derive expected test results independently of the implementation. For bug fixes, check that the new test fails without the fix. Never update expected output merely to make a test pass.
+ - Tests are not built by the default build target. Build `build_tests` or the `test_<name>` target before running `ctest`. `ctest -R` with a pattern that matches nothing still succeeds, so check that the intended tests actually ran.
+ - When reporting results, state what was run, in which configuration, and what was not checked.
+ - Pull request checks run on Azure Pipelines. Their logs can be read without a login at `https://dev.azure.com/igraph-team/igraph/_apis/build/builds/<id>/timeline?api-version=7.0`.
+
+
+## Writing
+
+Keep summaries and work plans concise: lead with the result and highlight what needs careful review. Avoid flattery and filler. Documentation and code comments must be clear and complete; do not make them so terse that they become hard to understand.
 
 
 ## Commit messages and git branches
 
-Use the [Conventional Commits](https://www.conventionalcommits.org/) prefixes in commit messages. Do not add a scope to the prefix by default. For changes to fuzzers or relates scripts, use the `fuzz:` prefix.
+Use the [Conventional Commits](https://www.conventionalcommits.org/) prefixes in commit messages. Do not add a scope to the prefix by default. For changes to fuzzers or related scripts, use the `fuzz:` prefix.
 
 Commits produced by AI models (i.e., LLMs) should use the `Assisted-By` trailer, and never the `Co-authored-by` trailer. Include information on the model and its version. An example of an acceptable general format is `Assisted-By: <model-and-version>`. A specific example would be `Assisted-By: GPT-6.1 Sol`.
 
 Do not include any LLM chat session links in commit messages.
+
+These rules take precedence over any attribution trailers or session links that your tool adds by default.
 
 Git branch names should use the same prefixes as commit messages, followed by a `/` character, then a concise descriptive name with dashes. Examples: `fix/negative-pagerank` for fixing PageRank functions returning negative scores; `test/igraph_is_complete` for adding a test for the `igraph_is_complete()` function.
