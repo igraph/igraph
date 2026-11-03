@@ -21,6 +21,7 @@
 */
 
 #include "igraph_bipartite.h"
+#include "igraph_sparsemat.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
@@ -920,6 +921,118 @@ igraph_error_t igraph_get_biadjacency(
             MATRIX(*res, from2, to2 - n1) += weights ? VECTOR(*weights)[i] : 1;
         } else {
             MATRIX(*res, to2, from2 - n1) += weights ? VECTOR(*weights)[i] : 1;
+        }
+    }
+
+    if (ignored_edges > 0) {
+        IGRAPH_WARNINGF("%" IGRAPH_PRId " edges running within partitions were ignored.", ignored_edges);
+    }
+
+    if (row_ids) {
+        IGRAPH_CHECK(igraph_vector_int_resize(row_ids, n1));
+    }
+    if (col_ids) {
+        IGRAPH_CHECK(igraph_vector_int_resize(col_ids, n2));
+    }
+    if (row_ids || col_ids) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+            if (! VECTOR(*types)[i]) {
+                if (row_ids) {
+                    igraph_int_t i2 = VECTOR(perm)[i];
+                    VECTOR(*row_ids)[i2] = i;
+                }
+            } else {
+                if (col_ids) {
+                    igraph_int_t i2 = VECTOR(perm)[i];
+                    VECTOR(*col_ids)[i2 - n1] = i;
+                }
+            }
+        }
+    }
+
+    igraph_vector_int_destroy(&perm);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_get_biadjacency_sparse
+ * \brief Converts a bipartite graph into a sparse bipartite adjacency matrix.
+ *
+ * This is the sparse matrix counterpart of \ref igraph_get_biadjacency().
+ * In a bipartite adjacency matrix \c A, element <code>A_ij</code> gives the number of edges between the <code>i</code>th vertex of the first partition and the <code>j</code>th vertex of the second partition.
+ *
+ * </para><para>
+ * Vertices with type \c false form the rows of the matrix, vertices with type \c true form the columns.
+ * The ordering of the rows and columns follows the vertex ID order, filtered by type, and can be recovered through the optional \p row_ids and \p col_ids vectors.
+ *
+ * </para><para>
+ * If the graph contains edges within the same partition, this function issues a warning and ignores those edges.
+ *
+ * \param graph The input graph, edge directions are ignored.
+ * \param types Boolean vector containing the vertex types. Vertices belonging to the first partition have type \c false, the one in the second partition type \c true.
+ * \param weights A vector specifying a weight for each edge or \c NULL. If \c NULL, all edges are assumed to have weight 1.
+ * \param res Pointer to an initialized sparse matrix, the result is stored here. The matrix will be resized as needed.
+ * \param row_ids Pointer to an initialized vector or \c NULL. If not a null pointer, then the IDs of vertices with type \c false are stored here, with the same ordering as the rows of the biadjacency matrix.
+ * \param col_ids Pointer to an initialized vector or \c NULL. If not a null pointer, then the IDs of vertices with type \c true are stored here, with the same ordering as the columns of the biadjacency matrix.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|) where |E| is the number of edges.
+ *
+ * \sa \ref igraph_get_biadjacency() for the dense version of this function.
+ */
+
+igraph_error_t igraph_get_biadjacency_sparse(
+    const igraph_t *graph, const igraph_vector_bool_t *types,
+    const igraph_vector_t *weights, igraph_sparsemat_t *res,
+    igraph_vector_int_t *row_ids, igraph_vector_int_t *col_ids
+) {
+
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t n1 = 0, n2;
+    igraph_int_t ignored_edges = 0;
+    igraph_vector_int_t perm;
+
+    if (igraph_vector_bool_size(types) != no_of_nodes) {
+        IGRAPH_ERRORF("Vertex type vector size (%" IGRAPH_PRId ") not equal to number of vertices (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
+    }
+
+    if (weights) {
+        if (igraph_vector_size(weights) != no_of_edges) {
+            IGRAPH_ERRORF("Edge weight vector size (%" IGRAPH_PRId ") not equal to number of edges (%" IGRAPH_PRId ").",
+                          IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
+        }
+    }
+
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+        n1 += VECTOR(*types)[i] == false ? 1 : 0;
+    }
+    n2 = no_of_nodes - n1;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&perm, no_of_nodes);
+
+    for (igraph_int_t i = 0, p1 = 0, p2 = n1; i < no_of_nodes; i++) {
+        VECTOR(perm)[i] = VECTOR(*types)[i] ? p2++ : p1++;
+    }
+
+    IGRAPH_CHECK(igraph_sparsemat_resize(res, n1, n2, no_of_edges));
+
+    for (igraph_int_t i = 0; i < no_of_edges; i++) {
+        igraph_int_t from = IGRAPH_FROM(graph, i);
+        igraph_int_t to = IGRAPH_TO(graph, i);
+        igraph_int_t from2 = VECTOR(perm)[from];
+        igraph_int_t to2 = VECTOR(perm)[to];
+        igraph_real_t weight = weights ? VECTOR(*weights)[i] : 1;
+
+        if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
+            ignored_edges++;
+        } else if (! VECTOR(*types)[from]) {
+            IGRAPH_CHECK(igraph_sparsemat_entry(res, from2, to2 - n1, weight));
+        } else {
+            IGRAPH_CHECK(igraph_sparsemat_entry(res, to2, from2 - n1, weight));
         }
     }
 

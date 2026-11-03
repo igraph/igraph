@@ -1,0 +1,29 @@
+Unweighted:
+Sparse biadjacency matrix:
+[        2        1        0
+         0        1        1
+         1        0        1 ]
+Row ids:
+( 0 2 4 )
+Column ids:
+( 1 3 5 )
+
+Weighted:
+Sparse biadjacency matrix:
+[        2      2.5        0
+         0      3.5      4.5
+       5.5        0      6.5 ]
+Row ids:
+( 0 2 4 )
+Column ids:
+( 1 3 5 )
+
+Edge within a partition:
+Sparse biadjacency matrix:
+[        1        0
+         0        1 ]
+Row ids:
+( 0 1 )
+Column ids:
+( 2 3 )
+

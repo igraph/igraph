@@ -23,6 +23,7 @@
 <!-- doxrox-include igraph_biadjacency -->
 <!-- doxrox-include igraph_weighted_biadjacency -->
 <!-- doxrox-include igraph_get_biadjacency -->
+<!-- doxrox-include igraph_get_biadjacency_sparse -->
 </section>
 
 <section id="project-two-mode-graphs"><title>Project two-mode graphs</title>
