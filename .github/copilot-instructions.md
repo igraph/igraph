@@ -159,6 +159,10 @@ Skip adding this message if the PR was opened by an igraph team member.
 
 ## Miscellaneous points to check during reviews
 
+ - Check that new code handles self-loops (including multiple self-loops on one vertex), multi-edges, and both directed and undirected graphs correctly. Recall that an undirected self-loop contributes 2 to the degree, and that `IGRAPH_ALL` on a directed graph sees each reciprocal pair as two edges.
+
+ - Long-running loops (especially super-linear work) must allow interruption with `IGRAPH_ALLOW_INTERRUPTION()`. In cheap inner loops use `IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << k)`. Functions taking callbacks must stop cleanly when the callback returns `IGRAPH_STOP` and must propagate other errors.
+
  - Check that newly added public functions that are intended for use from igraph's high-level interfaces have an interface description in `interfaces/functions.yaml`, and that the interface description uses the appropriate types. Note that the Stimulus CI check verifies that the interface description matches the C function prototype.
 
  - Check that the interface description is consistent with the documentation:
