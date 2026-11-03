@@ -1,43 +1,51 @@
 # igraph AI policy
 
-We support the use of AI tools (i.e., LLMs) for contributing to igraph for as long as the following guidelines are followed.
+We support the use of generative AI tools for contributing to igraph as long as the following guidelines are followed.
 
-### You are responsible for your contributions
+## You are responsible for your contributions
 
 You are responsible for your contributions. You must fully understand them and be able to explain them in your own words.
 
 igraph is a scientific library that implements advanced graph algorithms. You must have a good understanding of the concepts, mathematical reasoning, and algorithms relevant to your contribution.
 
-### No automated contributions
+## No automated contributions
 
-Using AI agents to automatically submit issues, open pull requests, or post comments on igraph’s GitHub repositories or forum is strictly disallowed. We reserve the right to close such contributions and block the accounts responsible for them.
+Using AI agents to automatically submit issues, open pull requests, or post comments on igraph's GitHub repositories or forum is strictly disallowed. We reserve the right to close such contributions and/or block the accounts responsible for them.
 
 Using AI agents to automatically push commits to a PR in response to comments by maintainers, without you staying in the loop, is similarly disallowed. We are interested in speaking with you, not your AI agent.
 
-### Use your own words
+## Use your own words
 
 When communicating with maintainers or other contributors, use your own words. Do not let AI speak for you, and do not paste AI-generated text. If you need to refer to such text, mark it clearly as AI-generated.
 
 Open source development is ultimately a social activity. Building a functional _community_ of developers and users is at least as important as building functional code. Human-to-human communication is essential for an open source community to thrive.
 
-You may use AI tools to proofread documentation and code comments, and edit them for clarity, but the text must be substantially your own work.
+You may use AI tools to proofread documentation and code comments, and edit them for clarity, but the text must be substantially your own work. When it comes to communication on GitHub or the forum, we do not expect you to proofread all that you post: remember, to err is human.
 
-### Disclosure of AI use
+## Disclosure of AI use
 
-You must disclose whether you used AI tools while preparing your contribution. Explain what tools you used, how you used them, and for which portions of your contribution you used them. Make it clear what code and what text is AI generated.
+You must disclose whether you used AI tools while preparing your contribution. Explain what tools you used, how you used them, and for which portions of your contribution you used them. Make it clear what code and what text are AI-generated.
 
-### Do not delegate "good first issues" to AI
+## Before automating work, know how to do it yourself
 
-Some issues in our issue tracker are marked with the `good first issue` label. Most of these propose low-stakes, easy to implement changes. They are primarily intended to provide a gentle learning path for becoming familiar with igraph.
+AI models can perform a tremendous amount of work in a short of time. Thus quantity is cheap and easy to produce, but quality is not. To be able to ensure the quality of work, we expect all contributors to have some familiarity with igraph.
 
-If you plan to work on one of these issues, please do not delegate any work to AI. Treat the work as a learning experience. You may use AI as a "personal tutor" that helps you learn about working with igraph, but it must not do the work for you.
+Before submitting code changes, _use igraph first_, and learn the basics of network analysis. igraph is typically used through its high-level interfaces, which we recommend as your first exposure to it. Do not attempt to replace the knowledge you would gain this way by delegating work to AI tools. Before using AI tools to automate work, know how to the work yourself.
 
-### Copyright
+If you are not familiar with igraph's codebase, organization and development practices, a good way to learn is through one of the issues labelled as `good first issue`.
+
+## Do not delegate "good first issues" to AI
+
+Some issues in our issue tracker are marked with the `good first issue` label. Most of these propose low-stakes, easy-to-implement changes. They are primarily intended to provide a gentle learning path for becoming familiar with igraph development.
+
+If you plan to work on one of these issues, please do not delegate any work to AI. Treat the work as a learning experience. You may use AI as a "personal tutor" that helps you learn about working with igraph, but it must not do the work for you, as that would defeat the purpose of these issues.
+
+## Copyright
 
 We require contributors to assign the copyright of their code contributions to the igraph team, and explicitly indicate this in each of their pull requests. igraph is currently licensed under the GPLv2+ and it is a long-term goal to move towards more permissive licensing, which requires consolidated copyright ownership.
 
 Code generated by AI may infringe on copyright. It is the responsibility of external contributors to verify that code they contribute does not infringe. We reserve the right to reject any pull requests where copyright comes into question, whether the code was AI-written or not.
 
-### Enforcement
+## Enforcement
 
-Contributions that do not follow these guidelines will be closed. If you believe that your contribution was closed in error, you may reach out to maintainers to discuss the situation.
+Contributions that do not follow these guidelines may be closed. If you believe that your contribution was closed in error, you may reach out to maintainers to discuss the situation.
