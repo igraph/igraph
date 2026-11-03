@@ -179,15 +179,3 @@ Skip adding this message if the PR was opened by an igraph team member.
  - When performing a code review on a pull request that adds new features, you may comment on adherence to the general design principles of igraph explained at https://github.com/igraph/igraph/wiki/Design-principles-for-functions
 
  - The description of pull requests must retain all checkbox lines present in the pull request template at `.github/pull_request_template.md`. The copyright transfer line present in the template must be retained literally, and the box must be checked. Remind the PR's author that pull request that do not adhere to this will not be merged. Special exception: igraph team members are exempt from this rule.
-
-## Broad guidelines on issue prioritization
-
-_The following passage is borrowed from `AGENTS.md`:_
-
-igraph is a scientific library for network analysis and graph theory. It is written in C, but mainly used through its high-level interfaces (Python, R and Mathematica, etc.) This determines how we view the seriousness of various issues.
-
-1. Silent wrong results are the worst sin a scientific library can commit. They may lead researchers to publish incorrect results.
-2. Crashes (such as a segmentation fault) should be fixed, especially since they can take down the session of a user when using igraph through a high-level interface. However, when a crash occurs, it is immediately clear to the user that something went wrong. This is not as serious as a silent wrong result.
-3. Problems that may occur during plausible igraph usage are higher priority than those that can only be triggered by exceedingly unlikely or specially crafted input.
-
-Deciding on fixes to certain issues involve compromises. In these cases we consider long-term maintainability, code complexity, and performance along with the seriousness of the issue.
