@@ -125,7 +125,7 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - Check the spelling and grammar of documentation and error/warning messages.
 
- - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments.
+ - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments or the changelog.
 
  - Check that the documentation of newly added or updated public functions describes all function parameters, as well as the return value. The parameters must be documented in the same order, and must have the same name as in the function signature.
 
