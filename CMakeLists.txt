@@ -136,6 +136,11 @@ option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
   include(CodeCoverage)
   append_coverage_compiler_flags()
+  # With FLEX_KEEP_LINE_NUMBERS, flex attributes the code following the last rule to lines
+  # past the end of the .l file, which lcov 2.1 and later reject. '--filter range' drops these
+  # lines. Newer lcov versions apply filters only to files of known languages, so .l files are
+  # declared as C sources.
+  set(IGRAPH_LCOV_FILTER_ARGS --filter range --rc c_file_extensions=c,h,i,C,H,I,icc,cpp,cc,cxx,hh,hpp,hxx,l)
   setup_target_for_coverage_lcov(
     NAME coverage
     EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
@@ -145,8 +150,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     # /Applications and /Library/Developer are for macOS -- they exclude files from the macOS SDK.
     EXCLUDE "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/infomap/*" "vendor/pcg/*"
     # These errors, present with lcov 2.x, are likely due to incompatibility with llvm-cov on macOS.
-    LCOV_ARGS --ignore-errors inconsistent,format,unused
-    GENHTML_ARGS --ignore-errors inconsistent,corrupt,category,unmapped
+    LCOV_ARGS --ignore-errors inconsistent,format,unused ${IGRAPH_LCOV_FILTER_ARGS}
+    GENHTML_ARGS --ignore-errors inconsistent,corrupt,category,unmapped ${IGRAPH_LCOV_FILTER_ARGS}
   )
 endif()
 
