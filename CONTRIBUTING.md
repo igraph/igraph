@@ -220,5 +220,6 @@ This is a pain to deal with, but we can't avoid it, unfortunately.
 
 `igraph` is licensed under the "General Public License (GPL) version 2, or
 later". The igraph manual is licensed under the "GNU Free Documentation
-License". By submitting a patch or pull request, you agree to allow the project
-owner to license your work under the same license as that used by the project.
+License". By submitting a patch or pull request, you agree to assign copyright
+to the "The igraph development team", and must explicitly indicate this
+in the pull request description.
