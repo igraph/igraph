@@ -187,14 +187,14 @@ see also [Legal Stuff](#legal).
 In short, at present, contributions should target the `main` branch.
 
 `igraph` follows [semantic versioning](https://semver.org/) with a small
-variation to accommodate experimental functions. Please see 
+variation to accommodate experimental functions. Please see
 [`VERSIONING.md`](VERSIONING.md) for a detailed explanation of the versioning
 policy.
 
 Current igraph is on the 1.x series. As of version 1.1, development takes place
 on the `main` branch, and changes are expected to be backward-compatible.
 Once work starts towards version 2.0, the `develop` branch will be used for
-breaking changes. Howver, as of 1.1, the `develop` branch is inactive;
+breaking changes. However, as of 1.1, the `develop` branch is inactive;
 please base your contributions on `main`.
 
 <a name="tips"></a>
@@ -221,5 +221,5 @@ This is a pain to deal with, but we can't avoid it, unfortunately.
 `igraph` is licensed under the "General Public License (GPL) version 2, or
 later". The igraph manual is licensed under the "GNU Free Documentation
 License". By submitting a patch or pull request, you agree to assign copyright
-to the "The igraph development team", and must explicitly indicate this
+to "The igraph development team", and must explicitly indicate this
 in the pull request description.

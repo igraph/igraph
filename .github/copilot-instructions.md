@@ -79,7 +79,7 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - Check that `calloc()` and `realloc()` are not used directly. Instead, the igraph-specific `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` macros should be used.
 
- - Errors should be reported using `IGRAPH_ERROR` or related macros instead of simply returning error code literals using `return` (e.g. `return IGRAPH_EIVAL;`). This ensures that the error handling mechanisms are run. This applies to `IGRAPH_UNIMPLEMENTED` as well. Special error codes that do not indicate error conditions, such as `IGRAPH_SUCCESS` or `IGRAPH_STOP`, are exempt from this rule. Passing up the error codes returned by other functions is acceptable (e.g. `return igraph_some_function();`).
+ - Errors should be reported using `IGRAPH_ERROR` or related macros instead of simply returning error code literals using `return` (e.g. `return IGRAPH_EINVAL;`). This ensures that the error handling mechanisms are run. This applies to `IGRAPH_UNIMPLEMENTED` as well. Special error codes that do not indicate error conditions, such as `IGRAPH_SUCCESS` or `IGRAPH_STOP`, are exempt from this rule. Passing up the error codes returned by other functions is acceptable (e.g. `return igraph_some_function();`).
 
 ## Input validation
 
@@ -93,7 +93,7 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - Check that choices made for the behaviour of new functions, and especially the treatment of edge cases, are consistent with the pre-existing choices of igraph. Examples of prior choices where consistency is of importance:
     * Since the null graph is considered disconnected by `igraph_is_connected()`, and trees are connected by definition, the null graph is not a tree, and `igraph_is_tree()` returns false for it.
-    * In undirected graphs, self-loops are considered to contribute 2 to the degree of vertices. Therefore, the diagonal of adjacency matrices of undirected graphs contains twice the number of self-loops. Network measures defined in terms of the adjacency matrix, such as eigenvector centraliy, are implemented in a way that is consistent with this convention.
+    * In undirected graphs, self-loops are considered to contribute 2 to the degree of vertices. Therefore, the diagonal of adjacency matrices of undirected graphs contains twice the number of self-loops. Network measures defined in terms of the adjacency matrix, such as eigenvector centrality, are implemented in a way that is consistent with this convention.
 
 ## Testing
 
@@ -182,6 +182,6 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - When performing a code review on a pull request that adds new features, you may comment on adherence to the general design principles of igraph explained at https://github.com/igraph/igraph/wiki/Design-principles-for-functions
 
- - The description of pull requests must retain all checkbox lines present in the pull request template at `.github/pull_request_template.md`. The copyright transfer line present in the template must be retained literally, and the box must be checked. Remind the PR's author that pull request that do not adhere to this will not be merged. Special exception: igraph team members are exempt from this rule.
+ - The description of pull requests must retain all checkbox lines present in the pull request template at `.github/pull_request_template.md`. The copyright transfer line present in the template must be retained literally, and the box must be checked. Remind the PR's author that pull requests that do not adhere to this will not be merged. Special exception: igraph team members are exempt from this rule.
 
  - Check that PRs opened by external contributors (i.e. people other than igraph team members) do not modify development configuration files such as `.gitignore`, `.editorconfig`, `.astylerc`, or similar.
