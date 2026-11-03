@@ -55,6 +55,7 @@
 - nanoflann was updated to version 2.0.1
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 - Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
+- Performance improvement for `igraph_realize_bipartite_degree_sequence()` and for `igraph_realize_degree_sequence()` with multigraphs, when using `IGRAPH_REALIZE_DEGSEQ_INDEX`. These no longer re-sort the remaining degrees after each step, and now take O((V + E) log V) time. The constructed graphs are unchanged (#2633).
 - The build system now uses the behaviour of CMake policies up to CMake 4.5.
 
 ## [1.0.1]

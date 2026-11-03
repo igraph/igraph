@@ -25,6 +25,7 @@
 
 #include <vector>
 #include <list>
+#include <set>
 #include <algorithm>
 #include <utility>
 #include <stack>
@@ -63,6 +64,71 @@ template<typename T> inline bool degree_greater(const T &a, const T &b) {
 template<typename T> inline bool degree_less(const T &a, const T &b) {
     return a.degree < b.degree;
 }
+
+// Vertices ordered by decreasing remaining degree, in the same order that
+// re-sorting them with std::stable_sort() after every change would give.
+//
+// Decrementing the degree of some of the first vertices and re-sorting moves
+// each of them in front of the vertices that already had its new degree, while
+// keeping their relative order. Instead of re-sorting, each decremented vertex
+// gets a key that comes before all keys given out so far. To decrement several
+// vertices at once, decrement them in reverse order.
+//
+// Removing or decrementing a vertex takes O(log V) time.
+class StableDegreeOrder {
+    struct entry {
+        igraph_int_t degree;
+        igraph_int_t key; // among equal degrees, smaller keys come first
+        igraph_int_t vertex;
+
+        bool operator<(const entry &other) const {
+            return degree != other.degree ? degree > other.degree : key < other.key;
+        }
+    };
+
+    std::set<entry> entries;
+    std::vector<std::set<entry>::iterator> position; // indexed by vertex
+    igraph_int_t next_key = -1;
+
+public:
+    typedef std::set<entry>::const_iterator const_iterator;
+
+    // Vertices are numbered from 0, ties are initially broken by vertex index.
+    explicit StableDegreeOrder(const igraph_vector_int_t *deg) {
+        igraph_int_t n = igraph_vector_int_size(deg);
+        position.reserve(n);
+        for (igraph_int_t i = 0; i < n; i++) {
+            position.push_back(entries.insert(entry{VECTOR(*deg)[i], i, i}).first);
+        }
+    }
+
+    bool empty() const {
+        return entries.empty();
+    }
+    const_iterator begin() const {
+        return entries.begin();
+    }
+    const_iterator end() const {
+        return entries.end();
+    }
+
+    // Only valid for vertices that were not removed.
+    igraph_int_t degree(igraph_int_t vertex) const {
+        return position[vertex]->degree;
+    }
+
+    void remove(igraph_int_t vertex) {
+        entries.erase(position[vertex]);
+    }
+
+    void decrement(igraph_int_t vertex) {
+        entry e = *position[vertex];
+        entries.erase(position[vertex]);
+        e.degree--;
+        e.key = next_key--;
+        position[vertex] = entries.insert(e).first;
+    }
+};
 
 
 /*************************************/
@@ -493,7 +559,7 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
     return IGRAPH_SUCCESS;
 }
 
-// O(V * E + V log V)
+// O((V + E) log V)
 static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool loops) {
     igraph_int_t vcount = igraph_vector_int_size(deg);
 
@@ -501,25 +567,12 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
         return IGRAPH_SUCCESS;
     }
 
-    typedef std::list<vd_pair> vlist;
-    vlist vertices;
-    for (igraph_int_t i = 0; i < vcount; ++i) {
-        vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
-    }
-
-    std::vector<vlist::iterator> pointers;
-    pointers.reserve(vcount);
-    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-        pointers.push_back(it);
-    }
-
-    // Initial sort
-    vertices.sort(degree_greater<vd_pair>);
+    StableDegreeOrder vertices(deg);
 
     igraph_int_t ec = 0;
-    for (const auto &pt : pointers) {
-        vd_pair vd = *pt;
-        vertices.erase(pt);
+    for (igraph_int_t v = 0; v < vcount; ++v) {
+        vd_pair vd(v, vertices.degree(v));
+        vertices.remove(v);
 
         while (vd.degree > 0) {
             auto uit = vertices.begin();
@@ -538,24 +591,14 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
                 }
             }
 
-            vd.degree   -= 1;
-            uit->degree -= 1;
+            igraph_int_t u = uit->vertex;
+
+            vd.degree -= 1;
+            vertices.decrement(u);
 
             VECTOR(*edges)[2*ec]   = vd.vertex;
-            VECTOR(*edges)[2*ec+1] = uit->vertex;
+            VECTOR(*edges)[2*ec+1] = u;
             ec++;
-
-            // If there are at least two elements, and the first two are not in order,
-            // re-sort the list. A possible optimization would be a version of
-            // bubble_up() that can exchange list nodes instead of swapping their values.
-            if (vertices.size() > 1) {
-                auto wit = uit;
-                ++wit;
-
-                if (wit->degree > uit->degree) {
-                    vertices.sort(degree_greater<vd_pair>);
-                }
-            }
         }
     }
 
@@ -1035,11 +1078,6 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
     igraph_int_t ds1_sum;
     igraph_int_t ds2_sum;
 
-    std::vector<vd_pair> vertices1;
-    std::vector<vd_pair> vertices2;
-    std::vector<vd_pair> *src_vs = &vertices1;
-    std::vector<vd_pair> *dest_vs = &vertices2;
-
     IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degree1, &ds1_sum));
     IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degree2, &ds2_sum));
 
@@ -1054,75 +1092,65 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
         }
     }
 
-    vertices1.reserve(n1);
-    vertices2.reserve(n2);
-
-    for (igraph_int_t i = 0; i < n1; i++) {
-        vertices1.push_back(vd_pair(i, VECTOR(*degree1)[i]));
-    }
-    for (igraph_int_t i = 0; i < n2; i++) {
-        vertices2.push_back(vd_pair(i + n1, VECTOR(*degree2)[i]));
-    }
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ds1_sum + ds2_sum);
 
-    while (!vertices1.empty() && !vertices2.empty()) {
-        // Go by index, so we start in ds1, so ds2 needs to be sorted.
-        std::stable_sort(vertices2.begin(), vertices2.end(), degree_greater<vd_pair>);
-        // No sorting of ds1 needed for index case
-        vd_pair vd_src = vertices1.front();
-        // No multiedges - Take the first vertex, connect to the largest delta in opposite partition
-        if (!multiedges) {
-            // Remove the source degrees
-            src_vs->erase(src_vs->begin());
+    {
+        // Go by index in ds1, connecting each vertex to the largest remaining
+        // degrees in ds2. These are kept in the order that re-sorting ds2 with
+        // std::stable_sort() after each step would give.
+        StableDegreeOrder dest_vs(degree2);
+        std::vector<igraph_int_t> spokes;
 
-            if (vd_src.degree == 0) {
-                continue;
-            }
+        for (igraph_int_t src = 0; src < n1 && n2 > 0; src++) {
+            igraph_int_t src_degree = VECTOR(*degree1)[src];
 
-            if (dest_vs->size() < size_t(vd_src.degree)) {
-                goto fail;
-            }
+            // No multiedges - Take the first vertex, connect to the largest delta in opposite partition
+            if (!multiedges) {
+                if (src_degree == 0) {
+                    continue;
+                }
 
-            for (igraph_int_t i = 0; i < vd_src.degree; i++) {
-                if ((*dest_vs)[i].degree == 0) {
-                    // Not enough non-zero remaining degree vertices in opposite partition.
-                    // Not graphical.
+                if (n2 < src_degree) {
                     goto fail;
                 }
 
-                (*dest_vs)[i].degree--;
+                spokes.clear();
+                for (auto it = dest_vs.begin(); igraph_int_t(spokes.size()) < src_degree; ++it) {
+                    if (it->degree == 0) {
+                        // Not enough non-zero remaining degree vertices in opposite partition.
+                        // Not graphical.
+                        goto fail;
+                    }
+                    spokes.push_back(it->vertex);
+                }
 
-                VECTOR(edges)[2*(ec + i)]     = vd_src.vertex;
-                VECTOR(edges)[2*(ec + i) + 1] = (*dest_vs)[i].vertex;
+                for (igraph_int_t i = 0; i < src_degree; i++) {
+                    VECTOR(edges)[2*(ec + i)]     = src;
+                    VECTOR(edges)[2*(ec + i) + 1] = spokes[i] + n1;
+                }
+                ec += src_degree;
+
+                // Decrement in reverse order, so the spokes keep their relative order.
+                for (igraph_int_t i = src_degree - 1; i >= 0; i--) {
+                    dest_vs.decrement(spokes[i]);
+                }
             }
-            ec += vd_src.degree;
-        }
-        // If multiedges are allowed
-        else {
-            // If this is the last edge to be created from this vertex, we remove it.
-            if (src_vs->front().degree <= 1) {
-                src_vs->erase(src_vs->begin());
-            } else {
-                src_vs->front().degree--;
+            // If multiedges are allowed
+            else {
+                for (igraph_int_t i = 0; i < src_degree; i++) {
+                    igraph_int_t dest = dest_vs.begin()->vertex;
+
+                    // We should never decrement below zero, but check just in case.
+                    IGRAPH_ASSERT(dest_vs.degree(dest) - 1 >= 0);
+
+                    // Connect to the opposite partition
+                    dest_vs.decrement(dest);
+
+                    VECTOR(edges)[2 * ec] = src;
+                    VECTOR(edges)[2 * ec + 1] = dest + n1;
+                    ec++;
+                }
             }
-
-            if (vd_src.degree == 0) {
-                continue;
-            }
-
-            if (dest_vs->size() < size_t(1)) {
-                goto fail;
-            }
-            // We should never decrement below zero, but check just in case.
-            IGRAPH_ASSERT((*dest_vs)[0].degree - 1 >= 0);
-
-            // Connect to the opposite partition
-            (*dest_vs)[0].degree--;
-
-            VECTOR(edges)[2 * ec] = vd_src.vertex;
-            VECTOR(edges)[2 * ec + 1] = (*dest_vs)[0].vertex;
-            ec++;
         }
     }
     IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, false));
