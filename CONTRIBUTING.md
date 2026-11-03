@@ -127,8 +127,8 @@ Follow these steps if you would like to make a new pull request:
    git remote add upstream https://github.com/<upstream-owner>/<repo-name>
    ```
 
-2. Please check out the section on [branching](#branching) to see whether you
-   need to branch off from the `main` branch or the `develop` branch.
+2. Please check out the section on [branching](#branching) to see which branch
+   to base your work on (currently `main`).
 
    If you cloned a while ago, get the latest changes from upstream:
 
