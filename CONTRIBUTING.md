@@ -133,8 +133,8 @@ Follow these steps if you would like to make a new pull request:
    If you cloned a while ago, get the latest changes from upstream:
 
    ```bash
-   git checkout <dev-branch>
-   git pull --rebase upstream <dev-branch>
+   git checkout main
+   git pull --rebase upstream main
    ```
 
 3. Create a new topic branch (off the targeted branch, see
@@ -159,7 +159,7 @@ Follow these steps if you would like to make a new pull request:
    rebase) the upstream development branch into your topic branch:
 
    ```bash
-   git pull [--rebase] upstream <dev-branch>
+   git pull [--rebase] upstream main
    ```
 
    Rebasing is preferable over merging as you do not need to deal with merge
@@ -179,6 +179,10 @@ Follow these steps if you would like to make a new pull request:
 **IMPORTANT**: By submitting a pull request, you agree to allow the project
 owner to license your work under the same license as that used by the project,
 see also [Legal Stuff](#legal).
+
+If you used generative AI tools while preparing your contribution, you must
+follow our [AI policy](AI_POLICY.md) and disclose their use in the pull request
+description.
 
 <a name="branching"></a>
 

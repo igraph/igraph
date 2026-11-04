@@ -180,7 +180,7 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - If `CHANGELOG.md` was updated, check that the description of changes is complete and accurate. If `CHANGELOG.md` was not updated, do not suggest doing so within the PR, but add a reminder in the review summary to update the changelog after the PR is merged.
 
- - If `CHANGELOG.md` was updated with a bugfix, check that there is a note about which version the bug was introduced in, unless that version is likely to be older than 0.9. If a bug in a function has been present since that function was originally implemented, it is sufficient to note this fact, without a reference to an igraph version.
+ - If `CHANGELOG.md` was updated with a bugfix, check that there is a note about which version the bug was introduced in, unless that version is likely to be older than 0.10. If a bug in a function has been present since that function was originally implemented, it is sufficient to note this fact, without a reference to an igraph version.
 
  - When performing a code review on a pull request that adds new features, you may comment on adherence to the general design principles of igraph explained at https://github.com/igraph/igraph/wiki/Design-principles-for-functions
 
