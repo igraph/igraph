@@ -24,6 +24,7 @@
 
 #include "igraph_interface.h"
 #include "igraph_interrupt.h"
+#include "igraph_random.h"
 
 #include "core/exceptions.h"
 
@@ -106,9 +107,20 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
 
 // Needed in case C++'s bool is not compatible with igraph's igraph_bool_t
 // which may happen in some configurations on some platforms, notable with R/igraph.
-static bool infomap_allow_interruption() {
+static bool infomap_allow_interruption(void *) {
     return igraph_allow_interruption();
 }
+
+// Lets Infomap draw its random numbers from igraph's default RNG,
+// so that igraph_rng_seed() controls the result.
+struct infomap_igraph_rng {
+    // Seeding is owned by igraph, so Infomap's own seeding is ignored.
+    void seed(unsigned int) { }
+
+    unsigned int randInt(unsigned int min, unsigned int max) {
+        return igraph_rng_get_integer(igraph_rng_default(), min, max);
+    }
+};
 #endif // HAVE_INFOMAP
 
 /**
@@ -249,15 +261,25 @@ igraph_error_t igraph_community_infomap(
     conf.numTrials = nb_trials;
     conf.silent = true;
     conf.directed = igraph_is_directed(graph);
-    conf.interruptionHandler = &infomap_allow_interruption;
     conf.regularized = is_regularized;
     conf.regularizationStrength = regularization_strength;
+    // Derive the settings that the options above imply, e.g. regularization
+    // implies recorded teleportation.
+    conf.adaptDefaults();
+
+    infomap::Log::setNoOutput();
 
     infomap::InfomapBase infomap(conf);
+    infomap.setRandomEngine(infomap_igraph_rng());
+    infomap.setInterruptHandler(&infomap_allow_interruption);
 
     IGRAPH_CHECK(convert_igraph_to_infomap(graph, edge_weights, vertex_weights, infomap.network()));
 
-    infomap.run();
+    try {
+        infomap.run();
+    } catch (const infomap::InterruptionError &) {
+        return IGRAPH_INTERRUPTED;
+    }
 
     if (membership) {
         IGRAPH_CHECK(infomap_get_membership(infomap, membership));

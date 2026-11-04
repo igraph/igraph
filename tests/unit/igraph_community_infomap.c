@@ -37,6 +37,10 @@ void show_results(const igraph_vector_int_t *membership, igraph_real_t codelengt
     printf("\n");
 }
 
+igraph_bool_t interrupt_immediately(void) {
+    return true;
+}
+
 void show_results_lite(igraph_vector_int_t * membership, igraph_real_t codelength) {
     const igraph_int_t n = igraph_vector_int_size(membership);
     printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n",
@@ -305,6 +309,13 @@ int main(void) {
                             1.0, 1.0, 1.0, 1.0, 2.0, 2.0);
     infomap_weighted_test(&g, &weights, /*smoke_test=*/ false, false);
     igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
+    /* An interruption request stops Infomap and is reported as IGRAPH_INTERRUPTED */
+    igraph_famous(&g, "Zachary");
+    igraph_set_interruption_handler(interrupt_immediately);
+    IGRAPH_ASSERT(igraph_community_infomap(&g, NULL, NULL, 1, false, 0, NULL, NULL) == IGRAPH_INTERRUPTED);
+    igraph_set_interruption_handler(NULL);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
