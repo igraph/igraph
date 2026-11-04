@@ -21,6 +21,9 @@
 
 */
 
+/* Allow testing the deprecated igraph_hrg_dendrogram() without warnings. */
+#define IGRAPH_DEPRECATED
+
 #include <igraph.h>
 #include <stdio.h>
 
@@ -102,6 +105,21 @@ int main(void) {
         IGRAPH_ASSERT(is_tree);
     }
     igraph_destroy(&dendrogram);
+
+    // deprecated igraph_hrg_dendrogram(), stores probabilities as an attribute
+    igraph_set_attribute_table(&igraph_cattribute_table);
+    igraph_hrg_dendrogram(&dendrogram, &hrg);
+    IGRAPH_ASSERT(igraph_vcount(&dendrogram) == 9);
+    IGRAPH_ASSERT(igraph_ecount(&dendrogram) == 8);
+    for (igraph_int_t i = 0; i < 5; i++) {
+        IGRAPH_ASSERT(isnan(VAN(&dendrogram, "probability", i)));
+    }
+    for (igraph_int_t i = 0; i < 4; i++) {
+        IGRAPH_ASSERT(VAN(&dendrogram, "probability", 5 + i) == VECTOR(hrg.prob)[i]);
+    }
+    igraph_destroy(&dendrogram);
+    igraph_set_attribute_table(NULL);
+
     igraph_hrg_destroy(&hrg);
     igraph_destroy(&graph);
 

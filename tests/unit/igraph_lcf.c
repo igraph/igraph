@@ -63,6 +63,15 @@ int main(void) {
 
     igraph_destroy(&g);
 
+    // Invalid vertex counts
+    {
+        igraph_vector_int_t shifts;
+        igraph_vector_int_init_int(&shifts, 1, 2);
+        CHECK_ERROR(igraph_lcf(&g, -1, &shifts, 0), IGRAPH_EINVAL);
+        CHECK_ERROR(igraph_lcf(&g, 0, &shifts, 1), IGRAPH_EINVAL);
+        igraph_vector_int_destroy(&shifts);
+    }
+
     VERIFY_FINALLY_STACK();
 
     return 0;

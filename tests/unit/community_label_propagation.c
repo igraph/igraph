@@ -149,6 +149,24 @@ int main(void) {
     igraph_vector_int_destroy(&initial);
     igraph_destroy(&g);
 
+    /* Initial labels must be less than the vertex count */
+    igraph_ring(&g, 3, IGRAPH_UNDIRECTED, false, true);
+    igraph_vector_int_init_int(&initial, 3, 0, 1, 3);
+    CHECK_ERROR(igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL,
+                                                   &initial, NULL, IGRAPH_LPA_DOMINANCE),
+                IGRAPH_EINVAL);
+    igraph_vector_int_destroy(&initial);
+    igraph_destroy(&g);
+
+    /* Null graph with initial labeling */
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_int_init(&initial, 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL,
+                                       &initial, NULL, IGRAPH_LPA_DOMINANCE);
+    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
+    igraph_vector_int_destroy(&initial);
+    igraph_destroy(&g);
+
     igraph_vector_int_destroy(&membership);
 
     VERIFY_FINALLY_STACK();

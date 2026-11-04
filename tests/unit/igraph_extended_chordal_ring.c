@@ -69,6 +69,21 @@ int main(void) {
     igraph_destroy(&g_test);
     igraph_matrix_int_destroy(&W);
 
+    /*    Empty W gives a cycle    */
+    igraph_matrix_int_init(&W, 0, 0);
+    igraph_extended_chordal_ring(&g, /* nodes */ 5, &W, 0 /*undirected*/);
+    igraph_ring(&g_test, 5, IGRAPH_UNDIRECTED, false, true);
+    igraph_is_same_graph(&g, &g_test, &same);
+    IGRAPH_ASSERT(same);
+    igraph_destroy(&g);
+    igraph_destroy(&g_test);
+    igraph_matrix_int_destroy(&W);
+
+    /*    W with rows but no columns is invalid    */
+    igraph_matrix_int_init(&W, 1, 0);
+    CHECK_ERROR(igraph_extended_chordal_ring(&g, /* nodes */ 5, &W, 0 /*undirected*/), IGRAPH_EINVAL);
+    igraph_matrix_int_destroy(&W);
+
     VERIFY_FINALLY_STACK();
     return 0;
 }
