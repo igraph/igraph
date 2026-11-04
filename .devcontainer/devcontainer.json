@@ -4,7 +4,7 @@
     "name": "igraph dev environment",
 
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-    "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04",
+    "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu26.04",
 
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
