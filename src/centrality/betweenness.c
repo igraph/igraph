@@ -972,6 +972,18 @@ igraph_error_t igraph_edge_betweenness_cutoff(
  * by considering only those shortest paths that lie between vertices in a given
  * source and target subset.
  *
+ * </para><para>
+ * The subset betweenness of a vertex \c v is the sum, over pairs of distinct
+ * vertices \c s and \c t where \c s is a source and \c t is a target, of the
+ * fraction of shortest paths between \c s and \c t that pass through \c v.
+ * The endpoints \c s and \c t themselves do not receive a contribution from
+ * the pair. When directed paths are considered, the pairs are ordered, and only
+ * paths from \c s to \c t are taken into account. Otherwise, the pairs are
+ * unordered: a pair of vertices is counted once if one of them is a source and
+ * the other is a target, even if both of them are in both sets. In particular,
+ * when all vertices are both sources and targets, the result is the same as
+ * that of \ref igraph_betweenness().
+ *
  * \param graph The graph object.
  * \param weights An optional vector containing edge weights for
  *        calculating weighted betweenness. No edge weight may be NaN.
@@ -1023,7 +1035,8 @@ igraph_error_t igraph_betweenness_subset(
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_vit_t vit;
-    bool *is_target;
+    bool *is_source, *is_target;
+    igraph_bool_t undirected = !directed || !igraph_is_directed(graph);
 
     if (normalized) {
         IGRAPH_ERROR("Normalization is not yet implemented for subset betweenness.", IGRAPH_UNIMPLEMENTED);
@@ -1057,6 +1070,18 @@ igraph_error_t igraph_betweenness_subset(
     IGRAPH_CHECK_OOM(tmpscore, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
+    is_source = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(is_source, "Insufficient memory for subset betweenness calculation.");
+    IGRAPH_FINALLY(igraph_free, is_source);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        is_source[IGRAPH_VIT_GET(vit)] = true;
+    }
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
+
     is_target = IGRAPH_CALLOC(no_of_nodes, bool);
     IGRAPH_CHECK_OOM(is_target, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_target);
@@ -1087,6 +1112,8 @@ igraph_error_t igraph_betweenness_subset(
         !IGRAPH_VIT_END(vit);
         IGRAPH_VIT_NEXT(vit), no_of_processed_sources++
     ) {
+        igraph_real_t pair_weight_both;
+
         source = IGRAPH_VIT_GET(vit);
 
         IGRAPH_PROGRESS(
@@ -1111,6 +1138,15 @@ igraph_error_t igraph_betweenness_subset(
          * nodes were reached.
          */
 
+        /* In the undirected case, each unordered pair {s, t} with s in the
+         * source set and t in the target set must contribute exactly once.
+         * The traversals consider ordered (source, target) pairs, and visit
+         * such a pair twice, as (s, t) and as (t, s), if and only if both s
+         * and t are in both the source and the target set. Only the
+         * contributions of these pairs are halved. Halving all contributions
+         * would be correct only if the source and target sets were the same. */
+        pair_weight_both = (undirected && is_target[source]) ? 0.5 : 1.0;
+
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
             IGRAPH_CHECK(sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
@@ -1127,7 +1163,8 @@ igraph_error_t igraph_betweenness_subset(
             igraph_real_t coeff;
 
             if (is_target[actnode]) {
-                coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
+                igraph_real_t pair_weight = is_source[actnode] ? pair_weight_both : 1.0;
+                coeff = (pair_weight + tmpscore[actnode]) / nrgeo[actnode];
             } else {
                 coeff = tmpscore[actnode] / nrgeo[actnode];
             }
@@ -1171,11 +1208,8 @@ igraph_error_t igraph_betweenness_subset(
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-   if (!directed || !igraph_is_directed(graph)) {
-        igraph_vector_scale(res, 0.5);
-    }
-
     IGRAPH_FREE(is_target);
+    IGRAPH_FREE(is_source);
     IGRAPH_FREE(tmpscore);
     IGRAPH_FREE(nrgeo);
     igraph_vector_destroy(&dist);
@@ -1186,7 +1220,7 @@ igraph_error_t igraph_betweenness_subset(
     } else {
         igraph_adjlist_destroy(&adjlist);
     }
-    IGRAPH_FINALLY_CLEAN(7);
+    IGRAPH_FINALLY_CLEAN(8);
 
     return IGRAPH_SUCCESS;
 }
@@ -1199,6 +1233,17 @@ igraph_error_t igraph_betweenness_subset(
  * This function computes the subset-limited version of edge betweenness centrality
  * by considering only those shortest paths that lie between vertices in a given
  * source and target subset.
+ *
+ * </para><para>
+ * The subset betweenness of an edge \c e is the sum, over pairs of distinct
+ * vertices \c s and \c t where \c s is a source and \c t is a target, of the
+ * fraction of shortest paths between \c s and \c t that use \c e. When
+ * directed paths are considered, the pairs are ordered, and only paths from
+ * \c s to \c t are taken into account. Otherwise, the pairs are unordered: a
+ * pair of vertices is counted once if one of them is a source and the other is
+ * a target, even if both of them are in both sets. In particular, when all
+ * vertices are both sources and targets, the result is the same as that of
+ * \ref igraph_edge_betweenness().
  *
  * \param graph The graph object.
  * \param weights An optional weight vector for weighted
@@ -1248,8 +1293,9 @@ igraph_error_t igraph_edge_betweenness_subset(
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_int_t source, j;
-    bool *is_target;
+    bool *is_source, *is_target;
     igraph_stack_int_t S;
+    igraph_bool_t undirected = !directed || !igraph_is_directed(graph);
 
     if (normalized) {
         IGRAPH_ERROR("Normalization is not yet implemented for subset edge betweenness.", IGRAPH_UNIMPLEMENTED);
@@ -1258,6 +1304,18 @@ igraph_error_t igraph_edge_betweenness_subset(
     IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
+
+    is_source = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(is_source, "Insufficient memory for subset edge betweenness calculation.");
+    IGRAPH_FINALLY(igraph_free, is_source);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        is_source[IGRAPH_VIT_GET(vit)] = true;
+    }
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
 
     is_target = IGRAPH_CALLOC(no_of_nodes, bool);
     IGRAPH_CHECK_OOM(is_target, "Insufficient memory for subset edge betweenness calculation.");
@@ -1307,6 +1365,8 @@ igraph_error_t igraph_edge_betweenness_subset(
         !IGRAPH_VIT_END(vit);
         IGRAPH_VIT_NEXT(vit), no_of_processed_sources++
     ) {
+        igraph_real_t pair_weight_both;
+
         source = IGRAPH_VIT_GET(vit);
 
         IGRAPH_PROGRESS(
@@ -1331,6 +1391,15 @@ igraph_error_t igraph_edge_betweenness_subset(
          * nodes were reached.
          */
 
+        /* In the undirected case, each unordered pair {s, t} with s in the
+         * source set and t in the target set must contribute exactly once.
+         * The traversals consider ordered (source, target) pairs, and visit
+         * such a pair twice, as (s, t) and as (t, s), if and only if both s
+         * and t are in both the source and the target set. Only the
+         * contributions of these pairs are halved. Halving all contributions
+         * would be correct only if the source and target sets were the same. */
+        pair_weight_both = (undirected && is_target[source]) ? 0.5 : 1.0;
+
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
             IGRAPH_CHECK(sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
@@ -1347,7 +1416,8 @@ igraph_error_t igraph_edge_betweenness_subset(
             igraph_real_t coeff;
 
             if (is_target[actnode]) {
-                coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
+                igraph_real_t pair_weight = is_source[actnode] ? pair_weight_both : 1.0;
+                coeff = (pair_weight + tmpscore[actnode]) / nrgeo[actnode];
             } else {
                 coeff = tmpscore[actnode] / nrgeo[actnode];
             }
@@ -1390,11 +1460,6 @@ igraph_error_t igraph_edge_betweenness_subset(
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-
-    if (!directed || !igraph_is_directed(graph)) {
-        igraph_vector_scale(res, 0.5);
-    }
-
     igraph_stack_int_destroy(&S);
     IGRAPH_FREE(tmpscore);
     IGRAPH_FREE(nrgeo);
@@ -1402,7 +1467,8 @@ igraph_error_t igraph_edge_betweenness_subset(
     igraph_inclist_destroy(&parents);
     igraph_inclist_destroy(&inclist);
     IGRAPH_FREE(is_target);
-    IGRAPH_FINALLY_CLEAN(7);
+    IGRAPH_FREE(is_source);
+    IGRAPH_FINALLY_CLEAN(8);
 
     return IGRAPH_SUCCESS;
 }

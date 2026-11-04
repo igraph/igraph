@@ -1,0 +1,19 @@
+Path of length 2 with an isolated vertex, disjoint sources and targets:
+Vertices: ( 0 1 0 0 )
+Edges:    ( 1 2 )
+
+Path of length 3, partially overlapping sources and targets:
+Vertices: ( 0 1 2 0 )
+Edges:    ( 2 2 2 )
+
+Directed path of length 3, directed paths ignored:
+Vertices: ( 0 1 2 0 )
+Edges:    ( 2 2 2 )
+
+Directed path of length 3, directed paths considered:
+Vertices: ( 0 1 2 0 )
+Edges:    ( 2 2 2 )
+
+Directed path of length 3, sources and targets swapped:
+Vertices: ( 0 0 0 0 )
+Edges:    ( 0 0 0 )

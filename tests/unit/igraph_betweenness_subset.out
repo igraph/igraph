@@ -13,54 +13,54 @@ Single path graph of subset
 ==========================================================
 subset without 0
 Unweighted
-( 1.5 3 2.5 0 )
+( 3 4 3 0 )
 Weighted
-( 1.5 3 2.5 0 )
+( 3 4 3 0 )
 
 subset without 1
 Unweighted
-( 0 3 2.5 0 )
+( 0 4 3 0 )
 Weighted
-( 0 3 2.5 0 )
+( 0 4 3 0 )
 
 subset without 2
 Unweighted
-( 0 2.5 2.5 0 )
+( 0 3 3 0 )
 Weighted
-( 0 2.5 2.5 0 )
+( 0 3 3 0 )
 
 subset without 3
 Unweighted
-( 0 2.5 3 0 )
+( 0 3 4 0 )
 Weighted
-( 0 2.5 3 0 )
+( 0 3 4 0 )
 
 subset without 4
 Unweighted
-( 0 2.5 3 1.5 )
+( 0 3 4 3 )
 Weighted
-( 0 2.5 3 1.5 )
+( 0 3 4 3 )
 
 
 Cycle graph subset
 ==========================================================
 subset without 0
 Unweighted
-( 0.5 0.25 0.25 0.5 )
+( 0.5 0.5 0.5 0.5 )
 Weighted
-( 0 0.5 0 1 )
+( 0 1 0 1 )
 
 subset without 1
 Unweighted
-( 0.25 0.5 0.5 0.25 )
+( 0.5 0.5 0.5 0.5 )
 Weighted
-( 0 1 0 0.5 )
+( 0 1 0 1 )
 
 subset without 2
 Unweighted
-( 0.25 0.5 0.5 0.25 )
+( 0.5 0.5 0.5 0.5 )
 Weighted
-( 0 1 0 0.5 )
+( 0 1 0 1 )
 
 
 Empty graph
