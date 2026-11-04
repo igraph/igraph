@@ -991,9 +991,11 @@ igraph_error_t igraph_edge_betweenness_cutoff(
  * \param res The result of the computation, a vector containing the
  *         betweenness score for the subset of vertices.
  * \param sources A vertex selector for the sources of the shortest paths taken
- *        into consideration in the betweenness calculation.
+ *        into consideration in the betweenness calculation. Vertices that
+ *        are listed more than once are used only once.
  * \param targets A vertex selector for the targets of the shortest paths taken
- *        into consideration in the betweenness calculation.
+ *        into consideration in the betweenness calculation. Vertices that
+ *        are listed more than once are used only once.
  * \param vids The vertices for which the subset-limited betweenness centrality
  *        scores will be computed.
  * \param directed If true, directed paths will be considered
@@ -1044,8 +1046,6 @@ igraph_error_t igraph_betweenness_subset(
 
     IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
-    IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
-
     if (weights) {
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -1074,10 +1074,16 @@ igraph_error_t igraph_betweenness_subset(
     IGRAPH_CHECK_OOM(is_source, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_source);
 
+    /* Sources that are listed more than once are used only once. */
+    no_of_sources = 0;
     IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        is_source[IGRAPH_VIT_GET(vit)] = true;
+        igraph_int_t vertex = IGRAPH_VIT_GET(vit);
+        if (!is_source[vertex]) {
+            is_source[vertex] = true;
+            no_of_sources++;
+        }
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1104,22 +1110,19 @@ igraph_error_t igraph_betweenness_subset(
         tmpres = res;
     }
 
-    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-
-    for (
-        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit);
-        !IGRAPH_VIT_END(vit);
-        IGRAPH_VIT_NEXT(vit), no_of_processed_sources++
-    ) {
+    no_of_processed_sources = 0;
+    for (source = 0; source < no_of_nodes; source++) {
         igraph_real_t pair_weight_both;
 
-        source = IGRAPH_VIT_GET(vit);
+        if (!is_source[source]) {
+            continue;
+        }
 
         IGRAPH_PROGRESS(
             "Betweenness centrality (subset): ",
             100.0 * no_of_processed_sources / no_of_sources, 0
         );
+        no_of_processed_sources++;
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Loop invariant that is valid at this point:
@@ -1188,9 +1191,6 @@ igraph_error_t igraph_betweenness_subset(
         }
     }
 
-    igraph_vit_destroy(&vit);
-    IGRAPH_FINALLY_CLEAN(1);
-
     /* Keep only the requested vertices */
     if (!igraph_vs_is_all(&vids)) {
         IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -1252,9 +1252,11 @@ igraph_error_t igraph_betweenness_subset(
  * \param res The result of the computation, a vector containing the
  *        betweenness scores for the edges.
  * \param sources A vertex selector for the sources of the shortest paths taken
- *        into consideration in the betweenness calculation.
+ *        into consideration in the betweenness calculation. Vertices that
+ *        are listed more than once are used only once.
  * \param targets A vertex selector for the targets of the shortest paths taken
- *        into consideration in the betweenness calculation.
+ *        into consideration in the betweenness calculation. Vertices that
+ *        are listed more than once are used only once.
  * \param eids The edges for which the subset-limited betweenness centrality
  *        scores will be returned. This parameter is for convenience only.
  *        Internally, the betweenness will be calculated for all edges.
@@ -1303,16 +1305,20 @@ igraph_error_t igraph_edge_betweenness_subset(
 
     IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
-    IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
-
     is_source = IGRAPH_CALLOC(no_of_nodes, bool);
     IGRAPH_CHECK_OOM(is_source, "Insufficient memory for subset edge betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_source);
 
+    /* Sources that are listed more than once are used only once. */
+    no_of_sources = 0;
     IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        is_source[IGRAPH_VIT_GET(vit)] = true;
+        igraph_int_t vertex = IGRAPH_VIT_GET(vit);
+        if (!is_source[vertex]) {
+            is_source[vertex] = true;
+            no_of_sources++;
+        }
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1357,22 +1363,19 @@ igraph_error_t igraph_edge_betweenness_subset(
         tmpres = res;
     }
 
-    IGRAPH_CHECK(igraph_vit_create(graph, sources, &vit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-
-    for (
-        no_of_processed_sources = 0, IGRAPH_VIT_RESET(vit);
-        !IGRAPH_VIT_END(vit);
-        IGRAPH_VIT_NEXT(vit), no_of_processed_sources++
-    ) {
+    no_of_processed_sources = 0;
+    for (source = 0; source < no_of_nodes; source++) {
         igraph_real_t pair_weight_both;
 
-        source = IGRAPH_VIT_GET(vit);
+        if (!is_source[source]) {
+            continue;
+        }
 
         IGRAPH_PROGRESS(
             "Edge betweenness centrality (subset): ",
             100.0 * no_of_processed_sources / no_of_sources, 0
         );
+        no_of_processed_sources++;
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Loop invariant that is valid at this point:
@@ -1438,9 +1441,6 @@ igraph_error_t igraph_edge_betweenness_subset(
             igraph_vector_int_clear(parentv);
         }
     }
-
-    igraph_vit_destroy(&vit);
-    IGRAPH_FINALLY_CLEAN(1);
 
     /* Keep only the requested edges */
     if (!igraph_es_is_all(&eids)) {

@@ -220,7 +220,7 @@ void print_both(const igraph_t *g, igraph_vs_t sources, igraph_vs_t targets, igr
 
 int main(void) {
     igraph_t g;
-    igraph_vector_int_t v13;
+    igraph_vector_int_t v13, sv, tv;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -258,6 +258,31 @@ int main(void) {
     print_both(&g, igraph_vss_range(0, 2), igraph_vss_vector(&v13), IGRAPH_DIRECTED);
     printf("\nDirected path of length 3, sources and targets swapped:\n");
     print_both(&g, igraph_vss_vector(&v13), igraph_vss_range(0, 2), IGRAPH_DIRECTED);
+    igraph_destroy(&g);
+
+    /* Vertices listed more than once in the source or target set are used
+     * only once. Directed path 0->1->2, sources {0, 0}, targets {2, 2}: the
+     * only qualifying pair is (0,2). Expected: vertices ( 0 1 0 ),
+     * edges ( 1 1 ). */
+    printf("\nDirected path of length 2, repeated sources and targets:\n");
+    igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, -1);
+    igraph_vector_int_init_int(&sv, 2, 0, 0);
+    igraph_vector_int_init_int(&tv, 2, 2, 2);
+    print_both(&g, igraph_vss_vector(&sv), igraph_vss_vector(&tv), IGRAPH_DIRECTED);
+    igraph_vector_int_destroy(&tv);
+    igraph_vector_int_destroy(&sv);
+    igraph_destroy(&g);
+
+    /* Undirected path 0-1-2, sources {0, 2, 0}, targets {2, 0, 2}: the only
+     * qualifying pair is {0,2}, counted once. Expected: vertices ( 0 1 0 ),
+     * edges ( 1 1 ). */
+    printf("\nUndirected path of length 2, repeated sources and targets:\n");
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
+    igraph_vector_int_init_int(&sv, 3, 0, 2, 0);
+    igraph_vector_int_init_int(&tv, 3, 2, 0, 2);
+    print_both(&g, igraph_vss_vector(&sv), igraph_vss_vector(&tv), IGRAPH_UNDIRECTED);
+    igraph_vector_int_destroy(&tv);
+    igraph_vector_int_destroy(&sv);
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&v13);
