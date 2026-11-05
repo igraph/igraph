@@ -3,8 +3,6 @@
 [![codecov](https://codecov.io/gh/igraph/igraph/branch/main/graph/badge.svg?token=xGFabHJE2I)](https://codecov.io/gh/igraph/igraph)
 [![DOI](https://zenodo.org/badge/8546198.svg)](https://zenodo.org/badge/latestdoi/8546198)
 
-<span style="color: red;">**Accepting AI-assisted contributions is temporarily on hold until the igraph team finalizes an AI policy.**</span>
-
 The igraph library
 ------------------
 

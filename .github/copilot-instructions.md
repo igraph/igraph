@@ -1,7 +1,30 @@
-
 # Code review guidelines
 
 When performing a code review, keep in mind the following.
+
+## Context on writing reviews
+
+The purpose of reviews is threefold:
+
+ - Aid maintainers in evaluating pull requests, and draw their attention to the most important points about PRs.
+ - Help the authors of pull requests improve the quality of their PR.
+ - Ensure correctness.
+
+All review comments will be checked by an igraph maintainer before asking the PR's author to address them. Maintainers may decide not to address some comments. Feel free to post comments which are not directly actionable by the PR's author but aid maintainers in their final judgement.
+
+Within GitHub PRs, users with an `author_association` of `MEMBER` or `OWNER` shall be considered igraph team members.
+
+## Instructions for Copilot-generated review summaries
+
+This section applies only to reviews posted by GitHub Copilot.
+
+@copilot, whenever you post specific review comments, include the following text in your review summary:
+
+> @contributor, please wait for an igraph maintainer to approve the review suggestions before addressing them.
+
+Replace "@contributor" with the GitHub handle of the PR's author.
+
+Skip adding this message if the PR was opened by an igraph team member.
 
 ## Coding standards
 
@@ -10,6 +33,8 @@ When performing a code review, keep in mind the following.
     * When interfacing with a library that uses a different type. Before passing igraph data to this library, it must be checked that the values will not overflow.
 
  - The `long` and `long long` types must never be used in native igraph code, as their sizes are inconsistent between platforms.
+
+ - `igraph_int_t` used to be called `igraph_integer_t`, which still works as a legacy alias. The current codebase no longer uses `igraph_integer_t`. Check that it does not accidentally get re-introduced.
 
  - Check that the parameter ordering of newly added public functions conforms to the guidelines in our wiki at https://github.com/igraph/igraph/wiki/Guidelines-for-function-argument-ordering
 
@@ -22,10 +47,15 @@ When performing a code review, keep in mind the following.
     * Next come headers of igraph's dependencies, if any are used.
     * Standard C library headers must come last.
 
- - Check that all newly added public and private functions follow these conventions:
+ - Check that within library code, all newly added public and private functions follow these conventions:
     * Public functions must have a name starting with `igraph_`, and must be included in a public header.
     * Private functions that can be used from multiple translation units must have a name starting with `igraph_i_`, and must be included in a private header.
     * Private functions that are local to their translation unit must be marked as `static` and should not use the above two prefixes in their name.
+
+ - Check that newly added code uses readable names for values when possible, specifically:
+    * `true`/`false` instead of `1`/`0` for boolean parameters.
+    * `NULL` instead of `0` for pointer parameters.
+    * Use readability constants such as `IGRAPH_UNDIRECTED`/`IGRAPH_DIRECTED`, `IGRAPH_NO_MULTIPLE`/`IGRAPH_MULTIPLE`, `IGRAPH_EDGE_UNLABELED`/`IGRAPH_EDGE_LABELED`, `IGRAPH_NO_LOOPS`/`IGRAPH_LOOPS` instead of `false`/`true` when passing values to boolean function parameters where these names make sense (typically, `directed` parameter, `multiple` parameter, `edge_labeled` parameter, `loops` parameter of a boolean type).
 
  - Public igraph functions that are written in C++ (i.e. defined in `.cpp` files) must catch all exceptions before returning. This can be done using the `IGRAPH_HANDLE_EXCEPTIONS_BEGIN;` and `IGRAPH_HANDLE_EXCEPTIONS_END;` macros.
 
@@ -41,13 +71,15 @@ When performing a code review, keep in mind the following.
 
  - Check that whenever a new data structure is initialized, it is registered on igraph's "finally stack" using `IGRAPH_FINALLY()`, or by using a convenience macro that combines initialization with registration on the "finally stack" (e.g. `IGRAPH_VECTOR_INT_INIT_FINALLY()`). The `IGRAPH_FINALLY()` call must follow the initialization call directly.
 
- - Check that when data structures are destroyed, they are also removed from the "finally stack" using `IGRAPH_FINALLY_CLEAN()`. The parameter passed to `IGRAPH_FINALLY_CLEAN()` indicates the number of items to remove. Thus n calls to destructors (usually named as `igraph_..._destroy()`) must be followed by `IGRAPH_FINALLY_CLEAN(n)`.
+ - Check that when data structures are destroyed, or their ownership is relinquished, they are also removed from the "finally stack" using `IGRAPH_FINALLY_CLEAN()`. The parameter passed to `IGRAPH_FINALLY_CLEAN()` indicates the number of items to remove. Thus n calls to destructors (usually named as `igraph_..._destroy()`) must be followed by `IGRAPH_FINALLY_CLEAN(n)`.
 
  - Check that data structures are destroyed in a reverse order compared to their initialization. This ensures that the "finally stack" is kept in a consistent state.
 
  - Suggest replacing pairs of a data structure initialization and `IGRAPH_FINALLY` calls with a single convenience macro, when such a macro is available. For example, `IGRAPH_CHECK(igraph_vector_init(&v, 0)); IGRAPH_FINALLY(igraph_vector_destroy, &v);` can be replaced by `IGRAPH_VECTOR_INIT_FINALLY(&v, 0);`.
 
  - Check that `calloc()` and `realloc()` are not used directly. Instead, the igraph-specific `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` macros should be used.
+
+ - Errors should be reported using `IGRAPH_ERROR` or related macros instead of simply returning error code literals using `return` (e.g. `return IGRAPH_EINVAL;`). This ensures that the error handling mechanisms are run. This applies to `IGRAPH_UNIMPLEMENTED` as well. Special error codes that do not indicate error conditions, such as `IGRAPH_SUCCESS` or `IGRAPH_STOP`, are exempt from this rule. Passing up the error codes returned by other functions is acceptable (e.g. `return igraph_some_function();`).
 
 ## Input validation
 
@@ -57,9 +89,14 @@ When performing a code review, keep in mind the following.
 
  - Check that edge and vertex weights, as well as spatial coordinates, are protected against invalid values such as NaN, or that there is a comment explaining why such a check is not present.
 
+## Mathematical correctness and consistency
+
+ - Check that choices made for the behaviour of new functions, and especially the treatment of edge cases, are consistent with the pre-existing choices of igraph. Examples of prior choices where consistency is of importance:
+    * Since the null graph is considered disconnected by `igraph_is_connected()`, and trees are connected by definition, the null graph is not a tree, and `igraph_is_tree()` returns false for it.
+
 ## Testing
 
- - Check that all newly added public functions have tests. If they do not, include a link in your response to the testing guide in our wiki at https://github.com/igraph/igraph/wiki/How-to-write-unit-tests%3F. Check that edge cases, such as the null graph and singleton graph (i.e. graphs with 0 and 1 vertices) are included in tests when relevant.
+ - Check that all newly added public functions have tests. If they do not, include a link in your response to the testing guide in our wiki at https://github.com/igraph/igraph/wiki/How-to-write-unit-tests%3F.
 
  - Tests for public igraph functions must only include the main igraph header `<igraph.h>` (with angle brackets), not any of igraph's sub-headers such as `"igraph_interface.h"`.
 
@@ -69,13 +106,27 @@ When performing a code review, keep in mind the following.
 
  - It is not necessary to use `IGRAPH_CHECK`, `IGRAPH_FINALLY` and related functions in tests. Do not suggest using these.
 
+ - When tests verify error codes, they should use `CHECK_ERROR` from `test_utilities.h`.
+
+ - Tests should not normally assert that return values are `IGRAPH_SUCCESS`, unless there is a special reason to do so. The reason should be spelt out.
+
+ - Tests should not take a long time to run. Most current tests finish within 0.01 seconds. With over 500 tests this is important. Longer runtimes must be justified by special needs.
+
+ - Tests must aim to be concise, readable and maintainable by humans. Allocate resources (testing time and test code complexity) where it truly makes a difference.
+
+ - When a newly contributed function is incomplete and throws `IGRAPH_UNIMPLEMENTED` under some conditions, this error code should be checked by tests using the usual `CHECK_ERROR` macro. This ensures that maintainers will remember to expand tests when missing features are implemented in the future.
+
+ - Functions in test sources should not be marked as `static`.
+
+ - Test output, whether printed or asserted, must not depend on `IGRAPH_INTEGER_SIZE`, as CI also runs 32-bit builds.
+
 ## Documentation and error messages
 
  - Check that newly added public functions are documented in detail. Check that the documentation is clear, concise, complete and accurate. When the documentation of public functions is missing or incomplete, point this out.
 
  - Check the spelling and grammar of documentation and error/warning messages.
 
- - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments.
+ - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments or the changelog.
 
  - Check that the documentation of newly added or updated public functions describes all function parameters, as well as the return value. The parameters must be documented in the same order, and must have the same name as in the function signature.
 
@@ -83,7 +134,9 @@ When performing a code review, keep in mind the following.
 
  - Check that within the main description of the function each paragraph, except the first, is preceded by `</para><para>` on a separate line.
 
- - Check that any scientific articles referenced in the documentation are accompanied by a weblink, ideally a DOI link of the form `https://www.doi.org/...`. References to books do not need a weblink.
+ - Check that any scientific articles referenced in the documentation are accompanied by a weblink, ideally a DOI link of the form `https://doi.org/...`. References to books do not need a weblink.
+
+ - Weblinks included in the documentation must use `https://...` unless only the `http://...` form is functional.
 
  - Check that newly added public functions are marked as experimental by including `\experimental` in their documentation. `\experimental` must appear on a separate line, directly following the `\brief` line. `IGRAPH_EXPERIMENTAL` must appear at the beginning of the function's declaration within public headers.
 
@@ -93,22 +146,43 @@ When performing a code review, keep in mind the following.
 
  - Check that error and warning messages use sentence case and end in a fullstop. Refer to https://github.com/igraph/igraph/wiki/Error-reporting-guidelines for more details, and link this page when commenting on error or warning messages.
 
- - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing.
+ - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing. When vertex or edge IDs are validated, a useful phrasing that avoids mentioning IDs is "ID out of range".
+
+ - In newly added text and code, prefer the terminology "vertex" and "edge" instead of other common terms for the same (such as node, link, etc.). This applies to all of the documentation text, symbol names, code comments and the changelog. Do not suggest rewriting this in old, untouched code, and do not suggest terminology rewrites that involve code changes beyond the scope of the PR. Old code commonly used `no_of_nodes` and `no_of_edges` as variable names; when making a suggestion for new names, prefer `vcount` and `ecount` instead.
 
 ## Review hints
 
  - Keep in mind that igraph vectors and matrices are always initialized to null values. However, in contrast to initialization, *resizing* a vector to a larger size does not ensure that newly added values are null.
 
+ - External contributors to igraph may be inexperienced. Aid them by providing links to relevant parts of the igraph wiki (https://github.com/igraph/igraph/wiki/) or the igraph documentation when this is appropriate.
+
+ - If concrete indications suggest that a contribution may be mostly or entirely AI-generated, and the PR description does not acknowledge this, politely ask the author to clarify, linking to `AI_POLICY.md` in the repository root. Briefly explain the basis for the question and indicate uncertainty; do not present suspected AI use as established fact. This rule applies to pull requests submitted by external contributors and igraph team members alike.
+
 ## Miscellaneous points to check during reviews
 
- - Check that newly added public functions that are intended for use from igraph's high-level interfaces have an interface description in `interfaces/functions.yaml`, and that the interface description uses the appropriate types. Note that the Stimulus CI check verifies that the interface description matched the C function prototype.
+ - Check that new code handles self-loops (including multiple self-loops on one vertex), multi-edges, and both directed and undirected graphs correctly. Recall that an undirected self-loop contributes 2 to the degree, and that `IGRAPH_ALL` on a directed graph sees each reciprocal pair as two edges.
+
+ - Long-running loops (especially super-linear work) must allow interruption with `IGRAPH_ALLOW_INTERRUPTION()`. In cheap inner loops use `IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << k)`. Functions taking callbacks must stop cleanly when the callback returns `IGRAPH_STOP` and must propagate other errors.
+
+ - Check that newly added public functions that are intended for use from igraph's high-level interfaces have an interface description in `interfaces/functions.yaml`, and that the interface description uses the appropriate types. Note that the Stimulus CI check verifies that the interface description matches the C function prototype.
+
+ - Check that the interface description is consistent with the documentation:
+    * If a parameter is documented as being optional, the interface description must reflect this.
+    * Optional pointer parameters are effectively "omitted" by passing `NULL` in C. The interface definition indicates this with the `OPTIONAL` keyword.
+    * Optional numerical parameters are effectively "omitted" by passing a special value in C. The special value differs from function to function: it may be a negative value, `-1`, `IGRAPH_UNLIMITED`, `IGRAPH_INFINITY` or something else. The interface definition indicates such optional parameters by providing this special value as the default.
 
  - Check that no irrelevant changes have been made that could cause merge conflicts in the future. Examples of inappropriate changes include reformatting code that is not relevant to the pull request, or changing whitespace in unrelated code.
 
  - Check that newly added public functions follow the guidelines within this checklist in our wiki at https://github.com/igraph/igraph/wiki/Checklist-for-new-(and-old)-functions. If they do not, include a link in your response to this checklist.
 
- - Newly added files must contain an appropriate copyright header.
+ - All newly added code files, including implementation files, tests, examples, build scripts, and all other code, must contain an appropriate copyright header.
 
- - If `CHANGELOG.md` was updated, check that the description of changes is complete and accurate. If `CHANGELOG.md` was not updated, do not suggest doing so.
+ - If `CHANGELOG.md` was updated, check that the description of changes is complete and accurate. If `CHANGELOG.md` was not updated, do not suggest doing so within the PR, but add a reminder in the review summary to update the changelog after the PR is merged.
+
+ - If `CHANGELOG.md` was updated with a bugfix, check that there is a note about which version the bug was introduced in, unless that version is likely to be older than 0.10. If a bug in a function has been present since that function was originally implemented, it is sufficient to note this fact, without a reference to an igraph version.
 
  - When performing a code review on a pull request that adds new features, you may comment on adherence to the general design principles of igraph explained at https://github.com/igraph/igraph/wiki/Design-principles-for-functions
+
+ - The description of pull requests must retain all checkbox lines present in the pull request template at `.github/pull_request_template.md`. The copyright transfer line present in the template must be retained literally, and the box must be checked. Remind the PR's author that pull requests that do not adhere to this will not be merged. Special exception: igraph team members are exempt from this rule.
+
+ - Check that PRs opened by external contributors (i.e. people other than igraph team members) do not modify development configuration files such as `.gitignore`, `.editorconfig`, `.astylerc`, or similar.
