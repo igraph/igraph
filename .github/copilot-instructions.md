@@ -93,7 +93,6 @@ Skip adding this message if the PR was opened by an igraph team member.
 
  - Check that choices made for the behaviour of new functions, and especially the treatment of edge cases, are consistent with the pre-existing choices of igraph. Examples of prior choices where consistency is of importance:
     * Since the null graph is considered disconnected by `igraph_is_connected()`, and trees are connected by definition, the null graph is not a tree, and `igraph_is_tree()` returns false for it.
-    * In undirected graphs, self-loops are considered to contribute 2 to the degree of vertices. Therefore, the diagonal of adjacency matrices of undirected graphs contains twice the number of self-loops. Network measures defined in terms of the adjacency matrix, such as eigenvector centrality, are implemented in a way that is consistent with this convention.
 
 ## Testing
 
