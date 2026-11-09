@@ -849,6 +849,11 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  cuts_and_separators_brute_force
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   igraph_cohesive_blocks
   igraph_minimum_size_separators
 )
