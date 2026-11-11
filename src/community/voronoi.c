@@ -492,6 +492,7 @@ static igraph_error_t get_modularity(igraph_real_t r, igraph_real_t *modularity,
  * \param membership If not \c NULL, the membership of each vertex is returned here.
  * \param generators If not \c NULL, the generator points used for Voronoi partitioning are returned here.
  * \param modularity If not \c NULL, the modularity score of the partitioning is returned here.
+ *   It is NaN for graphs with no edges.
  * \param lengths Edge lengths, or \c NULL to consider all edges as having unit length.
  *   Voronoi partitioning will use edge lengths equal to lengths / ECC where ECC is the edge
  *   clustering coefficient.
@@ -548,6 +549,9 @@ igraph_error_t igraph_community_voronoi(
         }
         if (generators) {
             IGRAPH_CHECK(igraph_vector_int_range(generators, 0, no_of_nodes));
+        }
+        if (modularity) {
+            *modularity = IGRAPH_NAN;
         }
         return IGRAPH_SUCCESS;
     }
@@ -622,7 +626,7 @@ igraph_error_t igraph_community_voronoi(
         }
     } else {
         IGRAPH_CHECK(choose_generators(graph, pgenerators, NULL, &local_rel_dens, &lengths2, mode, r));
-        IGRAPH_CHECK(igraph_voronoi(graph, membership, NULL, pgenerators, &lengths2, mode, IGRAPH_VORONOI_RANDOM));
+        IGRAPH_CHECK(igraph_voronoi(graph, pmembership, NULL, pgenerators, &lengths2, mode, IGRAPH_VORONOI_RANDOM));
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, pmembership, weights, 1,
                                            mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED, modularity));
