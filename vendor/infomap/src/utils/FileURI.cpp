@@ -8,7 +8,7 @@
  ******************************************************************************/
 
 #include "FileURI.h"
-#include "convert.h"
+#include "format.h"
 #include <stdexcept>
 #include <utility>
 
@@ -20,14 +20,17 @@ FileURI::FileURI(string filename, bool requireExtension)
     : m_filename(std::move(filename)), m_requireExtension(requireExtension)
 {
   auto getErrorMessage = [](const auto& name, auto requireExt) {
-    string s = io::Str() << "Filename '" << name << "' must match the pattern \"[dir/]name" << (requireExt ? ".extension\"" : "[.extension]\"");
+    string s = fmt::format(FMT_STRING("Filename '{}' must match the pattern \"[dir/]name{}"), name, requireExt ? ".extension\"" : "[.extension]\"");
     return s;
   };
+
+  if (m_filename.empty())
+    throw std::invalid_argument(getErrorMessage(m_filename, m_requireExtension));
 
   auto name = m_filename;
   auto pos = m_filename.find_last_of('/');
   if (pos != string::npos) {
-    if (pos == m_filename.length()) // File could not end with slash
+    if (pos == m_filename.length() - 1) // File could not end with slash
       throw std::invalid_argument(getErrorMessage(m_filename, m_requireExtension));
     m_directory = m_filename.substr(0, pos + 1); // Include the last slash in the directory
     name = m_filename.substr(pos + 1); // No slash in the name

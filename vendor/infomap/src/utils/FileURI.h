@@ -10,7 +10,7 @@
 #ifndef FILEURI_H_
 #define FILEURI_H_
 
-#include <iostream>
+#include <ostream>
 #include <string>
 
 namespace infomap {

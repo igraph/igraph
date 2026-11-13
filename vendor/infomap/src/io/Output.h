@@ -31,6 +31,13 @@ std::string writeCsvTree(InfomapBase&, const StateNetwork&, const std::string&, 
 
 std::string writeClu(InfomapBase&, const StateNetwork&, const std::string&, bool states, int moduleIndexLevel);
 
+// What a reader needs to reproduce a run, as one JSON object: version, the
+// argument string, the effective seed and trial counts, the canonical config
+// and its fingerprint, and the identity of the network, cluster-data and
+// metadata files (null when unknown). The same values the artifact headers and
+// the manifest carry, for programmatic access from the bindings (#1026).
+std::string provenanceJson(const InfomapBase&);
+
 } // namespace infomap
 
 #endif // OUTPUT_H_
