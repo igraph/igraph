@@ -38,6 +38,11 @@ IGRAPH_EXPORT igraph_error_t igraph_get_adjacency(
    const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,
    const igraph_vector_t *weights, igraph_loops_t loops
 );
+IGRAPH_EXPORT igraph_error_t igraph_get_adjacency_submatrix(
+    const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_vs_t rows, const igraph_vs_t cols,
+    const igraph_vector_t *weights, igraph_loops_t loops
+);
 IGRAPH_EXPORT igraph_error_t igraph_get_adjacency_sparse(
    const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type,
    const igraph_vector_t *weights, igraph_loops_t loops
