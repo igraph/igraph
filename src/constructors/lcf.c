@@ -60,8 +60,14 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_int_t n,
     igraph_int_t no_of_edges;
     igraph_int_t no_of_edges2;
 
+    if (n < 0) {
+        IGRAPH_ERRORF("Number of vertices must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
+    }
     if (repeats < 0) {
         IGRAPH_ERROR("Number of repeats must not be negative.", IGRAPH_EINVAL);
+    }
+    if (n == 0 && no_of_shifts > 0 && repeats > 0) {
+        IGRAPH_ERROR("Shifts cannot be applied to a graph with no vertices.", IGRAPH_EINVAL);
     }
 
     /* no_of_edges = n + no_of_shifts * repeats */

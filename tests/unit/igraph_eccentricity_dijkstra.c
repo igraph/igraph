@@ -108,6 +108,20 @@ int main(void) {
     VECTOR(weights)[0] = -1;
     CHECK_ERROR(igraph_eccentricity(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
 
+    /* Selector whose iterator allocates memory; checks for leaks */
+    {
+        igraph_vs_t vs;
+        igraph_destroy(&g);
+        igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
+        igraph_vector_resize(&weights, 2);
+        VECTOR(weights)[0] = 1; VECTOR(weights)[1] = 2;
+        igraph_vs_adj(&vs, 1, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+        igraph_eccentricity(&g, &weights, &ecc, vs, IGRAPH_ALL);
+        IGRAPH_ASSERT(igraph_vector_size(&ecc) == 2);
+        IGRAPH_ASSERT(VECTOR(ecc)[0] == 3 && VECTOR(ecc)[1] == 3);
+        igraph_vs_destroy(&vs);
+    }
+
     igraph_vector_destroy(&ecc);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);

@@ -599,6 +599,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         for (i = 0; i < no_of_nodes; i++) {
             if (VECTOR(*initial)[i] < 0) {
                 VECTOR(*membership)[i] = -1;
+            } else if (VECTOR(*initial)[i] >= no_of_nodes) {
+                IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1.", IGRAPH_EINVAL);
             } else {
                 VECTOR(*membership)[i] = VECTOR(*initial)[i];
             }
@@ -625,11 +627,6 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                     }
                 }
             }
-        }
-
-        i = igraph_vector_int_max(membership);
-        if (i > no_of_nodes) {
-            IGRAPH_ERROR("Elements of the initial labeling vector must be between 0 and |V|-1.", IGRAPH_EINVAL);
         }
     } else {
         for (i = 0; i < no_of_nodes; i++) {
