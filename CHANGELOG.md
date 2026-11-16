@@ -55,6 +55,7 @@
 - nanoflann was updated to version 2.0.1
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 - Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
+- Performance improvement for `igraph_girth()` on large graphs without triangles, such as bipartite graphs and lattices. The search from each vertex no longer resets state for the whole graph (PR #3003).
 - The build system now uses the behaviour of CMake policies up to CMake 4.5.
 
 ## [1.0.1]
