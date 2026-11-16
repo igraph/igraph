@@ -104,11 +104,6 @@ igraph_error_t igraph_girth(const igraph_t *graph,
 
         anycircle = 0;
 
-        /* The BFS queue is a vector that is never popped from, so after a
-         * search it lists every vertex that search reached. Resetting only
-         * those vertices avoids an O(|V|) reset per source; once a cycle is
-         * found, searches are limited to shallow depths and would otherwise
-         * be dominated by the reset. */
         igraph_int_t queue_size = igraph_vector_int_size(&bfs_queue);
         for (igraph_int_t i = 0; i < queue_size; i++) {
             VECTOR(level)[VECTOR(bfs_queue)[i]] = 0;
