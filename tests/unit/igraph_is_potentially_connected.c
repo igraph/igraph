@@ -54,20 +54,13 @@ void directed_potentially_connected_print_destroy(igraph_vector_int_t *ods, igra
     for (igraph_connectedness_t conn_mode = IGRAPH_WEAK; conn_mode <= IGRAPH_STRONG; conn_mode++) {
 
         igraph_is_potentially_connected(ods, ids, IGRAPH_SIMPLE_SW, conn_mode, &c_simple);
-        if (conn_mode == IGRAPH_WEAK) {
-            igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops);
-        } else {
-            CHECK_ERROR(
-                igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops),
-                IGRAPH_UNIMPLEMENTED
-            );
-        }
+        igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops);
         igraph_is_potentially_connected(ods, ids, IGRAPH_MULTI_SW, conn_mode, &c_multi);
         igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, conn_mode, &c_multiloops);
 
         printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n",
                g_simple                                    ? bool_str(c_simple)     : "  n/a",
-               (g_loops && conn_mode != IGRAPH_STRONG)     ? bool_str(c_loops)      : "  n/a",
+               g_loops                                    ? bool_str(c_loops)      : "  n/a",
                g_multi                                     ? bool_str(c_multi)      : "  n/a",
                g_multiloops                                ? bool_str(c_multiloops) : "  n/a");
     }
@@ -176,6 +169,16 @@ int main(void) {
     /* Previous but add one edge to break strongly connected simple */
     igraph_vector_int_init_int_end(&ods, -1, 3, 3, 1, 1, -1);
     igraph_vector_int_init_int_end(&ids, -1, 1, 1, 3, 3, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+
+    /* The same separate degree lists admit different answers depending on
+     * how in- and out-degrees are paired at each vertex. Both need a loop. */
+    igraph_vector_int_init_int_end(&ods, -1, 2, 1, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 2, 1, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+
+    igraph_vector_int_init_int_end(&ods, -1, 2, 1, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 1, 2, -1);
     directed_potentially_connected_print_destroy(&ods, &ids);
 
     VERIFY_FINALLY_STACK();
