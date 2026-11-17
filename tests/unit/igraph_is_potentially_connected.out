@@ -79,7 +79,6 @@ simple:  true, loops:  true, multi:  true, multiloops:  true
 simple:  true, loops:  true, multi:  true, multiloops:  true
 simple: false, loops: false, multi:  true, multiloops:  true
 
-
 ( 2 1 )
 ( 2 1 )
 simple:   n/a, loops:  true, multi:   n/a, multiloops:  true
