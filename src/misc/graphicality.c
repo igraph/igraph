@@ -277,8 +277,11 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * </para><para>
  * For strong connectivity, there are differences between simple graphs and multigraphs.
  * In multigraphs, it is sufficient that each in-degree and out-degree is positive.
- * In simple graphs, an additional condition must be satisfied, given by Beineke-Harary,
- * and later also by Hong-Liu-Lai.
+ * Without parallel edges, strong connectivity additionally requires a positive
+ * cut bound for every prefix ordered by decreasing out-degree, as in the
+ * Hong-Liu-Lai criterion. The same criterion applies when one self-loop per
+ * vertex is allowed. In its switching argument, a singleton with a self-loop
+ * is a strong component with an internal arc.
  *
  * </para><para>
  * References:
@@ -314,9 +317,7 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  *     \endclist
  * \param mode Can be \c IGRAPH_WEAK or \c IGRAPH_STRONG. Controls checking
  *     for a weakly or strongly connected realization of the degrees.
- *     Ignored in the undirected case. For directed graphs, \c IGRAPH_STRONG
- *     with self-loops allowed but multi-edges disallowed is not implemented
- *     and returns \c IGRAPH_UNIMPLEMENTED.
+ *     Ignored in the undirected case.
  * \param res Pointer to a Boolean. The result will be stored here.
  *     This function assumes that the degree sequence is graphical for the given allowed_edge_types, and does not check it.
  *     For non-graphical input the result is unspecified.
@@ -348,12 +349,6 @@ igraph_error_t igraph_is_potentially_connected(
         mode = IGRAPH_WEAK;
     } else if (mode != IGRAPH_WEAK && mode != IGRAPH_STRONG) {
         IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
-    }
-
-    if (!multigraph && loopy && mode == IGRAPH_STRONG) {
-        /* Strongly connected for simple graphs with self-loops unimplemented */
-        IGRAPH_ERROR("Potentially strongly connected check is not implemented"
-                     " for simple directed graphs with loops.", IGRAPH_UNIMPLEMENTED);
     }
 
     if (directed) {
@@ -443,26 +438,22 @@ igraph_error_t igraph_is_potentially_connected(
             *res = true;
             return IGRAPH_SUCCESS;
         }
-        if (loopy) {
-            /* TODO: Implement potentially strongly connected for loopy simple directed graph case.
-             * This is now caught at the beginning of this function and IGRAPH_UNIMPLEMENTED is returned. */
-        }
-
-        /* Assume simple loopless now */
-        /* We follow Hong-Liu-Lai (2016) and Beineke-Harary (1965) */
+        /* The maximum in- or out-degree is n-1 without loops, or n with loops.
+         * The prefix cut bounds are the same in either case. */
+        const igraph_int_t degree_range = n + loopy;
         igraph_vector_int_t out_degree_cumcounts, out_degree_counts;
         igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
         igraph_vector_int_t over;
         igraph_int_t lhs, rhs_sum;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_out_degrees, n);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, n);
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_cumcounts, n+1);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_cumcounts, degree_range + 1);
 
         /* Compute out_degree_cumcounts[d+1] to be the no. of out-degrees == d */
         for (igraph_int_t v = 0; v < n; v++) {
             igraph_int_t indeg = VECTOR(*in_degrees)[v];
             igraph_int_t outdeg = VECTOR(*out_degrees)[v];
-            if (indeg >= n || outdeg >= n) {
+            if (indeg >= degree_range || outdeg >= degree_range) {
                 *res = false;
                 igraph_vector_int_destroy(&out_degree_cumcounts);
                 igraph_vector_int_destroy(&sorted_in_degrees);
@@ -474,13 +465,13 @@ igraph_error_t igraph_is_potentially_connected(
         }
 
         /* Compute out_degree_cumcounts[d] to be the no. of out-degrees < d */
-        for (igraph_int_t outdeg = 0; outdeg < n; outdeg++) {
+        for (igraph_int_t outdeg = 0; outdeg < degree_range; outdeg++) {
             VECTOR(out_degree_cumcounts)[outdeg+1] += VECTOR(out_degree_cumcounts)[outdeg];
         }
 
         /* In the following loop, out_degree_counts[d] keeps track of the number of vertices
          * with out-degree d that were already placed. */
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_counts, n);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_counts, degree_range);
 
         for (igraph_int_t v = 0; v < n; v++) {
             igraph_int_t outdeg = VECTOR(*out_degrees)[v];
@@ -495,7 +486,7 @@ igraph_error_t igraph_is_potentially_connected(
         igraph_vector_int_destroy(&out_degree_cumcounts);
         IGRAPH_FINALLY_CLEAN(2);
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&over, n);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&over, degree_range);
         lhs = 0;
         rhs_sum = 0;
         igraph_int_t at = 0;
@@ -505,14 +496,9 @@ igraph_error_t igraph_is_potentially_connected(
             const igraph_int_t indeg = VECTOR(sorted_in_degrees)[v];
             VECTOR(over)[indeg]++;
         }
-
-
-        /* The sequence has a strongly connected realization unless a subset
-         * of the first k vertices, in non-increasing order of out-degree,
-         * has fewer incoming edges than outgoing ones, that is unless the
-         * Beineke-Harary / Hong-Liu-Lai condition fails for some k.
-         * Be optimistic and set to false if the condition is violated below.
-         */
+        /* For the first k vertices, lhs + rhs bounds the number of incoming
+         * arcs across the cut. The Hong-Liu-Lai test requires this bound to
+         * be positive for each nonempty proper prefix. */
         *res = true;
         for (igraph_int_t k = 1; k < n; k++) {
             const igraph_int_t indeg = VECTOR(sorted_in_degrees)[k - 1];
