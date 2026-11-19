@@ -15,12 +15,23 @@ mkdir build && cd build
 CFLAGS="$CFLAGS -O2" cmake .. -DCMAKE_INSTALL_PREFIX=$DEPS_PATH -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_MODULES=OFF
 make install -j$(nproc)
 
+# Build a recent flex. It is a build tool, so it is compiled without the
+# fuzzing/sanitizer flags (and without -m32 on i386).
+FLEX_VERSION=2.7.2
+cd $SRC
+wget https://github.com/westes/flex/releases/download/v$FLEX_VERSION/flex-$FLEX_VERSION.tar.gz
+tar xf flex-$FLEX_VERSION.tar.gz
+cd flex-$FLEX_VERSION
+env -u CFLAGS -u CXXFLAGS -u LDFLAGS ./configure --disable-nls
+env -u CFLAGS -u CXXFLAGS -u LDFLAGS make -j$(nproc)
+FLEX_EXECUTABLE=$SRC/flex-$FLEX_VERSION/src/flex
+
 # Build igraph
 cd $SRC/igraph
 mkdir build && cd build
 # CMAKE_BUILD_TYPE=None is an arbitrary value that prevents the automatic Release
 # build type setting, allowing OSS-Fuzz to pass on its own optimization flags.
-cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None -DCMAKE_PREFIX_PATH=$DEPS_PATH -DFLEX_KEEP_LINE_NUMBERS=ON
+cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None -DCMAKE_PREFIX_PATH=$DEPS_PATH -DFLEX_KEEP_LINE_NUMBERS=ON -DFLEX_EXECUTABLE=$FLEX_EXECUTABLE
 make -j$(nproc)
 
 
