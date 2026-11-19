@@ -7,10 +7,11 @@ mkdir $DEPS_PATH
 # Building libxml2 from scratch is also required for MemorySanitizer.
 # It may be necessary to leave CMAKE_BUILD_TYPE empty and specify LIBXML2_WITH_MODULES=OFF
 # in order for fuzz introspector builds to succeed (details unverified).
+LIBXML2_VERSION=2.15.4
 cd $SRC
-wget https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz
-tar xf libxml2-2.15.4.tar.xz
-cd libxml2-2.15.4
+wget https://download.gnome.org/sources/libxml2/${LIBXML2_VERSION%.*}/libxml2-$LIBXML2_VERSION.tar.xz
+tar xf libxml2-$LIBXML2_VERSION.tar.xz
+cd libxml2-$LIBXML2_VERSION
 mkdir build && cd build
 CFLAGS="$CFLAGS -O2" cmake .. -DCMAKE_INSTALL_PREFIX=$DEPS_PATH -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_MODULES=OFF
 make install -j$(nproc)
