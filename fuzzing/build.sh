@@ -18,7 +18,7 @@ make install -j$(nproc)
 
 # Build a recent flex. It is a build tool, so it is compiled without the
 # fuzzing/sanitizer flags (and without -m32 on i386).
-FLEX_VERSION=2.7.2
+FLEX_VERSION=2.7.3
 cd $SRC
 wget https://github.com/westes/flex/releases/download/v$FLEX_VERSION/flex-$FLEX_VERSION.tar.gz
 tar xf flex-$FLEX_VERSION.tar.gz
