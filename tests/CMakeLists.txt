@@ -762,6 +762,7 @@ add_legacy_tests(
   igraph_attribute_combination_remove
   cattributes5
   cattributes6
+  cattributes_string_combination
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES

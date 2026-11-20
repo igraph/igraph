@@ -72,10 +72,10 @@
       <data key="e_color">greenredblue</data>
     </edge>
     <edge source="n1" target="n2">
-      <data key="e_color">green</data>
+      <data key="e_color">white</data>
     </edge>
     <edge source="n2" target="n3">
-      <data key="e_color">green</data>
+      <data key="e_color">black</data>
     </edge>
   </graph>
 </graphml>
