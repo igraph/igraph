@@ -74,7 +74,17 @@ if(USE_SANITIZER)
   elseif(MSVC)
     if(USE_SANITIZER MATCHES "([Aa]ddress)")
       message(STATUS "Building with Address sanitizer")
-      append("-fsanitize=address" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+      append("/fsanitize=address" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+      # ASan is incompatible with incremental linking (/INCREMENTAL) and Edit and Continue (/ZI).
+      # Replace /INCREMENTAL with /INCREMENTAL:NO and /ZI with /Zi in all configuration flags.
+      foreach(config "" "_DEBUG" "_MINSIZEREL" "_RELEASE" "_RELWITHDEBINFO")
+        foreach(lang C CXX)
+          string(REPLACE "/ZI" "/Zi" CMAKE_${lang}_FLAGS${config} "${CMAKE_${lang}_FLAGS${config}}")
+        endforeach()
+        foreach(type EXE SHARED MODULE)
+          string(REGEX REPLACE "/INCREMENTAL(:[A-Z]+)?( |$)" "/INCREMENTAL:NO " CMAKE_${type}_LINKER_FLAGS${config} "${CMAKE_${type}_LINKER_FLAGS${config}}")
+        endforeach()
+      endforeach()
     else()
       message(
         FATAL_ERROR
