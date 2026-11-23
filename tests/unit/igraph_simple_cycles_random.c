@@ -53,7 +53,7 @@ static const char *mode_name(const igraph_t *graph, igraph_neimode_t mode) {
 }
 
 /* Sorts the edge IDs of each cycle, then sorts the list of cycles. */
-static void canonicalize(igraph_vector_int_list_t *cycles) {
+static void canonicalize_cycles(igraph_vector_int_list_t *cycles) {
     const igraph_int_t n = igraph_vector_int_list_size(cycles);
     for (igraph_int_t i = 0; i < n; i++) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(cycles, i));
@@ -189,7 +189,7 @@ static void brute_force_cycles(const igraph_t *graph, igraph_neimode_t mode,
     igraph_vector_int_destroy(&outdeg);
     igraph_vector_int_destroy(&indeg);
 
-    canonicalize(result);
+    canonicalize_cycles(result);
 }
 
 /* Checks that 'vertices' and 'edges' describe the same closed walk in the
@@ -255,7 +255,7 @@ static void find_cycles_canonical(const igraph_t *graph, igraph_neimode_t mode,
     }
     igraph_vector_int_list_destroy(&vertices);
 
-    canonicalize(result);
+    canonicalize_cycles(result);
 }
 
 /* Compares igraph_simple_cycles() with the brute-force enumerator. */
@@ -558,7 +558,7 @@ static void check_early_stop(const igraph_t *graph, igraph_neimode_t mode) {
         IGRAPH_ASSERT(igraph_simple_cycles_callback(graph, mode, -1, -1, &stop_after_k, &st)
                       == IGRAPH_SUCCESS);
         IGRAPH_ASSERT(st.calls == expected);
-        canonicalize(&st.edges);
+        canonicalize_cycles(&st.edges);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&st.edges) == expected);
         IGRAPH_ASSERT(is_distinct_subset(&st.edges, &all));
         igraph_vector_int_list_destroy(&st.edges);
@@ -572,7 +572,7 @@ static void check_early_stop(const igraph_t *graph, igraph_neimode_t mode) {
                                          igraph_vector_int_list_get_ptr(&vertices, j),
                                          igraph_vector_int_list_get_ptr(&edges, j)));
         }
-        canonicalize(&edges);
+        canonicalize_cycles(&edges);
         IGRAPH_ASSERT(is_distinct_subset(&edges, &all));
     }
 
