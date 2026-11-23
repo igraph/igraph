@@ -23,7 +23,6 @@
 
 #include "igraph_adjlist.h"
 #include "igraph_components.h"
-#include "igraph_dqueue.h"
 #include "igraph_interface.h"
 
 #include "core/interruption.h"
@@ -75,21 +74,21 @@ igraph_error_t igraph_girth(const igraph_t *graph,
                             igraph_vector_int_t *cycle) {
 
     igraph_int_t no_of_nodes = igraph_vcount(graph);
-    igraph_dqueue_int_t q;
     igraph_lazy_adjlist_t adjlist;
     igraph_int_t mincirc = IGRAPH_INTEGER_MAX, minvertex = 0;
     igraph_int_t node;
     igraph_bool_t triangle = false;
     igraph_vector_int_t *neis;
     igraph_vector_int_t level;
+    igraph_vector_int_t bfs_queue;
     igraph_int_t stoplevel = no_of_nodes + 1;
     igraph_bool_t anycircle = false;
     igraph_int_t t1 = 0, t2 = 0;
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&level, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&bfs_queue, 0);
 
     for (node = 0; !triangle && node < no_of_nodes; node++) {
 
@@ -104,15 +103,21 @@ igraph_error_t igraph_girth(const igraph_t *graph,
         }
 
         anycircle = 0;
-        igraph_dqueue_int_clear(&q);
-        igraph_vector_int_null(&level);
-        IGRAPH_CHECK(igraph_dqueue_int_push(&q, node));
+
+        igraph_int_t queue_size = igraph_vector_int_size(&bfs_queue);
+        for (igraph_int_t i = 0; i < queue_size; i++) {
+            VECTOR(level)[VECTOR(bfs_queue)[i]] = 0;
+        }
+        igraph_vector_int_clear(&bfs_queue);
+        igraph_int_t queue_head = 0;
+
+        IGRAPH_CHECK(igraph_vector_int_push_back(&bfs_queue, node));
         VECTOR(level)[node] = 1;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        while (!igraph_dqueue_int_empty(&q)) {
-            igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+        while (queue_head < igraph_vector_int_size(&bfs_queue)) {
+            igraph_int_t actnode = VECTOR(bfs_queue)[queue_head++];
             igraph_int_t actlevel = VECTOR(level)[actnode];
             igraph_int_t i, n;
 
@@ -149,12 +154,12 @@ igraph_error_t igraph_girth(const igraph_t *graph,
                         }
                     }
                 } else {
-                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&bfs_queue, nei));
                     VECTOR(level)[nei] = actlevel + 1;
                 }
             }
 
-        } /* while q !empty */
+        } /* while bfs_queue not exhausted */
     } /* node */
 
     if (girth) {
@@ -173,14 +178,14 @@ igraph_error_t igraph_girth(const igraph_t *graph,
     if (cycle) {
         IGRAPH_CHECK(igraph_vector_int_resize(cycle, mincirc));
         if (mincirc != 0) {
-            igraph_int_t i, n, idx = 0;
-            igraph_dqueue_int_clear(&q);
+            igraph_int_t i, n, idx = 0, queue_head = 0;
+            igraph_vector_int_clear(&bfs_queue);
             igraph_vector_int_null(&level); /* used for parent pointers */
 #define PARENT(x) (VECTOR(level)[(x)])
-            IGRAPH_CHECK(igraph_dqueue_int_push(&q, minvertex));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&bfs_queue, minvertex));
             PARENT(minvertex) = minvertex;
             while (PARENT(t1) == 0 || PARENT(t2) == 0) {
-                igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+                igraph_int_t actnode = VECTOR(bfs_queue)[queue_head++];
                 neis = igraph_lazy_adjlist_get(&adjlist, actnode);
                 IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
                 n = igraph_vector_int_size(neis);
@@ -188,10 +193,10 @@ igraph_error_t igraph_girth(const igraph_t *graph,
                     igraph_int_t nei = VECTOR(*neis)[i];
                     if (PARENT(nei) == 0) {
                         PARENT(nei) = actnode + 1;
-                        IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&bfs_queue, nei));
                     }
                 }
-            }  /* while q !empty */
+            }  /* while t1 or t2 has no parent */
             /* Ok, now use PARENT to create the path */
             while (t1 != minvertex) {
                 VECTOR(*cycle)[idx++] = t1;
@@ -207,8 +212,8 @@ igraph_error_t igraph_girth(const igraph_t *graph,
     } /* circle */
 #undef PARENT
 
+    igraph_vector_int_destroy(&bfs_queue);
     igraph_vector_int_destroy(&level);
-    igraph_dqueue_int_destroy(&q);
     igraph_lazy_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(3);
 
