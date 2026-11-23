@@ -1165,7 +1165,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
             degree_neg_out[i]   = 0.0;
 
 #ifdef SPINGLASS_DEBUG
-            printf("Initializing spin %d", i);
+            printf("Initializing spin %" IGRAPH_PRId, i);
 #endif
             spin[i] = 0;
         }
@@ -1186,7 +1186,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
         }
 
 #ifdef SPINGLASS_DEBUG
-        printf("Spin %d assigned to node %d.\n", s, v);
+        printf("Spin %" IGRAPH_PRId " assigned to node %" IGRAPH_PRId ".\n", s, v);
 #endif
 
         n_cur               =  net->node_list.Get(v);
@@ -1444,8 +1444,8 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
     }  // while sweep
 #ifdef SPINGLASS_DEBUG
     printf("Done %d sweeps.\n", max_sweeps);
-    printf("%ld changes made for %d nodes.\n", changes, num_nodes);
-    printf("Last node is %d and last random number is %f with sum of weights %f with spin %d.\n", v, r, sum_weights, old_spin);
+    printf("%" IGRAPH_PRId " changes made for %" IGRAPH_PRId " nodes.\n", changes, num_nodes);
+    printf("Last node is %" IGRAPH_PRId " and last random number is %f with sum of weights %f with spin %" IGRAPH_PRId ".\n", v, r, sum_weights, old_spin);
 #endif
 
     return (double(changes) / double(num_nodes) / double(sweep));
@@ -1499,7 +1499,7 @@ igraph_int_t PottsModelN::WriteClusters(igraph_real_t *modularity,
             num_clusters++;
             cluster_assign[s] = num_clusters;
 #ifdef SPINGLASS_DEBUG
-            printf("Setting cluster %d to %d.\n", s, num_clusters);
+            printf("Setting cluster %" IGRAPH_PRId " to %" IGRAPH_PRId ".\n", s, num_clusters);
 #endif
         }
     }
@@ -1508,12 +1508,12 @@ igraph_int_t PottsModelN::WriteClusters(igraph_real_t *modularity,
     q = num_clusters;
     for (igraph_int_t i = 0; i < num_nodes; i++) {
 #ifdef SPINGLASS_DEBUG
-        printf("Setting node %d to %d.\n", i, cluster_assign[spin[i]]);
+        printf("Setting node %" IGRAPH_PRId " to %" IGRAPH_PRId ".\n", i, cluster_assign[spin[i]]);
 #endif
         igraph_int_t s = cluster_assign[spin[i]];
         spin[i] = s;
 #ifdef SPINGLASS_DEBUG
-        printf("Have set node %d to %d.\n", i, s);
+        printf("Have set node %" IGRAPH_PRId " to %" IGRAPH_PRId ".\n", i, s);
 #endif
     }
     assign_initial_conf(false);

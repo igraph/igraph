@@ -228,7 +228,7 @@ static void igraph_i_fastgreedy_community_list_dump_heap(
     igraph_int_t i;
     debug("Heap:\n");
     for (i = 0; i < list->no_of_communities; i++) {
-        debug("(%ld, %p, %p)", i, list->heap[i],
+        debug("(%" IGRAPH_PRId ", %p, %p)", i, list->heap[i],
               list->heap[i]->maxdq);
         if (list->heap[i]->maxdq) {
             debug(" (%" IGRAPH_PRId ", %" IGRAPH_PRId ", %.7f)", list->heap[i]->maxdq->first,
@@ -827,21 +827,21 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         debug("===========================================\n");
         for (i = 0; i < communities.n; i++) {
             if (communities.e[i].maxdq == 0) {
-                debug("Community #%ld: PASSIVE\n", i);
+                debug("Community #%" IGRAPH_PRId ": PASSIVE\n", i);
                 continue;
             }
-            debug("Community #%ld\n ", i);
+            debug("Community #%" IGRAPH_PRId "\n ", i);
             for (j = 0; j < igraph_vector_ptr_size(&communities.e[i].neis); j++) {
                 p1 = (igraph_i_fastgreedy_commpair*)VECTOR(communities.e[i].neis)[j];
-                debug(" (%ld,%ld,%.4f)", p1->first, p1->second, *p1->dq);
+                debug(" (%" IGRAPH_PRId ",%" IGRAPH_PRId ",%.4f)", p1->first, p1->second, *p1->dq);
             }
             p1 = communities.e[i].maxdq;
-            debug("\n  Maxdq: (%ld,%ld,%.4f)\n", p1->first, p1->second, *p1->dq);
+            debug("\n  Maxdq: (%" IGRAPH_PRId ",%" IGRAPH_PRId ",%.4f)\n", p1->first, p1->second, *p1->dq);
         }
-        debug("Global maxdq is: (%ld,%ld,%.4f)\n", communities.heap[0]->maxdq->first,
+        debug("Global maxdq is: (%" IGRAPH_PRId ",%" IGRAPH_PRId ",%.4f)\n", communities.heap[0]->maxdq->first,
               communities.heap[0]->maxdq->second, *communities.heap[0]->maxdq->dq);
         for (i = 0; i < communities.no_of_communities; i++) {
-            debug("(%ld,%ld,%.4f) ", communities.heap[i]->maxdq->first, communities.heap[i]->maxdq->second, *communities.heap[0]->maxdq->dq);
+            debug("(%" IGRAPH_PRId ",%" IGRAPH_PRId ",%.4f) ", communities.heap[i]->maxdq->first, communities.heap[i]->maxdq->second, *communities.heap[0]->maxdq->dq);
         }
         debug("\n");
 #endif
@@ -854,7 +854,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         to = communities.heap[0]->maxdq->second;
         from = communities.heap[0]->maxdq->first;
 
-        debug("Q[%ld] = %.7f\tdQ = %.7f\t |H| = %ld\n",
+        debug("Q[%" IGRAPH_PRId "] = %.7f\tdQ = %.7f\t |H| = %" IGRAPH_PRId "\n",
               no_of_joins, q, *communities.heap[0]->maxdq->dq, no_of_nodes - no_of_joins - 1);
 
         /* IGRAPH_FASTCOMM_DEBUG */
@@ -871,7 +871,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
           dummy=n; n=m; m=dummy;
           dummy=to; to=from; from=dummy;
         }*/
-        debug("  joining: %ld <- %ld\n", to, from);
+        debug("  joining: %" IGRAPH_PRId " <- %" IGRAPH_PRId "\n", to, from);
         q += *communities.heap[0]->maxdq->dq;
 
         /* Merge the second community into the first */
@@ -888,7 +888,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                     debug("    WILL REMOVE: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", to, from);
                 } else {
                     /* chain, case 1 */
-                    debug("    CHAIN(1): %ld-%ld %ld, now=%.7f, adding=%.7f, newdq(%ld,%ld)=%.7f\n",
+                    debug("    CHAIN(1): %" IGRAPH_PRId "-%" IGRAPH_PRId " %" IGRAPH_PRId ", now=%.7f, adding=%.7f, newdq(%" IGRAPH_PRId ",%" IGRAPH_PRId ")=%.7f\n",
                           to, p1->second, from, *p1->dq, -2 * VECTOR(a)[from]*VECTOR(a)[p1->second], p1->first, p1->second, *p1->dq - 2 * VECTOR(a)[from]*VECTOR(a)[p1->second]);
                     igraph_i_fastgreedy_community_update_dq(&communities, p1, *p1->dq - 2 * VECTOR(a)[from]*VECTOR(a)[p1->second]);
                 }
@@ -898,7 +898,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                 debug("    Considering: %" IGRAPH_PRId "-%" IGRAPH_PRId " and %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p1->first, p1->second,
                       p2->first, p2->second);
                 /* Update dq value */
-                debug("    TRIANGLE: %ld-%ld-%ld, now=%.7f, adding=%.7f, newdq(%ld,%ld)=%.7f\n",
+                debug("    TRIANGLE: %" IGRAPH_PRId "-%" IGRAPH_PRId "-%" IGRAPH_PRId ", now=%.7f, adding=%.7f, newdq(%" IGRAPH_PRId ",%" IGRAPH_PRId ")=%.7f\n",
                       to, p1->second, from, *p1->dq, *p2->dq, p1->first, p1->second, *p1->dq + *p2->dq);
                 igraph_i_fastgreedy_community_update_dq(&communities, p1, *p1->dq + *p2->dq);
                 igraph_i_fastgreedy_community_remove_nei(&communities, p1->second, from);
@@ -910,7 +910,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                     debug("    WILL REMOVE: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p2->second, p2->first);
                 } else {
                     /* chain, case 2 */
-                    debug("    CHAIN(2): %ld %ld-%ld, newdq(%ld,%ld)=%.7f\n",
+                    debug("    CHAIN(2): %" IGRAPH_PRId " %" IGRAPH_PRId "-%" IGRAPH_PRId ", newdq(%" IGRAPH_PRId ",%" IGRAPH_PRId ")=%.7f\n",
                           to, p2->second, from, to, p2->second, *p2->dq - 2 * VECTOR(a)[to]*VECTOR(a)[p2->second]);
                     p2->opposite->second = to;
                     /* p2->opposite->second changed, so it means that
@@ -945,7 +945,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                 debug("    WILL REMOVE: %" IGRAPH_PRId "-%" IGRAPH_PRId "\n", p1->first, from);
             } else {
                 /* chain, case 1 */
-                debug("    CHAIN(1): %ld-%ld %ld, now=%.7f, adding=%.7f, newdq(%ld,%ld)=%.7f\n",
+                debug("    CHAIN(1): %" IGRAPH_PRId "-%" IGRAPH_PRId " %" IGRAPH_PRId ", now=%.7f, adding=%.7f, newdq(%" IGRAPH_PRId ",%" IGRAPH_PRId ")=%.7f\n",
                       to, p1->second, from, *p1->dq, -2 * VECTOR(a)[from]*VECTOR(a)[p1->second], p1->first, p1->second, *p1->dq - 2 * VECTOR(a)[from]*VECTOR(a)[p1->second]);
                 igraph_i_fastgreedy_community_update_dq(&communities, p1, *p1->dq - 2 * VECTOR(a)[from]*VECTOR(a)[p1->second]);
             }
@@ -958,7 +958,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                 continue;
             }
             /* chain, case 2 */
-            debug("    CHAIN(2): %ld %ld-%ld, newdq(%ld,%ld)=%.7f\n",
+            debug("    CHAIN(2): %" IGRAPH_PRId " %" IGRAPH_PRId "-%" IGRAPH_PRId ", newdq(%" IGRAPH_PRId ",%" IGRAPH_PRId ")=%.7f\n",
                   to, p2->second, from, p1 ? p1->first : -1, p2->second, *p2->dq - 2 * VECTOR(a)[to]*VECTOR(a)[p2->second]);
             p2->opposite->second = to;
             /* need to re-sort community nei list `p2->second` */
