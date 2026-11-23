@@ -275,6 +275,27 @@ int main(void) {
         check_iea(4, 3, 25, IGRAPH_DIRECTED, modes[i]);
     }
 
+    /* Sampling probabilities: with one bottom and two top vertices, and two edges,
+     * IEA produces a simple graph with probability 1/2. Uniform sampling of
+     * multigraphs would give 1/3. */
+    {
+        igraph_t graph;
+        igraph_bool_t simple;
+        const igraph_int_t samples = 10000;
+        igraph_int_t simple_count = 0;
+
+        igraph_rng_seed(igraph_rng_default(), 42);
+        for (igraph_int_t i = 0; i < samples; i++) {
+            igraph_bipartite_iea_game(&graph, NULL, 1, 2, 2, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+            igraph_is_simple(&graph, &simple, IGRAPH_UNDIRECTED);
+            if (simple) {
+                simple_count++;
+            }
+            igraph_destroy(&graph);
+        }
+        IGRAPH_ASSERT(simple_count > 0.45 * samples && simple_count < 0.55 * samples);
+    }
+
     VERIFY_FINALLY_STACK();
 
     /* G(n,p) */
