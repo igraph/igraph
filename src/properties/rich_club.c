@@ -164,3 +164,117 @@ igraph_error_t igraph_rich_club_sequence(
 
     return IGRAPH_SUCCESS;
 }
+
+
+/**
+ * \function igraph_rich_club_coefficient
+ * \brief Degree-based rich-club coefficient of a graph.
+ *
+ * \experimental
+ *
+ * The rich-club coefficient is a metric used to evaluate whether well-connected
+ * vertices (hubs) tend to connect to other well-connected vertices.
+ *
+ * </para><para>
+ * For a given degree threshold \p k, the rich-club coefficient \phi(k) is defined
+ * as the density of the subgraph induced by vertices with degree strictly greater
+ * than \p k.
+ *
+ * </para><para>
+ * The output vector \p res is resized to length <code>max(degree) + 1</code>,
+ * where <code>res[k]</code> contains \phi(k). When no vertices have degree
+ * greater than \p k, or fewer than two vertices remain (when \p loops is false),
+ * <code>res[k]</code> evaluates to \c NaN.
+ *
+ * \param graph The graph object to analyze.
+ * \param weights Optional edge weights. If \c NULL, all edge weights are
+ *    assumed to be 1.
+ * \param res Initialized vector, the result will be written here. <code>res[k]</code>
+ *    contains the rich-club coefficient for degree threshold \p k.
+ * \param mode For directed graphs, selects whether out-degree (\c IGRAPH_OUT),
+ *    in-degree (\c IGRAPH_IN), or total degree (\c IGRAPH_ALL) determines vertex
+ *    degree for ranking. Ignored for undirected graphs.
+ * \param loops Whether self-loops are considered when calculating degree and whether
+ *    they are assumed to be possible in the theoretical denominator.
+ * \param directed Whether directed density is calculated. Ignored for undirected graphs.
+ *
+ * \return Error code:
+ *    \c IGRAPH_EINVAL: invalid weight vector length.
+ *    \c IGRAPH_EINVMODE: invalid mode for directed graph.
+ *
+ * Time complexity: O(|V| log |V| + |E|), where |V| is the number of vertices and |E|
+ * is the number of edges.
+ *
+ * \sa \ref igraph_rich_club_sequence(), \ref igraph_density().
+ */
+igraph_error_t igraph_rich_club_coefficient(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_vector_t *res,
+        igraph_neimode_t mode,
+        igraph_bool_t loops,
+        igraph_bool_t directed) {
+
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
+
+    if (weights && igraph_vector_size(weights) != ecount) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match "
+                      "number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(weights), ecount);
+    }
+
+    if (igraph_is_directed(graph)) {
+        if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+            IGRAPH_ERROR("Invalid mode for directed graph.", IGRAPH_EINVMODE);
+        }
+    } else {
+        directed = false;
+        mode = IGRAPH_ALL;
+    }
+
+    /* Empty graph case */
+    if (vcount == 0) {
+        IGRAPH_CHECK(igraph_vector_resize(res, 0));
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_t degrees;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, vcount);
+    igraph_loops_t deg_loops = loops ? (igraph_is_directed(graph) ? IGRAPH_LOOPS_ONCE : IGRAPH_LOOPS_TWICE)
+                                     : IGRAPH_NO_LOOPS;
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, deg_loops));
+
+    igraph_int_t maxdeg = igraph_vector_int_max(&degrees);
+    IGRAPH_CHECK(igraph_vector_resize(res, maxdeg + 1));
+    igraph_vector_fill(res, IGRAPH_NAN);
+
+    igraph_vector_int_t order;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, vcount);
+    IGRAPH_CHECK(igraph_vector_int_sort_ind(&degrees, &order, IGRAPH_ASCENDING));
+
+    igraph_vector_t seq_res;
+    IGRAPH_VECTOR_INIT_FINALLY(&seq_res, vcount);
+    IGRAPH_CHECK(igraph_rich_club_sequence(graph, weights, &seq_res, &order, true, loops, directed));
+
+    igraph_int_t m_k = 0;
+    for (igraph_int_t k = 0; k <= maxdeg; k++) {
+        while (m_k < vcount && VECTOR(degrees)[VECTOR(order)[m_k]] <= k) {
+            m_k++;
+        }
+        igraph_int_t remaining = vcount - m_k;
+        if (remaining >= 2 || (loops && remaining >= 1)) {
+            VECTOR(*res)[k] = VECTOR(seq_res)[m_k];
+        } else {
+            VECTOR(*res)[k] = IGRAPH_NAN;
+        }
+    }
+
+    igraph_vector_destroy(&seq_res);
+    igraph_vector_int_destroy(&order);
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
+}

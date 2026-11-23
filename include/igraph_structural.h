@@ -130,6 +130,14 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rich_club_sequence(
     igraph_bool_t loops,
     igraph_bool_t directed);
 
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rich_club_coefficient(
+    const igraph_t *graph,
+    const igraph_vector_t *weights,
+    igraph_vector_t *res,
+    igraph_neimode_t mode,
+    igraph_bool_t loops,
+    igraph_bool_t directed);
+
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
