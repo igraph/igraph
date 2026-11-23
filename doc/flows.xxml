@@ -45,4 +45,12 @@
 <!-- doxrox-include igraph_cohesive_blocks -->
 </section>
 
+<section id="minimum-path-cover"><title>Minimum path cover</title>
+<!-- doxrox-include igraph_minimum_path_cover -->
+<!-- doxrox-include igraph_maximum_antichain -->
+<!-- doxrox-include igraph_minimum_chain_cover -->
+<!-- doxrox-include igraph_mpc_reduction_t -->
+<!-- doxrox-include igraph_mpc_solver_t -->
+</section>
+
 </chapter>
