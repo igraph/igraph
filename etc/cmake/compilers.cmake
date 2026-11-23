@@ -85,13 +85,13 @@ macro(use_all_warnings TARGET_NAME)
         -Wno-implicit-fallthrough
       >
       $<$<BOOL:${COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
-      # Enable some Clang-specific warnings:
+      # Disable some Clang-specific warnings:
       $<$<C_COMPILER_ID:Clang,AppleClang,IntelLLVM>:-Wno-constant-logical-operand>
       # Disable some GCC-specific warnings:
       $<$<C_COMPILER_ID:GNU>:
-        # Prone to false positive and are enabled by -Wall or -pedantic:
+        # Prone to false positive and are enabled by -Wall, -Wextra or -pednatic:
         -Wno-maybe-uninitialized -Wno-use-after-free
-        # Unlike Clang, GCC warns when using a deprecated functions from another one
+        # Unlike Clang, GCC warns when calling a deprecated function from another deprecated one
         -Wno-error=deprecated-declarations
       >
       # Intel classic compiler (icc):
