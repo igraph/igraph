@@ -218,15 +218,33 @@ igraph_error_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_int_t *
 igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_int_t idx,
                            igraph_real_t new_value) {
     const igraph_vector_t *tree = &t->v;
-    igraph_real_t difference;
+    const igraph_int_t vecsize = igraph_vector_size(tree);
 
     if (new_value >= 0 && isfinite(new_value)) {
+        /* 1-based position of the leaf; node i has children 2i and 2i+1,
+         * so the sibling of node i is i ^ 1. */
+        igraph_real_t sum = new_value;
         idx = idx + t->offset + 1;
-        difference = new_value - VECTOR(*tree)[idx - 1];
+        VECTOR(*tree)[idx - 1] = sum;
 
-        while ( idx >= 1 ) {
-            VECTOR(*tree)[idx - 1] += difference;
+        /* Recompute each ancestor as the sum of its children instead of
+         * adding the difference between the new and old value. Adding
+         * differences accumulates round-off errors: a sum that should be
+         * zero could become slightly negative or positive, and small values
+         * could be lost entirely after cancellation with a large one.
+         * All internal nodes exist, so only the leaf may lack a sibling. */
+        if (idx > 1) {
+            const igraph_int_t sibling = idx ^ 1;
+            if (sibling <= vecsize) {
+                sum += VECTOR(*tree)[sibling - 1];
+            }
             idx >>= 1;
+            VECTOR(*tree)[idx - 1] = sum;
+        }
+        while (idx > 1) {
+            sum += VECTOR(*tree)[(idx ^ 1) - 1];
+            idx >>= 1;
+            VECTOR(*tree)[idx - 1] = sum;
         }
 
         return IGRAPH_SUCCESS;
