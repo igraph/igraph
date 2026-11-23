@@ -533,10 +533,12 @@ bool graph_molloy_opt::make_connected() {
                 }
             }
         }
+    // Should ALWAYS return true : either we have no tree left, or we are a unique, big tree
+    // Evaluated before freeing buff, as trees and ffub point into it.
+    const bool result = (trees == ffub || ((trees + 1) == ffub && fatty_edge.from < 0));
     delete[] buff;
     delete[] dist;
-    // Should ALWAYS return true : either we have no tree left, or we are a unique, big tree
-    return (trees == ffub || ((trees + 1) == ffub && fatty_edge.from < 0));
+    return result;
 }
 
 bool graph_molloy_opt::swap_edges_simple(igraph_int_t from1, igraph_int_t to1, igraph_int_t from2, igraph_int_t to2) {
