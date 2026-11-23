@@ -63,7 +63,7 @@ template <class DATA>
 class HugeArray {
     igraph_int_t size = 2;
     unsigned int highest_field_index = 0;
-    const igraph_uint_t max_bit_left = igraph_uint_t(1) << (IGRAPH_INTEGER_SIZE - 1); //wir setzen das 31. Bit auf 1
+    const igraph_uint_t max_bit_left = igraph_uint_t(1) << (IGRAPH_INTEGER_SIZE - 1); // only the most significant bit is set
     igraph_int_t max_index = 0;
     DATA *data;
     DATA *fields[IGRAPH_INTEGER_SIZE];
@@ -308,7 +308,7 @@ HUGE_INDEX HugeArray<DATA>::get_huge_index(igraph_int_t index) const {
         h_index.in_field_index = index;
         return h_index;
     }
-    // wie oft muessen wir help_index nach links shiften, damit das 31. Bit gesetzt ist??
+    // how many left shifts are needed until the most significant bit of help_index is set?
     while (!(max_bit_left & help_index)) {
         help_index <<= 1;
         shift_index++;
