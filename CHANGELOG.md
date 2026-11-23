@@ -58,6 +58,7 @@
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 - Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
 - The build system now uses the behaviour of CMake policies up to CMake 4.5.
+- In prior versions of igraph that used CMake as the build system, warning options were not passed to GCC correctly. This is now corrected, and several strict warnings are now in use with GCC. If you encounter build failures with GCC due to these warning options, please open an issue and report this along with your GCC version. You can set `-DIGRAPH_WARNINGS_AS_ERRORS=OFF` on the `cmake` command line to avoid treating warnings as errors and allow the build to succeed.
 
 ## [1.0.1]
 
