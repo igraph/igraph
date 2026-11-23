@@ -120,8 +120,13 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m
                                                const TYPE(igraph_matrix) *m2);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
                                                         const TYPE(igraph_matrix) *m2);
+
+#if defined(BASE_BOOL)
+IGRAPH_DEPRECATED
+#endif
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
                                                         const TYPE(igraph_matrix) *m2);
+
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, scale)(TYPE(igraph_matrix) *m, BASE by);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m, BASE plus);
 
