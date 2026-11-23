@@ -39,6 +39,18 @@ macro(find_dependencies)
   # xmlStructuredErrorContext. This is not passed to find_package() because
   # some of libxml2's own CMake packages accept only their exact version.
 
+  # igraph supports only BLAS and LAPACK libraries that use 32-bit integers
+  # (LP64), not 64-bit ones (ILP64). Since CMake 3.22, BLA_SIZEOF_INTEGER
+  # makes FindBLAS and FindLAPACK skip ILP64 variants. Older CMake versions
+  # ignore it.
+  if(DEFINED BLA_SIZEOF_INTEGER AND NOT BLA_SIZEOF_INTEGER STREQUAL "4")
+    message(FATAL_ERROR
+      "igraph requires BLAS and LAPACK libraries with 32-bit integers (LP64); "
+      "BLA_SIZEOF_INTEGER=${BLA_SIZEOF_INTEGER} is not supported."
+    )
+  endif()
+  set(BLA_SIZEOF_INTEGER 4)
+
   # Extend dependencies depending on whether we will be using the vendored
   # copies or not
   foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})

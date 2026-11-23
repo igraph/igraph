@@ -98,6 +98,12 @@
     </listitem>
   </itemizedlist>
   <para>
+    The BLAS, LAPACK and ARPACK libraries must use 32-bit integers
+    (the LP64 interface). Libraries built with 64-bit integers (ILP64),
+    such as <literal>openblas64</literal> or the ILP64 interface of Intel MKL,
+    are not supported, and using them leads to crashes or incorrect results.
+  </para>
+  <para>
     When building the development version of igraph,
     <literal>bison</literal>, <literal>flex</literal> and
     <literal>git</literal> are also required. Released versions do not

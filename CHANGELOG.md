@@ -14,6 +14,7 @@
 
 ### Fixed
 
+- igraph's build system no longer selects BLAS and LAPACK libraries that use 64-bit integers (ILP64), such as `openblas64`, `flexiblas64` or the ILP64 interface of Intel MKL, when `BLA_VENDOR` is used with CMake 3.22 or later. igraph does not support these libraries, and linking to them caused crashes or incorrect results. Setting `BLA_SIZEOF_INTEGER` to a value other than 4 is now an error. The documentation now states that BLAS, LAPACK and ARPACK must use 32-bit integers.
 - Turn off CMake test preparation targets, introduced with CMake 4.4 and enabled by default with CMake 4.5. This eliminates warnings that CMake would otherwise produce for each test when using the Makefiles generator, due to igraph using `:` in test names.
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was directed with some mutual edges, but no multi-edges; the `mode=IGRAPH_ALL` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set. An incorrect cache entry may cause various igraph functions to return invalid results.
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was undirected with some self-loops, but no multi-edges; the `loops=IGRAPH_LOOPS_TWICE` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set; it was not yet cached whether the graph had multi-edges. An incorrect cache entry may cause various igraph functions to return invalid results.
