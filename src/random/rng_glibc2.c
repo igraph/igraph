@@ -122,8 +122,13 @@ static void igraph_rng_glibc2_destroy(void *vstate) {
  * buffer. This generator was the default prior to igraph version 0.6,
  * at least on systems relying on GNU libc.
  *
+ * </para><para>
  * This generator was ported from the GNU Scientific Library. It is a
  * reimplementation and does not call the system glibc generator.
+ *
+ * </para><para>
+ * Consistency with GNU libc 2's \c random() and consistency between platforms
+ * is guaranteed only when using seeds < 2^31.
  */
 
 const igraph_rng_type_t igraph_rngtype_glibc2 = {
