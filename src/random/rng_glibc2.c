@@ -128,7 +128,7 @@ static void igraph_rng_glibc2_destroy(void *vstate) {
  *
  * </para><para>
  * Consistency with GNU libc 2's \c random() and consistency between platforms
- * is guaranteed only when using seeds < 2^31.
+ * is guaranteed only when using seeds &lt; 2^31.
  */
 
 const igraph_rng_type_t igraph_rngtype_glibc2 = {
