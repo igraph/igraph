@@ -699,7 +699,9 @@ typedef int cmp_t (const void *, const void *);
  * Comparison function passed to qsort_r from  igraph_vector_ptr_sort_ind
  */
 static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const void *p2) {
-    cmp_t *cmp = (cmp_t *) thunk;
+    /* thunk points to the function pointer because ISO C does not allow converting
+     * a function pointer to void*. */
+    cmp_t *cmp = *(cmp_t **) thunk;
     uintptr_t *pa = (uintptr_t*) p1;
     uintptr_t *pb = (uintptr_t*) p2;
     void **item_a_ptr = (void**) *pa;
@@ -758,7 +760,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
 
     first = vind[0];
 
-    igraph_qsort_r(vind, n, sizeof(vind[0]), (void*)cmp, igraph_vector_ptr_i_sort_ind_cmp);
+    igraph_qsort_r(vind, n, sizeof(vind[0]), (void*) &cmp, igraph_vector_ptr_i_sort_ind_cmp);
 
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = (vind[i] - first) / sizeof(uintptr_t);

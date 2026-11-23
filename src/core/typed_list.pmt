@@ -963,7 +963,7 @@ igraph_error_t FUNCTION(sort_ind)(
     }
     first = vind[0];
     igraph_qsort_r(
-        vind, n, sizeof(ITEM_TYPE*), (void*) cmp,
+        vind, n, sizeof(ITEM_TYPE*), (void*) &cmp,
         (int(*)(void*, const void*, const void*)) INTERNAL_FUNCTION(sort_ind_cmp)
     );
     for (i = 0; i < n; i++) {
@@ -1114,7 +1114,9 @@ static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE *v) {
  * Helper function passed to qsort from  igraph_vector_list_sort_ind
  */
 static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const void *p2) {
-    int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*) = (int (*)(const ITEM_TYPE*, const ITEM_TYPE*)) thunk;
+    /* thunk points to the function pointer because ISO C does not allow converting
+     * a function pointer to void*. */
+    int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*) = *(int (**)(const ITEM_TYPE*, const ITEM_TYPE*)) thunk;
     ITEM_TYPE **pa = (ITEM_TYPE **) p1;
     ITEM_TYPE **pb = (ITEM_TYPE **) p2;
     return cmp(*pa, *pb);
