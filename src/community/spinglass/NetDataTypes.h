@@ -63,10 +63,10 @@ template <class DATA>
 class HugeArray {
     igraph_int_t size = 2;
     unsigned int highest_field_index = 0;
-    const igraph_int_t max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
+    const igraph_uint_t max_bit_left = igraph_uint_t(1) << (IGRAPH_INTEGER_SIZE - 1); //wir setzen das 31. Bit auf 1
     igraph_int_t max_index = 0;
     DATA *data;
-    DATA *fields[32];
+    DATA *fields[IGRAPH_INTEGER_SIZE];
 public:
     HugeArray();
     HugeArray(const HugeArray &) = delete;
@@ -313,7 +313,7 @@ HUGE_INDEX HugeArray<DATA>::get_huge_index(igraph_int_t index) const {
         help_index <<= 1;
         shift_index++;
     }
-    h_index.field_index = 31 - shift_index;   // das hoechste  besetzte Bit im Index
+    h_index.field_index = IGRAPH_INTEGER_SIZE - 1 - shift_index;   // das hoechste  besetzte Bit im Index
     help_index = igraph_int_t(1) << h_index.field_index;  // in help_index wird das hoechste besetzte Bit von Index gesetzt
     h_index.in_field_index = (index ^ help_index); // index XOR help_index, womit alle bits unter dem hoechsten erhalten bleiben
     return h_index;
