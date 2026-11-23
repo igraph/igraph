@@ -7,6 +7,13 @@
 #  * cmake -E cat (3.18)
 cmake_minimum_required(VERSION 3.18...4.5)
 
+# CMake 4.4 introduces test preparation targets, see
+# https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#test-preparation-targets
+# CMake 4.5 enables them by default, also for Makefiles. igraph's test names contain
+# the : character, which cannot be used in Makefile target names, so each test produces a warning
+# We turn test preparation targets off to avoid this.
+set(CMAKE_SKIP_TEST_PREP_TARGETS ON)
+
 # CMake 3.31.0 issues warnings due to the following bug:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/26449
 # Setting policy CMP0175 to OLD avoids the warnings.
