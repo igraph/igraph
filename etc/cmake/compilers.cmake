@@ -66,26 +66,42 @@ macro(use_all_warnings TARGET_NAME)
     )
   else()
     # Notes:
-    # GCC does not complain when encountering an unsupported "no"-prefixed warning option such as -Wno-foo.
+    # GCC ignores unsupported "no"-prefixed warning options such as -Wno-foo unless another
+    # diagnostic is issued. GCC 9 and earlier then report them as warnings, which -Werror would
+    # turn into errors; GCC 10 and later only issue a note. -Werror is therefore not used with these
+    # legacy GCC versions, which also tend to issue more false positive warnings.
     # Clang does complain, but these complaints can be silenced with -Wno-unknown-warning-option.
     # Therefore it is generally safe to use -Wno-... options that are only supported by recent GCC/Clang.
     target_compile_options(${TARGET_NAME} PRIVATE
       # GCC-style compilers:
-      $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel,IntelLLVM>:
-        $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
+      $<$<C_COMPILER_ID:GNU,Clang,AppleClang,Intel,IntelLLVM>:
+        $<$<AND:$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>,$<NOT:$<AND:$<C_COMPILER_ID:GNU>,$<VERSION_LESS:$<C_COMPILER_VERSION>,10>>>>:-Werror>
         -Wall -Wextra -pedantic
-        -Wstrict-prototypes
-        -Wno-unused-function -Wno-unused-parameter -Wno-unused-but-set-variable -Wno-sign-compare -Wno-constant-logical-operand
+        $<$<COMPILE_LANGUAGE:C>:-Wstrict-prototypes>
+        -Wno-unused-function -Wno-unused-parameter -Wno-unused-but-set-variable -Wno-sign-compare
+        # Triggers in IGRAPH_I_ALLOC_CHECK_OVERFLOW with GCC due to 0 <= (n) when n is an unsigned type
+        -Wno-type-limits
+        # Triggers with flex-generated code and nanoflann with GCC
+        -Wno-implicit-fallthrough
       >
       $<$<BOOL:${COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
-      # Intel compiler:
+      # Enable some Clang-specific warnings:
+      $<$<C_COMPILER_ID:Clang,AppleClang,IntelLLVM>:-Wno-constant-logical-operand>
+      # Disable some GCC-specific warnings:
+      $<$<C_COMPILER_ID:GNU>:
+        # Prone to false positive and are enabled by -Wall or -pedantic:
+        -Wno-maybe-uninitialized -Wno-use-after-free
+        # Unlike Clang, GCC warns when using a deprecated functions from another one
+        -Wno-error=deprecated-declarations
+      >
+      # Intel classic compiler (icc):
       $<$<C_COMPILER_ID:Intel>:
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
         # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED
         # disable #10148: warning option not supported, as a replacement for -Wno-unknown-warning-option
         -wd279 -wd592 -diag-disable=remark -diag-disable=10148
       >
-      # Intel LLVM:
+      # Intel LLVM compiler (icx):
       $<$<C_COMPILER_ID:IntelLLVM>:
         -fp-model=precise # The default 'fast' mode is not compatible with igraph's extensive use of NaN/Inf
       >

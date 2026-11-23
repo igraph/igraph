@@ -38,6 +38,6 @@ if (MSVC)
 else()
   target_compile_options(
     bliss PRIVATE
-    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-unused-variable>
+    $<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-Wno-unused-variable>
   )
 endif()
