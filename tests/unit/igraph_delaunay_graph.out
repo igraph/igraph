@@ -631,6 +631,19 @@ edges: {
 7 9
 8 9
 }
+5 points with geographic coordinates
+7
+directed: false
+vcount: 5
+edges: {
+0 1
+0 2
+1 2
+1 3
+2 3
+2 4
+3 4
+}
 3x3 square lattice
 16
 directed: false
