@@ -21,20 +21,22 @@
 
 #include "igraph_decls.h"
 
-IGRAPH_BEGIN_C_DECLS
-
 #ifdef __cplusplus
     #define __STDC_FORMAT_MACROS   /* needed for PRId32 and PRId64 from inttypes.h on Linux */
 #endif
 
-#include "igraph_config.h"
-
+/* Standard library headers must not be included inside an extern "C" block
+ * in C++, so these come before IGRAPH_BEGIN_C_DECLS. */
 #include <inttypes.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
+IGRAPH_BEGIN_C_DECLS
+
+#include "igraph_config.h"
 
 
 #if !defined(IGRAPH_INTEGER_SIZE)
