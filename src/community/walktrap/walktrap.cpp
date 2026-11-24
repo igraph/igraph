@@ -65,11 +65,6 @@
 #include <climits>
 #include <cmath>
 
-// This is necessary for GCC 5 and earlier, where including <cmath>
-// makes isnan() unusable without the std:: prefix, even if <math.h>
-// was included as well.
-using std::isnan;
-
 using namespace igraph::walktrap;
 
 /**
@@ -160,7 +155,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
             igraph_real_t minweight = igraph_vector_min(weights);
             if (minweight < 0) {
                 IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
-            } else if (isnan(minweight)) {
+            } else if (std::isnan(minweight)) {
                 IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
