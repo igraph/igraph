@@ -115,16 +115,16 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
   *command= '\0';
   strncat(command, rbox_command, sizeof(command)-sizeof(seedbuf)-strlen(command)-1);
 
-  while (*s && !isspace(*s))  /* skip program name */
+  while (*s && !isspace((unsigned char)*s))  /* skip program name */
     s++;
   while (*s) {
-    while (*s && isspace(*s))
+    while (*s && isspace((unsigned char)*s))
       s++;
     if (*s == '-')
       s++;
     if (!*s)
       break;
-    if (isdigit(*s)) {
+    if (isdigit((unsigned char)*s)) {
       numpoints= qh_strtol(s, &s);
       continue;
     }
@@ -133,7 +133,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
     case 'c':
       addcube= 1;
       t= s;
-      while (isspace(*t))
+      while (isspace((unsigned char)*t))
         t++;
       if (*t == 'G')
         cube= qh_strtod(++t, &s);
@@ -141,7 +141,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
     case 'd':
       adddiamond= 1;
       t= s;
-      while (isspace(*t))
+      while (isspace((unsigned char)*t))
         t++;
       if (*t == 'G')
         diamond= qh_strtod(++t, &s);
@@ -163,7 +163,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
       break;
     case 't':
       istime= 1;
-      if (isdigit(*s)) {
+      if (isdigit((unsigned char)*s)) {
         seed= qh_strtol(s, &s);
         israndom= 0;
       }else
@@ -193,7 +193,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
         ++s;
         coincidenttotal=  qh_strtol(s, &s);
       }
-      if (*s && !isspace(*s)) {
+      if (*s && !isspace((unsigned char)*s)) {
         qh_fprintf_rbox(qh, qh->ferr, 7080, "rbox error: arguments for 'Cn,r,m' are not 'int', 'float', and 'int'.  Remaining string is '%s'\n", s);
         qh_errexit_rbox(qh, qh_ERRinput);
       }
@@ -215,14 +215,14 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
       }
       break;
     case 'G':
-      if (isdigit(*s))
+      if (isdigit((unsigned char)*s))
         gap= qh_strtod(s, &s);
       else
         gap= 0.5;
       isgap= 1;
       break;
     case 'L':
-      if (isdigit(*s))
+      if (isdigit((unsigned char)*s))
         radius= qh_strtod(s, &s);
       else
         radius= 10;
@@ -242,7 +242,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
         meshr= qh_strtod(s, &s);
       }else
         meshr= sqrt(meshn*meshn + meshm*meshm);
-      if (*s && !isspace(*s)) {
+      if (*s && !isspace((unsigned char)*s)) {
         qh_fprintf_rbox(qh, qh->ferr, 7069, "rbox warning: assuming 'M3,4,5' since mesh args are not integers or reals\n");
         meshn= 3.0, meshm=4.0, meshr=5.0;
       }
@@ -254,7 +254,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
       if (!first_point)
         first_point= s - 1;
       addpoints++;
-      while (*s && !isspace(*s))   /* read points later */
+      while (*s && !isspace((unsigned char)*s))   /* read points later */
         s++;
       break;
     case 'W':
@@ -262,7 +262,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
       iswidth= 1;
       break;
     case 'Z':
-      if (isdigit(*s))
+      if (isdigit((unsigned char)*s))
         radius= qh_strtod(s, &s);
       else
         radius= 1.0;
@@ -272,7 +272,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
       qh_fprintf_rbox(qh, qh->ferr, 6352, "rbox error: unknown flag at '%s'.\nExecute 'rbox' without arguments for documentation.\n", s - 1);
       qh_errexit_rbox(qh, qh_ERRinput);
     }
-    if (*s && !isspace(*s)) {
+    if (*s && !isspace((unsigned char)*s)) {
       qh_fprintf_rbox(qh, qh->ferr, 6353, "rbox error: missing space between flags at %s.\n", s);
       qh_errexit_rbox(qh, qh_ERRinput);
     }
@@ -402,7 +402,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
       while (*++s) {
         qh_out1(qh, qh_strtod(s, &s));
         count++;
-        if (isspace(*s) || !*s)
+        if (isspace((unsigned char)*s) || !*s)
           break;
         if (*s != ',') {
           qh_fprintf_rbox(qh, qh->ferr, 6194, "rbox error: missing comma after coordinate in %s\n\n", s);
@@ -419,7 +419,7 @@ void qh_rboxpoints2(qhT *qh, char* rbox_command, double **simplex) {
       }
       qh_fprintf_rbox(qh, qh->fout, 9394, "\n");
       while ((s= strchr(s, 'P'))) {
-        if (isspace(s[-1]))
+        if (isspace((unsigned char)s[-1]))
           break;
       }
     }

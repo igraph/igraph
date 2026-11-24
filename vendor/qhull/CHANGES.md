@@ -10,3 +10,5 @@ Changed the following settings in `user_r.h`:
  - `#define qh_NOtrace`, do not include tracing code
 
 Patched with https://github.com/qhull/qhull/pull/165.
+
+Cast the arguments of `<ctype.h>` functions to `unsigned char` in `global_r.c`, `io_r.c` and `rboxlib_r.c`. Passing a plain `char` is undefined behaviour for negative values, and breaks the build on NetBSD with `-Werror` (`-Wchar-subscripts`). Submitted upstream as a patch to qhull.
