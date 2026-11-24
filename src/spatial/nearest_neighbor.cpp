@@ -32,8 +32,6 @@
 #include "core/interruption.h"
 #include "spatial/spatial_internal.h"
 
-#include "nanoflann/nanoflann.hpp"
-
 #include <vector>
 
 template <typename Metric, igraph_int_t Dimension>
