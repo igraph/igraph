@@ -57,8 +57,13 @@ macro(find_dependencies)
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
     # Skip optional dependencies that were turned off: do not search for
-    # them, and do not build or link them
+    # them, and do not build or link them. When igraph is a subproject, the
+    # parent project may have found the dependency already; clear its results
+    # in igraph's scope so that igraph does not use them.
     if(DEPENDENCY IN_LIST OPTIONAL_VENDORABLE_DEPENDENCIES AND NOT IGRAPH_${LIBNAME_UPPER}_SUPPORT)
+      set(${LIBNAME_UPPER}_FOUND FALSE)
+      set(${LIBNAME_UPPER}_LIBRARIES "")
+      set(${LIBNAME_UPPER}_INCLUDE_DIR "")
       continue()
     endif()
 
@@ -104,6 +109,12 @@ macro(find_dependencies)
 
   if(IGRAPH_GRAPHML_SUPPORT)
     list(APPEND REQUIRED_DEPENDENCIES LibXml2)
+  else()
+    # Clear results that a parent project may have set, see above
+    set(LibXml2_FOUND FALSE)
+    set(LIBXML2_FOUND FALSE)
+    set(LIBXML2_LIBRARIES "")
+    set(LIBXML2_INCLUDE_DIRS "")
   endif()
 
   # Find dependencies
