@@ -65,9 +65,7 @@ foreach(DEPENDENCY ${ALL_DEPENDENCIES})
   list(FIND VENDORED_DEPENDENCIES "${DEPENDENCY}" INDEX)
   if(INDEX EQUAL -1)
     print_bool("${DEPENDENCY}" ${DEPENDENCY}_FOUND)
-  # This is a hack to skip printing Infomap, until
-  # support for linking to an external version is added
-  elseif(NOT "${DEPENDENCY}" STREQUAL "INFOMAP")
+  else()
     print_str("${DEPENDENCY}" "vendored")
   endif()
 endforeach()

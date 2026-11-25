@@ -382,6 +382,7 @@ target_include_directories(
 
   # Include paths for dependencies
   "$<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>"
+  # INFOMAP_INCLUDE_DIR is currently unused: linking to an external Infomap is not supported
   "$<$<BOOL:${INFOMAP_INCLUDE_DIR}>:${INFOMAP_INCLUDE_DIR}>"
   "$<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>"
   "$<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>"
@@ -404,6 +405,7 @@ if(GLPK_LIBRARIES)
   target_link_libraries(igraph PRIVATE ${GLPK_LIBRARIES})
 endif()
 
+# INFOMAP_LIBRARIES is currently unused: linking to an external Infomap is not supported
 if(INFOMAP_LIBRARIES)
   target_link_libraries(igraph PRIVATE ${INFOMAP_LIBRARIES})
 endif()
