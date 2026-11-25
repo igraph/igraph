@@ -44,5 +44,5 @@ use_all_warnings(qhull_vendored)
 
 target_compile_options(
   qhull_vendored PRIVATE
-  $<$<C_COMPILER_ID:GCC,Clang,AppleClang,IntelLLVM>:-Wno-unused-variable>
+  $<$<C_COMPILER_ID:GNU,Clang,AppleClang,IntelLLVM>:-Wno-unused-variable>
 )

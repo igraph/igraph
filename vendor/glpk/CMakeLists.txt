@@ -106,6 +106,6 @@ if (MSVC)
 else()
   target_compile_options(glpk_vendored PRIVATE
     $<$<C_COMPILER_ID:Intel>:-wd161>
-    $<$<C_COMPILER_ID:GCC,Clang,AppleClang,IntelLLVM>:-Wno-unused-value -Wno-dangling-else -Wno-logical-op-parentheses>
+    $<$<C_COMPILER_ID:GNU,Clang,AppleClang,IntelLLVM>:-Wno-unused-value -Wno-dangling-else -Wno-logical-op-parentheses>
   )
 endif()

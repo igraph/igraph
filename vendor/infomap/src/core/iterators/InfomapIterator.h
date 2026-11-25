@@ -108,7 +108,7 @@ public:
   {
     InfomapModuleIterator copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
   }
 
   using InfomapIterator::childIndex;
@@ -142,7 +142,7 @@ public:
   {
     InfomapLeafModuleIterator copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
   }
 
   using InfomapIterator::childIndex;
@@ -176,7 +176,7 @@ public:
   {
     InfomapLeafIterator copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
   }
 
   using InfomapIterator::childIndex;
@@ -225,7 +225,7 @@ public:
   {
     InfomapIteratorPhysical copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
   }
 
   using InfomapIterator::childIndex;
@@ -268,7 +268,7 @@ public:
   {
     InfomapLeafIteratorPhysical copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
   }
 
   using InfomapIteratorPhysical::childIndex;
