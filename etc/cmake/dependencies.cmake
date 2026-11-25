@@ -11,9 +11,9 @@ macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored
   set(VENDORABLE_DEPENDENCIES BLAS GLPK LAPACK ARPACK GMP PLFIT INFOMAP)
 
-  # Declare optional dependencies associated with IGRAPH_..._SUPPORT flags
-  # Note that GLPK and INFOMAP are both vendorable and optional
-  set(OPTIONAL_DEPENDENCIES GLPK OpenMP INFOMAP)
+  # Declare vendorable dependencies that are also optional, i.e. they can be
+  # turned off with the corresponding IGRAPH_..._SUPPORT option
+  set(OPTIONAL_VENDORABLE_DEPENDENCIES GLPK INFOMAP)
 
   # Declare configuration options for dependencies
   tristate(IGRAPH_USE_INTERNAL_GMP "Compile igraph with internal Mini-GMP" AUTO)
@@ -56,6 +56,17 @@ macro(find_dependencies)
   foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
 
+    # Skip optional dependencies that were turned off: do not search for
+    # them, and do not build or link them. When igraph is a subproject, the
+    # parent project may have found the dependency already; clear its results
+    # in igraph's scope so that igraph does not use them.
+    if(DEPENDENCY IN_LIST OPTIONAL_VENDORABLE_DEPENDENCIES AND NOT IGRAPH_${LIBNAME_UPPER}_SUPPORT)
+      set(${LIBNAME_UPPER}_FOUND FALSE)
+      set(${LIBNAME_UPPER}_LIBRARIES "")
+      set(${LIBNAME_UPPER}_INCLUDE_DIR "")
+      continue()
+    endif()
+
     if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} STREQUAL "AUTO")
       find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN} QUIET)
       if(${DEPENDENCY}_FOUND)
@@ -96,20 +107,14 @@ macro(find_dependencies)
     endif()
   endif()
 
-  if(NOT IGRAPH_GLPK_SUPPORT)
-    if(IGRAPH_USE_INTERNAL_GLPK)
-      list(REMOVE_ITEM VENDORED_DEPENDENCIES GLPK)
-    else()
-      list(REMOVE_ITEM REQUIRED_DEPENDENCIES GLPK)
-    endif()
-  endif()
-
-  if(NOT IGRAPH_INFOMAP_SUPPORT)
-    list(REMOVE_ITEM VENDORED_DEPENDENCIES INFOMAP)
-  endif()
-
   if(IGRAPH_GRAPHML_SUPPORT)
     list(APPEND REQUIRED_DEPENDENCIES LibXml2)
+  else()
+    # Clear results that a parent project may have set, see above
+    set(LibXml2_FOUND FALSE)
+    set(LIBXML2_FOUND FALSE)
+    set(LIBXML2_LIBRARIES "")
+    set(LIBXML2_INCLUDE_DIRS "")
   endif()
 
   # Find dependencies
