@@ -60,7 +60,10 @@
     #define MULTIPLICITY 1
     #define NOTORDERED 1
     #define NOABS 1
-    #define EQ(a,b) ((a && b) || (!a && !b))
+    #define EQ(a,b) (!!(a) == !!(b))
+    #define PROD(a,b,c) ((a) = ((b) && (c)))
+    #define SUM(a,b,c) ((a) = ((b) || (c)))
+    #define DIFF(a,b,c) ((a) = (!!(b) != !!(c)))
 
 #elif defined(BASE_INT)
     #define BASE igraph_int_t

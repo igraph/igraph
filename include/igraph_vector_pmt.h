@@ -121,8 +121,13 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, sub)(TYPE(igraph_vector) *v
                                                const TYPE(igraph_vector) *v2);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, mul)(TYPE(igraph_vector) *v1,
                                                const TYPE(igraph_vector) *v2);
+
+#if defined(BASE_BOOL)
+IGRAPH_DEPRECATED
+#endif
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, div)(TYPE(igraph_vector) *v1,
                                                const TYPE(igraph_vector) *v2);
+
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
                                                   const TYPE(igraph_vector) *from);
 

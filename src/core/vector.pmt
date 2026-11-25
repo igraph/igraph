@@ -1554,7 +1554,9 @@ igraph_error_t FUNCTION(igraph_vector, init_copy)(
  * \function igraph_vector_sum
  * \brief Calculates the sum of the elements in the vector.
  *
- * For the empty vector 0 is returned.
+ * With numeric vectors, the sum of elements is returned.
+ * With boolean vectors, the logical OR of elements is returned.
+ * For the empty vector 0 (or \c false) is returned.
  *
  * \param v The vector object.
  * \return The sum of the elements.
@@ -1598,8 +1600,10 @@ igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v) {
  * \function igraph_vector_prod
  * \brief Calculates the product of the elements in the vector.
  *
- * </para><para>
- * For the empty vector one (1) is returned.
+ * With numeric vectors, the product of elements is returned.
+ * With boolean vectors, the logical AND of elements is returned.
+ * For the empty vector 1 (or \c true) is returned.
+ *
  * \param v The vector object.
  * \return The product of the elements.
  *
@@ -1627,10 +1631,11 @@ BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v) {
  * \function igraph_vector_cumsum
  * \brief Calculates the cumulative sum of the elements in the vector.
  *
- * </para><para>
- * \param to An initialized vector object that will store the cumulative
- *           sums. Element i of this vector will store the sum of the elements
- *           of the 'from' vector, up to and including element i.
+ * Element \c i of the \p to vector will be set to the sum of elements of
+ * \p from up to and including element \c i. With boolean vectors, the logical
+ * OR will be taken instead of the sum.
+ *
+ * \param to An initialized vector object that will store the cumulative sums.
  * \param from The input vector.
  * \return Error code.
  *
@@ -2246,6 +2251,10 @@ igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(const TYPE(igraph_vector)
  * \function igraph_vector_scale
  * \brief Multiplies all elements of a vector by a constant.
  *
+ * With numeric vectors, each element will be multiplied by the
+ * constant \p by. With boolean vectors, the logical AND of each element
+ * will be taken with \p by.
+ *
  * \param v The vector.
  * \param by The constant.
  * \return Error code. The current implementation always returns with success.
@@ -2280,8 +2289,10 @@ void FUNCTION(igraph_vector, scale)(TYPE(igraph_vector) *v, BASE by) {
  * \function igraph_vector_add_constant
  * \brief Adds a constant to the vector.
  *
- * \p plus is added to every element of \p v. Note that overflow
- * might happen.
+ * With numeric vectors, the constant \p plus will be added to each element.
+ * With boolean vectors, the logical OR of each element will be taken with
+ * \p plus.
+ *
  * \param v The input vector.
  * \param plus The constant to add.
  *
@@ -2683,8 +2694,10 @@ void FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
  * \function igraph_vector_add
  * \brief Adds two vectors.
  *
- * Add the elements of \p v2 to \p v1, the result is stored in \p
- * v1. The two vectors must have the same length.
+ * With numeric vectors, \p v2 will be added to \p v1, elementwise.
+ * With boolean vectors, \p v1 is set to the elementwise logical OR of
+ * \p v1 and \p v2. The two vectors must have the same length.
+ *
  * \param v1 The first vector, the result will be stored here.
  * \param v2 The second vector, its contents will be unchanged.
  * \return Error code.
@@ -2718,10 +2731,11 @@ igraph_error_t FUNCTION(igraph_vector, add)(TYPE(igraph_vector) *v1,
  * \function igraph_vector_sub
  * \brief Subtracts a vector from another one.
  *
- * Subtract the elements of \p v2 from \p v1, the result is stored in
- * \p v1. The two vectors must have the same length.
- * \param v1 The first vector, to subtract from. The result is stored
- *    here.
+ * With numeric vectors, \p v2 will be subtracted from \p v1, elementwise.
+ * With boolean vectors, \p v1 is set to the elementwise logical XOR of
+ * \p v1 and \p v2. The two vectors must have the same length.
+ *
+ * \param v1 The first vector, to subtract from. The result is stored here.
  * \param v2 The vector to subtract, it will be unchanged.
  * \return Error code.
  *
@@ -2754,8 +2768,10 @@ igraph_error_t FUNCTION(igraph_vector, sub)(TYPE(igraph_vector) *v1,
  * \function igraph_vector_mul
  * \brief Multiplies two vectors.
  *
- * \p v1 will be multiplied by \p v2, elementwise. The two vectors
- * must have the same length.
+ * With numeric vectors, \p v1 will be multiplied by \p v2, elementwise.
+ * With boolean vectors, \p v1 is set to the elementwise logical AND of
+ * \p v1 and \p v2. The two vectors must have the same length.
+ *
  * \param v1 The first vector, the result will be stored here.
  * \param v2 The second vector, it is left unchanged.
  * \return Error code.
@@ -2793,6 +2809,11 @@ igraph_error_t FUNCTION(igraph_vector, mul)(TYPE(igraph_vector) *v1,
  * base type of the vector can generate division-by-zero errors then
  * please make sure that \p v2 contains no zero if you want to avoid
  * trouble.
+ *
+ * </para><para>
+ * The boolean version of this function was deprecated in igraph 1.1
+ * and is scheduled for removal in igraph 2.0.
+ *
  * \param v1 The dividend. The result is also stored here.
  * \param v2 The divisor, it is left unchanged.
  * \return Error code.

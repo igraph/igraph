@@ -569,7 +569,9 @@ igraph_real_t FUNCTION(igraph_matrix, max)(const TYPE(igraph_matrix) *m) {
 /**
  * \function igraph_matrix_scale
  *
- * Multiplies each element of the matrix by a constant.
+ * Multiplies each element of the matrix by a constant. For boolean matrices,
+ * the logical AND of each element is taken with \p by.
+ *
  * \param m The matrix.
  * \param by The constant.
  *
@@ -687,7 +689,10 @@ igraph_error_t FUNCTION(igraph_matrix, get_col)(const TYPE(igraph_matrix) *m,
  * \function igraph_matrix_sum
  * \brief Sum of elements.
  *
- * Returns the sum of the elements of a matrix.
+ * Returns the sum of the elements of a matrix. For boolean matrices, the
+ * logical OR of the elements is returned. For the empty matrix, 0 (or
+ * \c false) is returned.
+ *
  * \param m The input matrix.
  * \return The sum of the elements.
  *
@@ -1256,8 +1261,10 @@ igraph_error_t FUNCTION(igraph_matrix, swap_cols)(TYPE(igraph_matrix) *m,
  * \function igraph_matrix_add_constant
  * Add a constant to every element.
  *
+ * For boolean matrices, the logical OR of each element is taken with \p plus.
+ *
  * \param m The input matrix.
- * \param plud The constant to add.
+ * \param plus The constant to add.
  *
  * Time complexity: O(mn), the number of elements.
  */
@@ -1270,8 +1277,9 @@ void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m, BASE plus) {
  * \function igraph_matrix_add
  * Add two matrices.
  *
- * Add \p m2 to \p m1, and store the result in \p m1. The dimensions of the
- * matrices must match.
+ * Add \p m2 to \p m1, and store the result in \p m1. For boolean matrices,
+ * \p m1 is set to the elementwise logical OR of \p m1 and \p m2.
+ * The dimensions of the matrices must match.
  * \param m1 The first matrix; the result will be stored here.
  * \param m2 The second matrix; it is left unchanged.
  * \return Error code.
@@ -1291,7 +1299,8 @@ igraph_error_t FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
  * \function igraph_matrix_sub
  * Difference of two matrices.
  *
- * Subtract \p m2 from \p m1 and store the result in \p m1.
+ * Subtract \p m2 from \p m1 and store the result in \p m1. For boolean
+ * matrices, \p m1 is set to the elementwise logical XOR of \p m1 and \p m2.
  * The dimensions of the two matrices must match.
  * \param m1 The first matrix; the result is stored here.
  * \param m2 The second matrix; it is left unchanged.
@@ -1313,7 +1322,8 @@ igraph_error_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
  * \brief Elementwise matrix multiplication.
  *
  * Multiply \p m1 by \p m2 elementwise and store the result in \p m1.
- * The dimensions of the two matrices must match.
+ * For boolean matrices, \p m1 is set to the elementwise logical AND of
+ * \p m1 and \p m2. The dimensions of the two matrices must match.
  *
  * \param m1 The first matrix; the result is stored here.
  * \param m2 The second matrix; it is left unchanged.
@@ -1336,6 +1346,11 @@ igraph_error_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
  *
  * Divide \p m1 by \p m2 elementwise and store the result in \p m1.
  * The dimensions of the two matrices must match.
+ *
+ * </para><para>
+ * The boolean version of this function was deprecated in igraph 1.1
+ * and is scheduled for removal in igraph 2.0.
+ *
  * \param m1 The dividend. The result is stored here.
  * \param m2 The divisor. It is left unchanged.
  * \return Error code.
@@ -1552,7 +1567,9 @@ igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m
  * \brief Product of all matrix elements.
  *
  * Note that this function can result in overflow easily, even for not too
- * big matrices. Overflow is not checked.
+ * big matrices. Overflow is not checked. For boolean matrices, the logical
+ * AND of the elements is returned. For the empty matrix, 1 (or \c true)
+ * is returned.
  *
  * \param m The input matrix.
  * \return The product of the elements.
@@ -1568,7 +1585,8 @@ BASE FUNCTION(igraph_matrix, prod)(const TYPE(igraph_matrix) *m) {
  * \function igraph_matrix_rowsum
  * \brief Rowwise sum.
  *
- * Calculate the sum of the elements in each row.
+ * Calculate the sum of the elements in each row. For boolean matrices,
+ * the logical OR of the elements in each row is computed.
  *
  * \param m The input matrix.
  * \param res Pointer to an initialized vector; the result is stored
@@ -1600,7 +1618,8 @@ igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
  * \function igraph_matrix_colsum
  * \brief Columnwise sum.
  *
- * Calculate the sum of the elements in each column.
+ * Calculate the sum of the elements in each column. For boolean matrices,
+ * the logical OR of the elements in each column is computed.
  *
  * \param m The input matrix.
  * \param res Pointer to an initialized vector; the result is stored
