@@ -316,6 +316,14 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_int_t n,
         IGRAPH_ERROR("`rho' must be between zero and one for HSBM",
                      IGRAPH_EINVAL);
     }
+    if (fabs(igraph_vector_sum(rho) - 1.0) > sq_dbl_epsilon) {
+        IGRAPH_ERROR("`rho' must sum up to 1 for HSBM", IGRAPH_EINVAL);
+    }
+    if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
+        IGRAPH_ERROR("`C' dimensions must match `rho' dimensions in HSBM",
+                     IGRAPH_EINVAL);
+    }
+    /* C is not empty here: rho is non-empty because its sum is 1. */
     {
         igraph_real_t minc, maxc;
         igraph_matrix_minmax(C, &minc, &maxc);
@@ -325,13 +333,6 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_int_t n,
         if (minc < 0 || maxc > 1) {
             IGRAPH_ERROR("`C' must be between zero and one for HSBM", IGRAPH_EINVAL);
         }
-    }
-    if (fabs(igraph_vector_sum(rho) - 1.0) > sq_dbl_epsilon) {
-        IGRAPH_ERROR("`rho' must sum up to 1 for HSBM", IGRAPH_EINVAL);
-    }
-    if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
-        IGRAPH_ERROR("`C' dimensions must match `rho' dimensions in HSBM",
-                     IGRAPH_EINVAL);
     }
     if (!igraph_matrix_is_symmetric(C)) {
         IGRAPH_ERROR("`C' must be a symmetric matrix", IGRAPH_EINVAL);
@@ -517,7 +518,19 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
             IGRAPH_ERROR("`rho' must sum up to 1 for HSBM.", IGRAPH_EINVAL);
         }
     }
-    /* Checks for the Cs */
+    /* Check that C and rho sizes match */
+    for (i = 0; i < no_blocks; i++) {
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
+        const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
+        igraph_int_t k = igraph_vector_size(rho);
+        if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
+            IGRAPH_ERROR("All Bernoulli rate matrix dimensions must match `rho' "
+                    "dimensions in HSBM.",
+                         IGRAPH_EINVAL);
+        }
+    }
+    /* Checks for the Cs. They are not empty here: each rho is non-empty
+     * because its sum is 1. */
     for (i = 0; i < no_blocks; i++) {
         const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
         igraph_real_t minc, maxc;
@@ -531,17 +544,6 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
         }
         if (!igraph_matrix_is_symmetric(C)) {
             IGRAPH_ERROR("Bernoulli rate matrices must be symmetric.", IGRAPH_EINVAL);
-        }
-    }
-    /* Check that C and rho sizes match */
-    for (i = 0; i < no_blocks; i++) {
-        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
-        const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
-        igraph_int_t k = igraph_vector_size(rho);
-        if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
-            IGRAPH_ERROR("All Bernoulli rate matrix dimensions must match `rho' "
-                    "dimensions in HSBM.",
-                         IGRAPH_EINVAL);
         }
     }
     /* Check that rho * m is integer */
