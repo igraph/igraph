@@ -106,6 +106,10 @@ int main(void) {
         MATRIX(*igraph_matrix_list_get_ptr(&pref_matrix_list, 0), 0, 0) = 0.5;
         CHECK_ERROR(igraph_hsbm_list_game(&result, 4, &mlist, &rholist, &pref_matrix_list, IGRAPH_NAN), IGRAPH_EINVAL);
 
+        /* Empty C with non-empty rho */
+        igraph_matrix_resize(igraph_matrix_list_get_ptr(&pref_matrix_list, 0), 0, 0);
+        CHECK_ERROR(igraph_hsbm_list_game(&result, 4, &mlist, &rholist, &pref_matrix_list, 0.5), IGRAPH_EINVAL);
+
         igraph_vector_list_destroy(&rholist);
         igraph_matrix_list_destroy(&pref_matrix_list);
         igraph_vector_int_destroy(&mlist);

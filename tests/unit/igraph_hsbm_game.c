@@ -82,6 +82,10 @@ int main(void) {
         MATRIX(pref_matrix, 0, 0) = 0.5;
         CHECK_ERROR(igraph_hsbm_game(&result, 4, 2, &rho, &pref_matrix, IGRAPH_NAN), IGRAPH_EINVAL);
 
+        /* Empty C with non-empty rho */
+        igraph_matrix_resize(&pref_matrix, 0, 0);
+        CHECK_ERROR(igraph_hsbm_game(&result, 4, 2, &rho, &pref_matrix, 0.5), IGRAPH_EINVAL);
+
         igraph_vector_destroy(&rho);
         igraph_matrix_destroy(&pref_matrix);
     }
