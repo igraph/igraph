@@ -786,6 +786,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   dgemv
   igraph_arpack_2x2
+  igraph_arpack_auto_ncv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
   igraph_blas_dgemm
