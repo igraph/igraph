@@ -491,7 +491,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
     if (no_blocks == 0) {
         IGRAPH_ERROR("`rholist' empty for HSBM.", IGRAPH_EINVAL);
     }
-    if (igraph_matrix_list_size(Clist) != no_blocks &&
+    if (igraph_matrix_list_size(Clist) != no_blocks ||
         igraph_vector_int_size(mlist) != no_blocks) {
         IGRAPH_ERROR("`rholist' must have the same length as `Clist' and `m' "
                      "for HSBM.", IGRAPH_EINVAL);
