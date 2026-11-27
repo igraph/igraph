@@ -339,6 +339,15 @@ int main(void) {
                                           false), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, 10, 1.1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
+    /* Empty partition, so that a NaN p cannot cause an unrelated error later. */
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 0, 10, IGRAPH_NAN, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
+                                          IGRAPH_EDGE_UNLABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 0, 10, IGRAPH_INFINITY, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTI_SW,
+                                          IGRAPH_EDGE_UNLABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, 10, IGRAPH_NAN, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTI_SW,
+                                          IGRAPH_EDGE_LABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, 10, IGRAPH_INFINITY, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTI_SW,
+                                          IGRAPH_EDGE_LABELED), IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();
 
