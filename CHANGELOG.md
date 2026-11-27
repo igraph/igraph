@@ -7,6 +7,7 @@
 - `igraph_hamming()` creates a Hamming graph (experimental function). Thanks to @zxawry for contributing this functionality in #2890!
 - `igraph_is_triangle_free()` determines whether a graph contains no triangles (experimental function).
 - `igraph_is_potentially_connected()` determines whether a connected realization exists for a given degree sequence. Thanks to Arnar Bjarni Arnarson @Tagl for contributing this functionality in #2924!
+- `igraph_matrix_is_any_nan()` and `igraph_matrix_is_all_finite()` check whether a matrix contains NaN values or non-finite values.
 
 ### Changed
 

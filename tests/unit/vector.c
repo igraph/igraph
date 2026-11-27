@@ -368,6 +368,37 @@ int main(void) {
     igraph_vector_int_destroy(&v4);
     igraph_vector_int_destroy(&v5);
 
+    printf("Test igraph_vector_is_any_nan, igraph_vector_is_all_finite, igraph_vector_is_nan\n");
+    {
+        igraph_vector_bool_t is_nan;
+
+        igraph_vector_init(&v, 0);
+        igraph_vector_bool_init(&is_nan, 0);
+        IGRAPH_ASSERT(!igraph_vector_is_any_nan(&v));
+        IGRAPH_ASSERT(igraph_vector_is_all_finite(&v));
+        igraph_vector_is_nan(&v, &is_nan);
+        IGRAPH_ASSERT(igraph_vector_bool_size(&is_nan) == 0);
+
+        igraph_vector_resize(&v, 4);
+        igraph_vector_fill(&v, 1.5);
+        IGRAPH_ASSERT(!igraph_vector_is_any_nan(&v));
+        IGRAPH_ASSERT(igraph_vector_is_all_finite(&v));
+
+        VECTOR(v)[2] = IGRAPH_INFINITY;
+        IGRAPH_ASSERT(!igraph_vector_is_any_nan(&v));
+        IGRAPH_ASSERT(!igraph_vector_is_all_finite(&v));
+
+        VECTOR(v)[1] = IGRAPH_NAN;
+        IGRAPH_ASSERT(igraph_vector_is_any_nan(&v));
+        IGRAPH_ASSERT(!igraph_vector_is_all_finite(&v));
+        igraph_vector_is_nan(&v, &is_nan);
+        IGRAPH_ASSERT(igraph_vector_bool_size(&is_nan) == 4);
+        IGRAPH_ASSERT(!VECTOR(is_nan)[0] && VECTOR(is_nan)[1] && !VECTOR(is_nan)[2] && !VECTOR(is_nan)[3]);
+
+        igraph_vector_bool_destroy(&is_nan);
+        igraph_vector_destroy(&v);
+    }
+
     VERIFY_FINALLY_STACK();
 
     return 0;

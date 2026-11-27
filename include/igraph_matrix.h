@@ -90,6 +90,9 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_matrix_all_almost_e(cons
 IGRAPH_EXPORT igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_zapsmall(igraph_matrix_complex_t *m, igraph_real_t tol);
 
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_matrix_is_any_nan(const igraph_matrix_t *m);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_matrix_is_all_finite(const igraph_matrix_t *m);
+
 IGRAPH_END_C_DECLS
 
 #endif
