@@ -38,7 +38,7 @@
  *
  * \param graph The graph whose layout is to be aligned.
  * \param layout A matrix whose rows are the coordinates of vertices. It will
- *    be modified in-place.
+ *    be modified in-place. Coordinates must not be NaN or infinite.
  * \return Error code.
  *
  * Time complexity: O(|E| + |V|), linear in the number of edges and vertices.
@@ -102,6 +102,10 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
     if (dim == 0) {
         IGRAPH_ERROR("Vertex coordinates must be at least one-dimensional, "
                      "but a zero-dimensional input was received.", IGRAPH_EINVAL);
+    }
+
+    if (!igraph_matrix_is_all_finite(layout)) {
+        IGRAPH_ERROR("Vertex coordinates must not be NaN or infinite.", IGRAPH_EINVAL);
     }
 
     /* Shift layout to origin. */
