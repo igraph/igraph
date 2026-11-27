@@ -106,11 +106,18 @@ igraph_error_t igraph_sbm_game(
 
     if (no_blocks > 0) {
         igraph_matrix_minmax(pref_matrix, &minp, &maxp);
+        if (isnan(minp)) {
+            IGRAPH_ERROR("Preference matrix must not contain NaN values.", IGRAPH_EINVAL);
+        }
         if (multiple) {
             if (minp < 0.0) {
                 IGRAPH_ERRORF("Expected edge multiplicities must not be negative "
                               "for SBM multigraph model, got %g.",
                               IGRAPH_EINVAL, minp);
+            }
+            if (maxp == IGRAPH_INFINITY) {
+                IGRAPH_ERROR("Expected edge multiplicities must be finite "
+                             "for SBM multigraph model.", IGRAPH_EINVAL);
             }
         } else {
             if (minp < 0 || maxp > 1) {
@@ -309,8 +316,15 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_int_t n,
         IGRAPH_ERROR("`rho' must be between zero and one for HSBM",
                      IGRAPH_EINVAL);
     }
-    if (igraph_matrix_min(C) < 0 || igraph_matrix_max(C) > 1) {
-        IGRAPH_ERROR("`C' must be between zero and one for HSBM", IGRAPH_EINVAL);
+    {
+        igraph_real_t minc, maxc;
+        igraph_matrix_minmax(C, &minc, &maxc);
+        if (isnan(minc)) {
+            IGRAPH_ERROR("`C' must not contain NaN values for HSBM.", IGRAPH_EINVAL);
+        }
+        if (minc < 0 || maxc > 1) {
+            IGRAPH_ERROR("`C' must be between zero and one for HSBM", IGRAPH_EINVAL);
+        }
     }
     if (fabs(igraph_vector_sum(rho) - 1.0) > sq_dbl_epsilon) {
         IGRAPH_ERROR("`rho' must sum up to 1 for HSBM", IGRAPH_EINVAL);
@@ -322,7 +336,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_int_t n,
     if (!igraph_matrix_is_symmetric(C)) {
         IGRAPH_ERROR("`C' must be a symmetric matrix", IGRAPH_EINVAL);
     }
-    if (p < 0 || p > 1) {
+    if (!(p >= 0 && p <= 1)) { /* also rejects NaN */
         IGRAPH_ERROR("`p' must be a probability for HSBM", IGRAPH_EINVAL);
     }
     for (i = 0; i < k; i++) {
@@ -482,7 +496,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
         IGRAPH_ERROR("`rholist' must have the same length as `Clist' and `m' "
                      "for HSBM.", IGRAPH_EINVAL);
     }
-    if (p < 0 || p > 1) {
+    if (!(p >= 0 && p <= 1)) { /* also rejects NaN */
         IGRAPH_ERROR("`p' must be a probability for HSBM.", IGRAPH_EINVAL);
     }
     /* Checks for m's */
@@ -506,7 +520,12 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
     /* Checks for the Cs */
     for (i = 0; i < no_blocks; i++) {
         const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
-        if (igraph_matrix_min(C) < 0 || igraph_matrix_max(C) > 1) {
+        igraph_real_t minc, maxc;
+        igraph_matrix_minmax(C, &minc, &maxc);
+        if (isnan(minc)) {
+            IGRAPH_ERROR("Bernoulli rates must not be NaN for HSBM.", IGRAPH_EINVAL);
+        }
+        if (minc < 0 || maxc > 1) {
             IGRAPH_ERROR("Bernoulli rates must be between zero and one for HSBM.",
                          IGRAPH_EINVAL);
         }

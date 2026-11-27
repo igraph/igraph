@@ -69,6 +69,23 @@ int main(void) {
         igraph_matrix_destroy(&pref_matrix);
     }
 
+    /* NaN in C or p */
+    {
+        igraph_t result;
+
+        igraph_vector_init_int(&rho, 1, 1);
+        igraph_matrix_init(&pref_matrix, 1, 1);
+
+        MATRIX(pref_matrix, 0, 0) = IGRAPH_NAN;
+        CHECK_ERROR(igraph_hsbm_game(&result, 4, 2, &rho, &pref_matrix, 0.5), IGRAPH_EINVAL);
+
+        MATRIX(pref_matrix, 0, 0) = 0.5;
+        CHECK_ERROR(igraph_hsbm_game(&result, 4, 2, &rho, &pref_matrix, IGRAPH_NAN), IGRAPH_EINVAL);
+
+        igraph_vector_destroy(&rho);
+        igraph_matrix_destroy(&pref_matrix);
+    }
+
     VERIFY_FINALLY_STACK();
     return 0;
 }
