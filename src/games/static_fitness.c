@@ -82,7 +82,7 @@ static igraph_error_t check_fitness(const igraph_vector_t *fitness) {
  *
  * </para><para>
  * To generate random undirected graphs with a given expected degree sequence, set
- * \p fitness_out (and in the directed case \p fitness_out) to the desired expected
+ * \p fitness_out (and in the directed case \p fitness_in) to the desired expected
  * degrees, and \p no_of_edges to the corresponding edge count, i.e. half the sum of
  * expected degrees in the undirected case, and the sum of out- or in-degrees in the
  * directed case.
