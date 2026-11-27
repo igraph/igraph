@@ -49,6 +49,7 @@
 - `igraph_count_multiple_1()` did not validate its edge ID argument, reading out of bounds for invalid IDs.
 - `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` did not reject negative or NaN weights when using `IGRAPH_PAGERANK_ALGO_PRPACK` on undirected graphs, or on directed graphs with `directed=false`. Negative-weight edges were silently ignored, and NaN weights led to NaN results. The ARPACK method, and PRPACK with directed graphs and `directed=true`, were not affected.
 - `igraph_pagerank()`, `igraph_personalized_pagerank()` and `igraph_personalized_pagerank_vs()` did not reject infinite weights, regardless of the algorithm or the graph's directedness. `IGRAPH_PAGERANK_ALGO_PRPACK` returned NaN results, while `IGRAPH_PAGERANK_ALGO_ARPACK` terminated the process.
+- The C attribute handler combined string attributes incorrectly with `IGRAPH_ATTRIBUTE_COMBINE_CONCAT`, `IGRAPH_ATTRIBUTE_COMBINE_RANDOM` and `IGRAPH_ATTRIBUTE_COMBINE_FUNCTION`, e.g. in `igraph_contract_vertices()` and `igraph_simplify()`. `CONCAT` and `RANDOM` used the values of the wrong vertices or edges. With `FUNCTION`, the combination function received empty strings, and igraph wrote past the end of the result whenever a group of merged vertices or edges was larger than the number of groups.
 
 ### Other
 
