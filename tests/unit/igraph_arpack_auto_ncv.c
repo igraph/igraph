@@ -25,6 +25,15 @@
 
 #include "test_utilities.h"
 
+/* Multiplies by diag(1, 2, ..., n). */
+static igraph_error_t diag_matvec(igraph_real_t *to, const igraph_real_t *from, int n, void *extra) {
+    IGRAPH_UNUSED(extra);
+    for (igraph_int_t i = 0; i < n; i++) {
+        to[i] = (i + 1) * from[i];
+    }
+    return IGRAPH_SUCCESS;
+}
+
 int main(void) {
     igraph_t g, k4;
     igraph_vector_t hub, ec;
@@ -73,6 +82,38 @@ int main(void) {
     igraph_vector_destroy(&ec);
     igraph_vector_destroy(&hub);
     igraph_destroy(&g);
+
+    /* The automatic ncv must fit in caller-provided storage when possible. */
+    {
+        igraph_arpack_options_t options;
+        igraph_arpack_storage_t storage;
+        igraph_vector_t values;
+        igraph_matrix_t cvalues;
+
+        igraph_vector_init(&values, 0);
+        igraph_matrix_init(&cvalues, 0, 0);
+
+        igraph_arpack_options_init(&options);
+        options.n = 6;
+        options.nev = 1;
+        options.which[0] = 'L'; options.which[1] = 'A';
+        igraph_arpack_storage_init(&storage, 6, 5, 6, true);
+        igraph_arpack_rssolve(diag_matvec, NULL, &options, &storage, &values, NULL);
+        IGRAPH_ASSERT(fabs(VECTOR(values)[0] - 6) < 1e-10);
+        igraph_arpack_storage_destroy(&storage);
+
+        igraph_arpack_options_init(&options);
+        options.n = 30;
+        options.nev = 1;
+        options.which[0] = 'L'; options.which[1] = 'M';
+        igraph_arpack_storage_init(&storage, 30, 10, 30, false);
+        igraph_arpack_rnsolve(diag_matvec, NULL, &options, &storage, &cvalues, NULL);
+        IGRAPH_ASSERT(fabs(MATRIX(cvalues, 0, 0) - 30) < 1e-10);
+        igraph_arpack_storage_destroy(&storage);
+
+        igraph_matrix_destroy(&cvalues);
+        igraph_vector_destroy(&values);
+    }
 
     VERIFY_FINALLY_STACK();
 
