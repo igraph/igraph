@@ -15,6 +15,7 @@
 #include "../utils/Log.h"
 
 #include <algorithm>
+#include <limits>
 #include <unordered_map>
 #include <vector>
 
@@ -105,6 +106,34 @@ double LossyMapEquation::calcLoss(double moduleFlow, double flowLogFlow) const
 double LossyMapEquation::calcCorrection(double moduleFlow, double flowLogFlow, double entropy) const
 {
   return std::max(0.0, calcLoss(moduleFlow, flowLogFlow) - m_lambda * entropy);
+}
+
+void LossyMapEquation::collectNoiseModules(const std::vector<FlowData>& moduleFlowData,
+                                           const std::vector<unsigned int>& moduleMembers,
+                                           std::vector<unsigned int>& noiseModules,
+                                           unsigned int maxCount) const
+{
+  noiseModules.clear();
+  if (maxCount == 0)
+    return;
+  const auto numModules = static_cast<unsigned int>(std::min(moduleMembers.size(), m_moduleEntropy.size()));
+  for (unsigned int i = 0; i < numModules; ++i) {
+    if (moduleMembers[i] == 0)
+      continue;
+    if (calcCorrection(moduleFlowData[i].flow, m_moduleFlowLogFlow[i], m_moduleEntropy[i]) > 0.0)
+      noiseModules.push_back(i);
+  }
+  if (noiseModules.size() > maxCount) {
+    std::partial_sort(noiseModules.begin(), noiseModules.begin() + maxCount, noiseModules.end(), [&](unsigned int a, unsigned int b) { return moduleFlowData[a].flow > moduleFlowData[b].flow; });
+    noiseModules.resize(maxCount);
+  }
+}
+
+double LossyMapEquation::noiseRank(const InfoNode& node) const
+{
+  if (!(node.data.flow > 0.0))
+    return -std::numeric_limits<double>::infinity();
+  return (-node.lossyFlowLogFlow - m_lambda * node.lossyEntropy) / node.data.flow;
 }
 
 void LossyMapEquation::calculateCodelength(std::vector<InfoNode*>& nodes)

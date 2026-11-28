@@ -52,6 +52,20 @@ public:
   // of the root. Independent of lambda; used for reporting and relative savings.
   double getOneLevelLossless() const { return m_oneLevelLossless; }
 
+  // Modules that are noise now (c_i > 0), largest flow first, at most maxCount.
+  // The optimizer offers them as move targets to every node. Whether a node gains
+  // from joining a noise module does not depend on links to it, so such a move is
+  // rarely among the neighbouring modules the core loop otherwise considers.
+  void collectNoiseModules(const std::vector<FlowData>& moduleFlowData,
+                           const std::vector<unsigned int>& moduleMembers,
+                           std::vector<unsigned int>& noiseModules,
+                           unsigned int maxCount) const;
+
+  // Rank for seeding a noise module: naming cost minus lambda times transition
+  // entropy, per unit flow. For a leaf node -log2(p_alpha) - lambda * h_alpha; for an
+  // aggregated node the flow-weighted mean over its leaves. Zero-flow nodes rank last.
+  double noiseRank(const InfoNode& node) const;
+
   // ===================================================
   // IO
   // ===================================================

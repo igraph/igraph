@@ -25,6 +25,7 @@
 #include <utility>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <vector>
 
 #ifdef _OPENMP
@@ -114,6 +115,10 @@ protected:
 
   unsigned int optimizeActiveNetwork() override;
 
+  // Lossy map equation: seed a noise module from the best-ranked nodes if that lowers
+  // the codelength. Returns true if a module was seeded.
+  bool tryNucleateNoiseModule();
+
   bool shouldUseInnerParallelization() const;
 
   unsigned int tryMoveEachNodeIntoBestModule() override;
@@ -148,6 +153,28 @@ protected:
   std::vector<FlowDataType> m_moduleFlowData;
   std::vector<unsigned int> m_moduleMembers;
   std::vector<unsigned int> m_emptyModules;
+
+  // Lossy map equation: noise modules offered as move targets to every node in the
+  // current sweep (empty for objectives without noise modules).
+  std::vector<unsigned int> m_noiseCandidates;
+  static constexpr unsigned int s_maxNoiseCandidates = 4;
+
+  template <typename O>
+  auto collectNoiseCandidates(O& objective, int)
+      -> decltype(objective.collectNoiseModules(m_moduleFlowData, m_moduleMembers, m_noiseCandidates, 0u), void())
+  {
+    objective.collectNoiseModules(m_moduleFlowData, m_moduleMembers, m_noiseCandidates, s_maxNoiseCandidates);
+  }
+  template <typename O>
+  void collectNoiseCandidates(O&, long) { m_noiseCandidates.clear(); }
+
+  template <typename O>
+  static auto noiseRankOf(const O& objective, const InfoNode& node, int) -> decltype(objective.noiseRank(node))
+  {
+    return objective.noiseRank(node);
+  }
+  template <typename O>
+  static double noiseRankOf(const O&, const InfoNode&, long) { return -std::numeric_limits<double>::infinity(); }
   unsigned int m_innerParallelMoveSweep = 0;
 
   struct ParallelMoveProposal {
@@ -499,22 +526,91 @@ INFOMAP_HOT inline unsigned int InfomapOptimizer<Objective>::optimizeActiveNetwo
     loopLimit = 20;
   }
 
-  do {
-    // Cancellation checkpoint (#412): between the inner sweeps, so a throw here
-    // never unwinds through an OpenMP region.
-    m_infomap->pollInterrupt();
-    ++coreLoopCount;
-    unsigned int numNodesMoved = shouldUseInnerParallelization()
-        ? tryMoveEachNodeIntoBestModuleInParallel()
-        : tryMoveEachNodeIntoBestModule();
-    // Break if not enough improvement
-    if (numNodesMoved == 0 || m_objective.getCodelength() >= oldCodelength - m_infomap->minimumCodelengthImprovement)
-      break;
-    ++numEffectiveLoops;
+  auto runCoreLoops = [&]() {
+    coreLoopCount = 0;
     oldCodelength = m_objective.getCodelength();
-  } while (coreLoopCount != loopLimit);
+    do {
+      // Cancellation checkpoint (#412): between the inner sweeps, so a throw here
+      // never unwinds through an OpenMP region.
+      m_infomap->pollInterrupt();
+      ++coreLoopCount;
+      unsigned int numNodesMoved = shouldUseInnerParallelization()
+          ? tryMoveEachNodeIntoBestModuleInParallel()
+          : tryMoveEachNodeIntoBestModule();
+      // Break if not enough improvement
+      if (numNodesMoved == 0 || m_objective.getCodelength() >= oldCodelength - m_infomap->minimumCodelengthImprovement)
+        break;
+      ++numEffectiveLoops;
+      oldCodelength = m_objective.getCodelength();
+    } while (coreLoopCount != loopLimit);
+  };
+
+  runCoreLoops();
+
+  // Lossy: a noise module pays off only above a critical size, so no sequence of
+  // single-node moves starts one. Seed it from the best-ranked nodes, then let the
+  // core loop adjust its members.
+  if (tryNucleateNoiseModule()) {
+    ++numEffectiveLoops;
+    runCoreLoops();
+  }
 
   return numEffectiveLoops;
+}
+
+template <typename Objective>
+bool InfomapOptimizer<Objective>::tryNucleateNoiseModule()
+{
+  auto& network = m_infomap->activeNetwork();
+  const auto numNodes = static_cast<unsigned int>(network.size());
+  // Only when fine-tuning leaf nodes in the modules of a finished pass: seeding from the
+  // immature partition of the first core loop can sweep the whole network into one module.
+  const bool isFineTune = m_infomap->m_tuneIterationIndex > 0 && !m_infomap->m_isCoarseTune
+      && m_infomap->m_aggregationLevel == 0 && numNodes == m_infomap->numLeafNodes();
+  if (!isFineTune || numNodes < 3 || m_emptyModules.empty() || !m_infomap->isMainInfomap())
+    return false;
+
+  // Best candidates first; objectives without noise modules rank every node -inf
+  std::vector<std::pair<double, unsigned int>> ranked;
+  ranked.reserve(numNodes);
+  for (unsigned int i = 0; i < numNodes; ++i) {
+    const double rank = noiseRankOf(m_objective, *network[i], 0);
+    if (std::isfinite(rank))
+      ranked.emplace_back(-rank, i);
+  }
+  if (ranked.size() < 2)
+    return false;
+  std::sort(ranked.begin(), ranked.end());
+
+  // Move the ranked nodes one by one into an empty module and remember the prefix
+  // with the lowest codelength. The codelength first rises, since a small noise
+  // module costs more in module switches than it saves in node names.
+  const unsigned int seedModule = m_emptyModules.back();
+  const double startCodelength = m_objective.getCodelength();
+  double bestCodelength = startCodelength;
+  unsigned int bestCount = 0;
+  const auto numRanked = static_cast<unsigned int>(std::min<std::size_t>(ranked.size(), numNodes - 1));
+  std::vector<unsigned int> oldModules(numRanked);
+  for (unsigned int k = 0; k < numRanked; ++k) {
+    InfoNode& node = *network[ranked[k].second];
+    oldModules[k] = node.index;
+    moveNodeToPredefinedModule(node, seedModule);
+    if (m_objective.getCodelength() < bestCodelength - m_infomap->minimumCodelengthImprovement) {
+      bestCodelength = m_objective.getCodelength();
+      bestCount = k + 1;
+    }
+  }
+  // Undo in reverse order beyond the best prefix (keeps m_emptyModules consistent)
+  for (unsigned int k = numRanked; k-- > bestCount;) {
+    moveNodeToPredefinedModule(*network[ranked[k].second], oldModules[k]);
+  }
+  Log(4).print("Noise seed: kept {} of {} ranked nodes, codelength {} -> {}\n", bestCount, numRanked, startCodelength, m_objective.getCodelength());
+  if (bestCount == 0)
+    return false;
+
+  for (auto& nodePtr : network)
+    nodePtr->dirty = true;
+  return true;
 }
 
 template <typename Objective>
@@ -535,10 +631,14 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
     m_deltaFlow = VectorMap<DeltaFlowDataType>(numNodes);
   auto& deltaFlow = m_deltaFlow;
 
+  collectNoiseCandidates(m_objective, 0);
+  const bool hasNoiseCandidates = !m_noiseCandidates.empty();
+
   for (unsigned int i = 0; i < numNodes; ++i) {
     InfoNode& current = *network[nodeEnumeration[i]];
 
-    if (!current.dirty)
+    // A noise module can become attractive to a node none of whose neighbours moved
+    if (!current.dirty && !hasNoiseCandidates)
       continue;
 
     // If other nodes have moved here, don't move away on first loop
@@ -567,6 +667,12 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
         InfoNode& neighbour = *network[nodeEnumeration[randIndex]];
         deltaFlow.add(neighbour.index, DeltaFlowDataType(neighbour.index, 0, 0));
       }
+    }
+
+    // Lossy: every current noise module is a candidate, linked or not
+    for (unsigned int noiseModule : m_noiseCandidates) {
+      if (m_moduleMembers[noiseModule] > 0)
+        deltaFlow.add(noiseModule, DeltaFlowDataType(noiseModule, 0.0, 0.0));
     }
 
     // For not moving
@@ -742,6 +848,9 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
     }
   }
 
+  collectNoiseCandidates(m_objective, 0);
+  const bool hasNoiseCandidates = !m_noiseCandidates.empty();
+
   auto& proposals = m_moveProposals;
   proposals.assign(numNodes, ParallelMoveProposal());
 
@@ -788,7 +897,7 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
       unsigned int nodeIndex = nodeEnumeration[i];
       InfoNode& current = *network[nodeIndex];
 
-      if (!current.dirty)
+      if (!current.dirty && !hasNoiseCandidates)
         continue;
 
       // If other nodes have moved here, don't move away on first loop
@@ -818,6 +927,12 @@ INFOMAP_HOT unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestMod
           InfoNode& neighbour = *network[m_randomMoveTargets[t]];
           deltaFlow.add(neighbour.index, DeltaFlowDataType(neighbour.index, 0.0, 0.0));
         }
+      }
+
+      // Lossy: every current noise module is a candidate, linked or not
+      for (unsigned int noiseModule : m_noiseCandidates) {
+        if (m_moduleMembers[noiseModule] > 0)
+          deltaFlow.add(noiseModule, DeltaFlowDataType(noiseModule, 0.0, 0.0));
       }
 
       // For not moving

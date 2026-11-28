@@ -69,7 +69,7 @@
 - Proofread the documentation and error/warning message texts, correcting spelling, grammar, and formatting, using AI assistance.
 - nanoflann was updated to version 2.0.2
 - nanoflann is now configured not to link against the threads library, which eliminates linking issues on some platforms. igraph does not use nanoflann's multiprocessing features, so the threads library was not needed for this purpose.
-- Infomap was updated to version 2.16.0. The vendored copy is now unmodified upstream source.
+- Infomap was updated to version 2.16.1. The vendored copy is now unmodified upstream source.
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 - Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
 - The build system now uses the behaviour of CMake policies up to CMake 4.5.
