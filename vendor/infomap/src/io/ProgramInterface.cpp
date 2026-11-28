@@ -8,14 +8,14 @@
  ******************************************************************************/
 
 #include "ProgramInterface.h"
+#include "Features.h"
 #include "../utils/Log.h"
+#include "../utils/convert.h"
+#include "../utils/format.h"
 
-#include "igraph_error.h"
-
-#include <iostream>
-#include <cstdlib>
 #include <map>
 #include <utility>
+#include <vector>
 
 namespace infomap {
 
@@ -37,6 +37,206 @@ const std::unordered_map<std::string, char> ArgType::toShort = {
   { "list", 'l' },
 };
 
+namespace {
+
+  using ShortOptionMap = std::map<char, Option*>;
+  using LongOptionMap = std::map<std::string, Option*>;
+  using NonOptionArguments = std::deque<std::unique_ptr<TargetBase>>;
+
+  struct OptionLookup {
+    ShortOptionMap shortOptions;
+    LongOptionMap longOptions;
+  };
+
+  OptionLookup buildOptionLookup(std::deque<std::unique_ptr<Option>>& options)
+  {
+    OptionLookup lookup;
+    for (auto& optionArgument : options) {
+      auto& opt = *optionArgument;
+      if (opt.shortName != '\0') {
+        auto inserted = lookup.shortOptions.insert(std::make_pair(opt.shortName, &opt));
+        if (!inserted.second)
+          throw std::runtime_error(fmt::format(FMT_STRING("Duplication of option '{}'"), opt.shortName));
+      }
+
+      auto inserted = lookup.longOptions.insert(std::make_pair(opt.longName, &opt));
+      if (!inserted.second)
+        throw std::runtime_error(fmt::format(FMT_STRING("Duplication of option \"{}\""), opt.longName));
+    }
+    return lookup;
+  }
+
+  std::vector<std::string> tokenizeArgs(const std::string& args)
+  {
+    std::vector<std::string> flags;
+    std::istringstream argStream(args);
+    std::string arg;
+    while (!(argStream >> arg).fail())
+      flags.push_back(arg);
+    return flags;
+  }
+
+  void parseOptionValue(Option& opt, const std::string& value)
+  {
+    if (!opt.parse(value))
+      throw std::runtime_error(fmt::format(FMT_STRING("Cannot parse '{}' as argument to option '{}'."), value, opt.longName));
+  }
+
+  void parseLongOption(const std::string& arg, const LongOptionMap& longOptions, const std::vector<std::string>& flags, unsigned int& i)
+  {
+    if (arg.length() < 3)
+      throw std::runtime_error("Illegal argument '--'");
+
+    std::string longOpt = arg.substr(2);
+    bool flagValue = true;
+    auto it = longOptions.find(longOpt);
+    if (it == longOptions.end()) {
+      // Unrecognized option, check if it negates a recognised option with the '--no-' prefix
+      if (longOpt.compare(0, 3, "no-") == 0 && longOptions.find(std::string(longOpt, 3)) != longOptions.end()) {
+        longOpt = std::string(longOpt, 3);
+        it = longOptions.find(longOpt);
+        flagValue = false;
+      } else {
+        throw std::runtime_error(fmt::format(FMT_STRING("Unrecognized option: '--{}'"), longOpt));
+      }
+    }
+
+    auto& opt = *it->second;
+    if (!opt.requireArgument || opt.incrementalArgument) {
+      opt.set(flagValue);
+      return;
+    }
+
+    const auto numArgsLeft = flags.size() - i - 1;
+    if (numArgsLeft == 0)
+      throw std::runtime_error(fmt::format(FMT_STRING("Option '{}' requires argument"), opt.longName));
+
+    ++i;
+    parseOptionValue(opt, flags[i]);
+  }
+
+  void parseShortOptions(const std::string& arg, const ShortOptionMap& shortOptions, const std::vector<std::string>& flags, unsigned int& i)
+  {
+    for (unsigned int j = 1; j < arg.length(); ++j) {
+      const auto optionName = arg[j];
+      const auto numCharsLeft = arg.length() - j - 1;
+      auto it = shortOptions.find(optionName);
+      if (it == shortOptions.end())
+        throw std::runtime_error(fmt::format(FMT_STRING("Unrecognized option: '-{}'"), optionName));
+
+      auto& opt = *it->second;
+      if (!opt.requireArgument || opt.incrementalArgument) {
+        opt.set(true);
+        continue;
+      }
+
+      std::string optArg;
+      const auto numArgsLeft = flags.size() - i - 1;
+      if (numCharsLeft > 0) {
+        optArg = arg.substr(j + 1);
+        j = arg.length() - 1;
+      } else if (numArgsLeft > 0) {
+        ++i;
+        optArg = flags[i];
+      } else {
+        throw std::runtime_error(fmt::format(FMT_STRING("Option '{}' requires argument"), opt.longName));
+      }
+
+      parseOptionValue(opt, optArg);
+    }
+  }
+
+  void parseNonOptionArguments(std::deque<std::string>& nonOpts, NonOptionArguments& nonOptionArguments, unsigned int numRequiredArguments)
+  {
+    if (nonOpts.size() < numRequiredArguments)
+      throw std::runtime_error("Missing required arguments.");
+
+    unsigned int i = 0;
+    unsigned int numVectorArguments = nonOpts.size() - (nonOptionArguments.size() - 1);
+    while (!nonOpts.empty()) {
+      std::string arg = nonOpts.front();
+      nonOpts.pop_front();
+      if (nonOptionArguments[i]->isOptionalVector && numVectorArguments == 0)
+        ++i;
+      if (!nonOptionArguments[i]->parse(arg))
+        throw std::runtime_error("Argument error.");
+      if (!nonOptionArguments[i]->isOptionalVector || --numVectorArguments == 0)
+        ++i;
+    }
+  }
+
+  std::string join(const std::vector<std::string>& values, const std::string& separator)
+  {
+    return io::stringify(values, separator);
+  }
+
+  std::string bashWords(const std::vector<std::string>& values)
+  {
+    return join(values, " ");
+  }
+
+  std::string zshDescription(std::string value)
+  {
+    for (char& c : value) {
+      if (c == '\'' || c == '[' || c == ']' || c == ':' || c == '\\')
+        c = ' ';
+    }
+    return value;
+  }
+
+  std::string zshAction(const Option& opt)
+  {
+    if (!opt.choices.empty())
+      return fmt::format(FMT_STRING("({})"), join(opt.choices, " "));
+    if (opt.argumentName == ArgType::path)
+      return "_files";
+    return "";
+  }
+
+  std::vector<std::string> visibleOptionWords(const std::deque<std::unique_ptr<Option>>& options)
+  {
+    std::vector<std::string> words;
+    for (const auto& optionArgument : options) {
+      const auto& opt = *optionArgument;
+      if (opt.hidden)
+        continue;
+      if (opt.shortName != '\0')
+        words.push_back(fmt::format(FMT_STRING("-{}"), opt.shortName));
+      words.push_back(fmt::format(FMT_STRING("--{}"), opt.longName));
+    }
+    return words;
+  }
+
+  std::vector<std::string> valueOptionWords(const std::deque<std::unique_ptr<Option>>& options)
+  {
+    std::vector<std::string> words;
+    for (const auto& optionArgument : options) {
+      const auto& opt = *optionArgument;
+      if (opt.hidden || !opt.requireArgument)
+        continue;
+      if (opt.shortName != '\0')
+        words.push_back(fmt::format(FMT_STRING("-{}"), opt.shortName));
+      words.push_back(fmt::format(FMT_STRING("--{}"), opt.longName));
+    }
+    return words;
+  }
+
+  std::vector<std::string> pathOptionWords(const std::deque<std::unique_ptr<Option>>& options)
+  {
+    std::vector<std::string> words;
+    for (const auto& optionArgument : options) {
+      const auto& opt = *optionArgument;
+      if (opt.hidden || opt.argumentName != ArgType::path)
+        continue;
+      if (opt.shortName != '\0')
+        words.push_back(fmt::format(FMT_STRING("-{}"), opt.shortName));
+      words.push_back(fmt::format(FMT_STRING("--{}"), opt.longName));
+    }
+    return words;
+  }
+
+} // namespace
+
 ProgramInterface::ProgramInterface(std::string name, std::string shortDescription, std::string version)
     : m_programName(std::move(name)),
       m_shortProgramDescription(std::move(shortDescription)),
@@ -44,12 +244,10 @@ ProgramInterface::ProgramInterface(std::string name, std::string shortDescriptio
 {
   addIncrementalOptionArgument(m_displayHelp, 'h', "help", "Prints this help message. Use -hh to show advanced options.", "About");
   addOptionArgument(m_displayVersion, 'V', "version", "Display program version information.", "About");
+  addOptionArgument(m_completionShell, "completion", "Print shell completion script for bash or zsh.", ArgType::option, "About").setChoices({ "bash", "zsh" });
   addOptionArgument(m_printJsonParameters, "print-json-parameters", "Print Infomap parameters in JSON.", "About").setHidden(true);
 }
 
-/* Modification for igraph: Disable functions that call forbidden
- * functions such as exit(). */
-#if 0
 void ProgramInterface::exitWithUsage(bool showAdvanced) const
 {
   Log() << "Name:\n";
@@ -79,12 +277,12 @@ void ProgramInterface::exitWithUsage(bool showAdvanced) const
   for (unsigned int i = 0; i < m_optionArguments.size(); ++i) {
     auto& opt = *m_optionArguments[i];
     bool haveShort = opt.shortName != '\0';
-    std::string optArgShort = opt.requireArgument ? (io::Str() << "<" << ArgType::toShort.at(opt.argumentName) << ">") : opt.incrementalArgument ? "[+]"
-                                                                                                                                                 : std::string(3, ' ');
-    std::string optArgLong = opt.requireArgument ? (io::Str() << "<" << opt.argumentName << ">") : opt.incrementalArgument ? "[+]"
-                                                                                                                           : std::string(3, ' ');
-    std::string shortOption = haveShort ? (io::Str() << "  -" << opt.shortName << optArgShort) : std::string(7, ' ');
-    optionStrings[i] = io::Str() << shortOption << " --" << opt.longName << " " << optArgLong;
+    std::string optArgShort = opt.requireArgument ? fmt::format(FMT_STRING("<{}>"), ArgType::toShort.at(opt.argumentName)) : opt.incrementalArgument ? "[+]"
+                                                                                                                                                     : std::string(3, ' ');
+    std::string optArgLong = opt.requireArgument ? fmt::format(FMT_STRING("<{}>"), opt.argumentName) : opt.incrementalArgument ? "[+]"
+                                                                                                                               : std::string(3, ' ');
+    std::string shortOption = haveShort ? fmt::format(FMT_STRING("  -{}{}"), opt.shortName, optArgShort) : std::string(7, ' ');
+    optionStrings[i] = fmt::format(FMT_STRING("{} --{} {}"), shortOption, opt.longName, optArgLong);
     if (optionStrings[i].length() > maxLength)
       maxLength = optionStrings[i].length();
   }
@@ -117,7 +315,7 @@ void ProgramInterface::exitWithUsage(bool showAdvanced) const
     }
   }
   Log() << '\n';
-  std::exit(0);
+  throw CleanExit {};
 }
 
 void ProgramInterface::exitWithVersionInformation() const
@@ -127,25 +325,27 @@ void ProgramInterface::exitWithVersionInformation() const
   Log() << " compiled with OpenMP";
 #endif
   Log() << '\n';
+  const auto features = enabledFeatures();
+  if (!features.empty()) {
+    Log() << "Features:";
+    const char* separator = " ";
+    for (const auto& feature : features) {
+      Log() << separator << feature;
+      separator = ", ";
+    }
+    Log() << '\n';
+  }
   Log() << "See www.mapequation.org for terms of use.\n";
-  std::exit(0);
+  throw CleanExit {};
 }
-#endif
 
 void ProgramInterface::exitWithError(const std::string& message) const
 {
-    /* Modification for igraph: This function must never be called
-     * when using Infomap through igraph. The function is disabled
-     * to eliminate forbidden references to exit() and std::cerr. */
-    IGRAPH_FATALF("Infomap called exitWithError() with message '%s'.",
-                  message.c_str());
-#if 0
   Log() << m_programName << " version " << m_programVersion;
 #ifdef _OPENMP
   Log() << " compiled with OpenMP";
 #endif
-  Log() << std::endl;
-  std::cerr << message << std::endl;
+  Log() << '\n';
   Log() << "Usage: " << m_executableName;
   for (auto& nonOptionArgument : m_nonOptionArguments)
     if (!nonOptionArgument->isAdvanced)
@@ -153,106 +353,145 @@ void ProgramInterface::exitWithError(const std::string& message) const
   if (!m_optionArguments.empty())
     Log() << " [options]";
   Log() << ". Run with option '-h' for more information.\n";
-  std::exit(1);
-#endif
+  throw std::runtime_error(message);
 }
 
-std::string toJson(const std::string& key, const std::string& value)
+void ProgramInterface::printBashCompletion() const
 {
-  return io::Str() << '"' << key << "\": \"" << value << '"';
+  const auto options = visibleOptionWords(m_optionArguments);
+  const auto valueOptions = valueOptionWords(m_optionArguments);
+  const auto pathOptions = pathOptionWords(m_optionArguments);
+
+  Log() << "# bash completion for Infomap\n";
+  Log() << "_infomap_completion()\n";
+  Log() << "{\n";
+  Log() << "  local cur prev position\n";
+  Log() << "  COMPREPLY=()\n";
+  Log() << "  cur=\"${COMP_WORDS[COMP_CWORD]}\"\n";
+  Log() << "  prev=\"${COMP_WORDS[COMP_CWORD-1]}\"\n";
+  Log() << "\n";
+  Log() << "  __infomap_words() { COMPREPLY=( $(compgen -W \"$1\" -- \"$cur\") ); }\n";
+  Log() << "  __infomap_files() { if declare -F _filedir >/dev/null; then _filedir; else COMPREPLY=( $(compgen -f -- \"$cur\") ); fi; }\n";
+  Log() << "  __infomap_dirs() { if declare -F _filedir >/dev/null; then _filedir -d; else COMPREPLY=( $(compgen -d -- \"$cur\") ); fi; }\n";
+  Log() << "  __infomap_option_requires_value() {\n";
+  Log() << "    case \"$1\" in\n";
+  Log() << "      " << join(valueOptions, "|") << ") return 0 ;;\n";
+  Log() << "    esac\n";
+  Log() << "    return 1\n";
+  Log() << "  }\n";
+  Log() << "  __infomap_position() {\n";
+  Log() << "    local i word count=0\n";
+  Log() << "    for ((i = 1; i < COMP_CWORD; ++i)); do\n";
+  Log() << "      word=\"${COMP_WORDS[i]}\"\n";
+  Log() << "      if __infomap_option_requires_value \"$word\"; then ((++i)); continue; fi\n";
+  Log() << "      [[ \"$word\" == -* ]] && continue\n";
+  Log() << "      ((++count))\n";
+  Log() << "    done\n";
+  Log() << "    printf '%s' \"$count\"\n";
+  Log() << "  }\n";
+  Log() << "\n";
+  Log() << "  case \"$prev\" in\n";
+  Log() << "    --completion) __infomap_words \"bash zsh\"; return ;;\n";
+  for (const auto& optionArgument : m_optionArguments) {
+    const auto& opt = *optionArgument;
+    if (opt.hidden || opt.choices.empty() || opt.longName == "completion")
+      continue;
+    std::vector<std::string> words;
+    if (opt.shortName != '\0')
+      words.push_back(fmt::format(FMT_STRING("-{}"), opt.shortName));
+    words.push_back(fmt::format(FMT_STRING("--{}"), opt.longName));
+    Log() << "    " << join(words, "|") << ") __infomap_words \"" << bashWords(opt.choices) << "\"; return ;;\n";
+  }
+  if (!pathOptions.empty())
+    Log() << "    " << join(pathOptions, "|") << ") __infomap_files; return ;;\n";
+  Log() << "  esac\n";
+  Log() << "\n";
+  Log() << "  case \"$cur\" in\n";
+  Log() << "    -*) __infomap_words \"" << bashWords(options) << "\"; return ;;\n";
+  Log() << "  esac\n";
+  Log() << "\n";
+  Log() << "  position=\"$(__infomap_position)\"\n";
+  Log() << "  if [[ \"$position\" -ge 1 ]]; then\n";
+  Log() << "    __infomap_dirs\n";
+  Log() << "  else\n";
+  Log() << "    __infomap_files\n";
+  Log() << "  fi\n";
+  Log() << "}\n";
+  Log() << "\n";
+  Log() << "complete -F _infomap_completion Infomap infomap\n";
 }
 
-std::string toJson(const std::string& key, bool value)
+void ProgramInterface::printZshCompletion() const
 {
-  return io::Str() << '"' << key << "\": " << (value ? "true" : "false");
-}
-
-template <typename Value>
-std::string toJson(const std::string& key, Value value)
-{
-  return io::Str() << '"' << key << "\": " << value;
-}
-
-std::string toJson(const Option& opt)
-{
-  return io::Str() << "{ "
-                   << toJson("long", std::string(io::Str() << "--" << opt.longName)) << ", "
-                   << toJson("short", opt.shortName != '\0' ? std::string(io::Str() << "-" << opt.shortName) : "") << ", "
-                   << toJson("description", opt.description) << ", "
-                   << toJson("group", opt.group) << ", "
-                   << toJson("required", opt.requireArgument) << ", "
-                   << toJson("advanced", opt.isAdvanced) << ", "
-                   << toJson("incremental", opt.incrementalArgument) << ", "
-                   << (opt.requireArgument
-                           ? (io::Str() << toJson("longType", opt.argumentName) << ", "
-                                        << toJson("shortType", std::string(1, ArgType::toShort.at(opt.argumentName))) << ", "
-                                        << toJson("default", opt.printValue()))
-                           : toJson("default", false))
-                   << " }";
-}
-
-/* Modification for igraph: Disable functions that call forbidden
- * functions such as exit(). */
-#if 0
-void ProgramInterface::exitWithJsonParameters() const
-{
-  Log() << "{\n  \"parameters\": [\n";
-
-  for (unsigned int i = 0; i < m_optionArguments.size(); ++i) {
-    auto& opt = *m_optionArguments[i];
+  Log() << "#compdef Infomap infomap\n";
+  Log() << "\n";
+  Log() << "_infomap() {\n";
+  Log() << "  _arguments -C \\\n";
+  for (const auto& optionArgument : m_optionArguments) {
+    const auto& opt = *optionArgument;
     if (opt.hidden)
       continue;
-    Log() << "    " << toJson(opt);
-    if (i < m_optionArguments.size() - 1) {
-      Log() << ",\n";
-    } else {
-      Log() << "\n";
-    }
-  }
-  Log() << "  ]\n}";
 
-  std::exit(0);
+    const auto desc = zshDescription(opt.description);
+    const auto action = zshAction(opt);
+    if (opt.shortName != '\0') {
+      Log() << "    '(-" << opt.shortName << " --" << opt.longName << ")'{-" << opt.shortName << ",--" << opt.longName << "}'[" << desc << "]";
+    } else {
+      Log() << "    '--" << opt.longName << "[" << desc << "]";
+    }
+    if (opt.requireArgument) {
+      Log() << ":" << opt.argumentName << ":";
+      if (!action.empty())
+        Log() << action;
+    }
+    Log() << "'";
+    Log() << " \\\n";
+  }
+  Log() << "    '1:network file:_files' \\\n";
+  Log() << "    '2:output directory:_files -/'\n";
+  Log() << "}\n";
+  Log() << "\n";
+  Log() << "_infomap \"$@\"\n";
 }
-#endif
+
+void ProgramInterface::exitWithCompletion() const
+{
+  if (m_completionShell == "bash") {
+    printBashCompletion();
+  } else if (m_completionShell == "zsh") {
+    printZshCompletion();
+  } else {
+    throw std::runtime_error(fmt::format(FMT_STRING("Unsupported completion shell '{}'. Supported shells: bash, zsh."), m_completionShell));
+  }
+
+  throw CleanExit {};
+}
+
+void ProgramInterface::exitWithJsonParameters() const
+{
+  auto jsonParameters = m_jsonParameters;
+  if (jsonParameters.empty() && m_jsonParametersProvider) {
+    jsonParameters = m_jsonParametersProvider();
+  }
+
+  if (jsonParameters.empty()) {
+    throw std::runtime_error("JSON parameter metadata is not configured for this ProgramInterface.");
+  }
+
+  Log() << jsonParameters;
+  throw CleanExit {};
+}
 
 void ProgramInterface::parseArgs(const std::string& args)
 {
-  // Map the options on short and long name, and check for duplication
-  std::map<char, Option*> shortOptionMap;
-  std::map<std::string, Option*> longOptionMap;
-  for (auto& optionArgument : m_optionArguments) {
-    auto& opt = *optionArgument;
-    if (opt.shortName != '\0') {
-      auto it = shortOptionMap.find(opt.shortName);
-      if (it != shortOptionMap.end())
-        throw std::runtime_error(io::Str() << "Duplication of option '" << opt.shortName << "'");
-      shortOptionMap.insert(std::make_pair(opt.shortName, &opt));
-    }
-
-    auto it = longOptionMap.find(opt.longName);
-    if (it != longOptionMap.end())
-      throw std::runtime_error(io::Str() << "Duplication of option \"" << opt.longName << "\"");
-    longOptionMap.insert(std::make_pair(opt.longName, &opt));
-  }
-
-  // Split the flags on whitespace
-  std::vector<std::string> flags;
-  std::istringstream argStream(args);
-
-  {
-    std::string arg;
-    while (!(argStream >> arg).fail())
-      flags.push_back(arg);
-  }
+  const auto optionLookup = buildOptionLookup(m_optionArguments);
+  const auto flags = tokenizeArgs(args);
 
   std::deque<std::string> nonOpts;
   try {
     for (unsigned int i = 0; i < flags.size(); ++i) {
-      bool flagValue = true;
-      unsigned int numArgsLeft = flags.size() - i - 1;
-
       const std::string& arg = flags[i];
-      if (arg.length() == 0)
+      if (arg.empty())
         throw std::runtime_error("Illegal argument ''");
 
       if (arg[0] != '-') {
@@ -262,88 +501,28 @@ void ProgramInterface::parseArgs(const std::string& args)
           throw std::runtime_error("Illegal argument '-'");
 
         if (arg[1] == '-') {
-          // Long option
-          if (arg.length() < 3)
-            throw std::runtime_error("Illegal argument '--'");
-          std::string longOpt = arg.substr(2);
-          auto it = longOptionMap.find(longOpt);
-          if (it == longOptionMap.end()) {
-            // Unrecognized option, check if it negates a recognised option with the '--no-' prefix
-            if (longOpt.compare(0, 3, "no-") == 0 && longOptionMap.find(std::string(longOpt, 3)) != longOptionMap.end()) {
-              longOpt = std::string(longOpt, 3);
-              it = longOptionMap.find(longOpt);
-              flagValue = false;
-            } else {
-              throw std::runtime_error(io::Str() << "Unrecognized option: '--" << longOpt << "'");
-            }
-          }
-          auto& opt = *it->second;
-          if (!opt.requireArgument || opt.incrementalArgument)
-            opt.set(flagValue);
-          else {
-            if (numArgsLeft == 0)
-              throw std::runtime_error(io::Str() << "Option '" << opt.longName << "' requires argument");
-            ++i;
-            if (!opt.parse(flags[i]))
-              throw std::runtime_error(io::Str() << "Cannot parse '" << flags[i] << "' as argument to option '" << opt.longName << "'. ");
-          }
+          parseLongOption(arg, optionLookup.longOptions, flags, i);
         } else {
-          // Short option(s)
-          for (unsigned int j = 1; j < arg.length(); ++j) {
-            char o = arg[j];
-            unsigned int numCharsLeft = arg.length() - j - 1;
-            auto it = shortOptionMap.find(o);
-            if (it == shortOptionMap.end())
-              throw std::runtime_error(io::Str() << "Unrecognized option: '-" << o << "'");
-            auto& opt = *it->second;
-            if (!opt.requireArgument || opt.incrementalArgument)
-              opt.set(flagValue);
-            else {
-              std::string optArg;
-              if (numCharsLeft > 0) {
-                optArg = arg.substr(j + 1);
-                j = arg.length() - 1;
-              } else if (numArgsLeft) {
-                ++i;
-                optArg = flags[i];
-              } else
-                throw std::runtime_error(io::Str() << "Option '" << opt.longName << "' requires argument");
-
-              if (!opt.parse(optArg))
-                throw std::runtime_error(io::Str() << "Cannot parse '" << optArg << "' as argument to option '" << opt.longName << "'. ");
-            }
-          }
+          parseShortOptions(arg, optionLookup.shortOptions, flags, i);
         }
       }
-    /* Modification for igraph: Disable calls to functions that
-     * needed to be removed because they referenced exit().  */
-#if 0
       if (m_displayHelp > 0)
         exitWithUsage(m_displayHelp > 1);
       if (m_displayVersion)
         exitWithVersionInformation();
+      if (!m_completionShell.empty())
+        exitWithCompletion();
       if (m_printJsonParameters)
         exitWithJsonParameters();
-#endif
     }
   } catch (std::exception& e) {
     exitWithError(e.what());
   }
 
-  if (nonOpts.size() < numRequiredArguments())
-    exitWithError("Missing required arguments.");
-
-  unsigned int i = 0;
-  unsigned int numVectorArguments = nonOpts.size() - (m_nonOptionArguments.size() - 1);
-  while (!nonOpts.empty()) {
-    std::string arg = nonOpts.front();
-    nonOpts.pop_front();
-    if (m_nonOptionArguments[i]->isOptionalVector && numVectorArguments == 0)
-      ++i;
-    if (!m_nonOptionArguments[i]->parse(arg))
-      exitWithError("Argument error.");
-    if (!m_nonOptionArguments[i]->isOptionalVector || --numVectorArguments == 0)
-      ++i;
+  try {
+    parseNonOptionArguments(nonOpts, m_nonOptionArguments, numRequiredArguments());
+  } catch (std::exception& e) {
+    exitWithError(e.what());
   }
 }
 
@@ -353,8 +532,20 @@ std::vector<ParsedOption> ProgramInterface::getUsedOptionArguments() const
   unsigned int numFlags = m_optionArguments.size();
   for (unsigned int i = 0; i < numFlags; ++i) {
     auto& opt = *m_optionArguments[i];
-    if (opt.used && opt.longName != "negate-next")
-      opts.emplace_back(opt);
+    if (opt.used && opt.longName != "negate-next") {
+      opts.push_back({
+          opt.shortName,
+          opt.longName,
+          opt.description,
+          opt.group,
+          opt.isAdvanced,
+          opt.requireArgument,
+          opt.incrementalArgument,
+          opt.argumentName,
+          opt.negated,
+          opt.printValue(),
+      });
+    }
   }
   return opts;
 }

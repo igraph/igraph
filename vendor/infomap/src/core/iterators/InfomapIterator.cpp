@@ -9,7 +9,6 @@
 
 #include "InfomapIterator.h"
 #include "../InfoNode.h"
-#include <iostream>
 #include <utility> // std::pair
 
 namespace infomap {
@@ -150,7 +149,7 @@ InfomapIterator& InfomapLeafIterator::operator++() noexcept
 
 InfomapIterator& InfomapIteratorPhysical::operator++() noexcept
 {
-  if (m_physNodes.empty()) {
+  if (!m_physNodes || m_physNodes->empty()) {
     // Iterate modules
     InfomapIterator::operator++();
     if (isEnd()) {
@@ -161,7 +160,24 @@ InfomapIterator& InfomapIteratorPhysical::operator++() noexcept
       auto firstLeafIt = *this;
       // If on a leaf node, loop through and aggregate to physical nodes
       while (!isEnd() && m_current->isLeaf()) {
-        auto ret = m_physNodes.insert(std::make_pair(m_current->physicalId, InfoNode(*m_current)));
+        if (!m_physNodes)
+          resetPhysNodes();
+        // Detach the copy's sibling and child links before it can be destroyed anywhere.
+        // InfoNode's copy constructor takes them verbatim and ~InfoNode unlinks through
+        // them, so destroying such an aggregate writes into the engine's live tree -- on
+        // a traversal documented as read-only, and into freed memory if a position
+        // outlives the engine (#900). Detaching after insert() would miss the case where
+        // the key is already present: insert then destroys the copy it was handed, links
+        // and all. The parent stays, since the path needs it.
+        InfoNode physCopy(*m_current);
+        physCopy.previous = nullptr;
+        physCopy.next = nullptr;
+        physCopy.firstChild = nullptr;
+        physCopy.lastChild = nullptr;
+        physCopy.collapsedFirstChild = nullptr;
+        physCopy.collapsedLastChild = nullptr;
+
+        auto ret = m_physNodes->insert(std::make_pair(m_current->physicalId, physCopy));
         auto& physNode = ret.first->second;
         if (ret.second) {
           // New physical node, use same parent as the state leaf node
@@ -181,19 +197,24 @@ InfomapIterator& InfomapIteratorPhysical::operator++() noexcept
       m_depth = firstLeafIt.m_depth;
       m_moduleIndex = firstLeafIt.m_moduleIndex;
       // Set current node to the first physical node
-      m_physIter = m_physNodes.begin();
+      m_physIter = m_physNodes->begin();
+      // m_path/m_depth above came from a base copy, so re-anchor before handing out a
+      // position that points into these nodes.
+      anchorPhysNodes();
       m_current = &m_physIter->second;
     }
   } else {
     // Iterate physical nodes instead of leaf state nodes
     ++m_physIter;
     ++m_path.back();
-    if (m_physIter == m_physNodes.end()) {
-      // End of leaf nodes
-      m_physNodes.clear();
+    if (m_physIter == m_physNodes->end()) {
       m_path.pop_back();
       // reset iterator to the one after the leaf nodes
       *this = m_oldIter;
+      // Fresh storage rather than clear(): a position handed out earlier points into
+      // these nodes and keeps them alive through its own anchor. After the assignment
+      // above, which copies m_oldIter's empty anchor over this one.
+      resetPhysNodes();
     } else {
       // Set iterator node to the currently iterated physical node
       m_current = &m_physIter->second;

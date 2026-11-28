@@ -10,26 +10,27 @@
 #ifndef PROGRAM_INTERFACE_H_
 #define PROGRAM_INTERFACE_H_
 
+#include "ParsedOption.h"
 #include "../utils/convert.h"
 
 #include <stdexcept>
 #include <utility>
 #include <vector>
 #include <deque>
+#include <functional>
 #include <memory>
 #include <string>
-#include <sstream>
-#include <iostream>
+#include <ostream>
 #include <unordered_map>
 
 namespace infomap {
 
-class InterruptException : public std::exception {
-public:
-    InterruptException() {};
-};
-
-typedef bool interruptionHandlerFn(void);
+/// Thrown by ProgramInterface help/version/json-parameters paths
+/// instead of std::exit(0). The CLI binary catches this and exits with
+/// status 0; library callers (R/Python/JS bindings) never trigger these
+/// flags. Not derived from std::exception so the generic catch in
+/// infomap::run() does not treat it as an error.
+struct CleanExit {};
 
 struct ArgType {
   static const std::string integer;
@@ -43,15 +44,15 @@ struct ArgType {
 };
 
 struct Option {
-  Option(char shortName, std::string longName, std::string desc, std::string group, bool isAdvanced, bool requireArgument = false, std::string argName = "")
-      : shortName(shortName),
-        longName(std::move(longName)),
+  Option(char shortName_, std::string longName_, std::string desc, std::string group_, bool isAdvanced_, bool requireArgument_ = false, std::string argName = "")
+      : shortName(shortName_),
+        longName(std::move(longName_)),
         description(std::move(desc)),
-        group(std::move(group)),
-        isAdvanced(isAdvanced),
-        requireArgument(requireArgument),
+        group(std::move(group_)),
+        isAdvanced(isAdvanced_),
+        requireArgument(requireArgument_),
         incrementalArgument(false),
-        argumentName(std::move(argName)) { }
+        argumentName(std::move(argName)) {}
 
   virtual ~Option() = default;
 
@@ -75,6 +76,12 @@ struct Option {
   Option& setHidden(bool value)
   {
     hidden = value;
+    return *this;
+  }
+
+  Option& setChoices(std::vector<std::string> values)
+  {
+    choices = std::move(values);
     return *this;
   }
 
@@ -103,11 +110,12 @@ struct Option {
   bool hidden = false;
   bool used = false;
   bool negated = false;
+  std::vector<std::string> choices;
 };
 
 struct IncrementalOption : Option {
-  IncrementalOption(unsigned int& target, char shortName, std::string longName, std::string desc, std::string group, bool isAdvanced)
-      : Option(shortName, std::move(longName), std::move(desc), std::move(group), isAdvanced, false), target(target)
+  IncrementalOption(unsigned int& target_, char shortName_, std::string longName_, std::string desc, std::string group_, bool isAdvanced_)
+      : Option(shortName_, std::move(longName_), std::move(desc), std::move(group_), isAdvanced_, false), target(target_)
   {
     incrementalArgument = true;
   }
@@ -129,15 +137,15 @@ struct IncrementalOption : Option {
   }
 
   std::ostream& printValue(std::ostream& out) const override { return out << target; }
-  std::string printValue() const override { return io::Str() << target; }
+  std::string printValue() const override { return io::stringify(target); }
 
   unsigned int& target;
 };
 
 template <typename T>
 struct ArgumentOption : Option {
-  ArgumentOption(T& target, char shortName, std::string longName, std::string desc, std::string group, bool isAdvanced, std::string argName)
-      : Option(shortName, std::move(longName), std::move(desc), std::move(group), isAdvanced, true, std::move(argName)), target(target) { }
+  ArgumentOption(T& target_, char shortName_, std::string longName_, std::string desc, std::string group_, bool isAdvanced_, std::string argName)
+      : Option(shortName_, std::move(longName_), std::move(desc), std::move(group_), isAdvanced_, true, std::move(argName)), target(target_) {}
 
   bool parse(std::string const& value) override
   {
@@ -145,7 +153,7 @@ struct ArgumentOption : Option {
     return io::stringToValue(value, target);
   }
 
-  std::string printValue() const override { return io::Str() << target; }
+  std::string printValue() const override { return io::stringify(target); }
   std::ostream& printValue(std::ostream& out) const override { return out << target; }
   std::string printNumericValue() const override { return TypeInfo<T>::isNumeric() ? printValue() : ""; }
 
@@ -154,8 +162,8 @@ struct ArgumentOption : Option {
 
 template <typename T>
 struct LowerBoundArgumentOption : ArgumentOption<T> {
-  LowerBoundArgumentOption(T& target, char shortName, std::string longName, std::string desc, std::string group, bool isAdvanced, std::string argName, T minValue)
-      : ArgumentOption<T>(target, shortName, std::move(longName), std::move(desc), std::move(group), isAdvanced, std::move(argName)), minValue(minValue) { }
+  LowerBoundArgumentOption(T& target_, char shortName_, std::string longName_, std::string desc, std::string group_, bool isAdvanced_, std::string argName, T minValue_)
+      : ArgumentOption<T>(target_, shortName_, std::move(longName_), std::move(desc), std::move(group_), isAdvanced_, std::move(argName)), minValue(minValue_) {}
 
   bool parse(std::string const& value) override
   {
@@ -169,8 +177,8 @@ struct LowerBoundArgumentOption : ArgumentOption<T> {
 
 template <typename T>
 struct LowerUpperBoundArgumentOption : LowerBoundArgumentOption<T> {
-  LowerUpperBoundArgumentOption(T& target, char shortName, std::string longName, std::string desc, std::string group, bool isAdvanced, std::string argName, T minValue, T maxValue)
-      : LowerBoundArgumentOption<T>(target, shortName, std::move(longName), std::move(desc), std::move(group), isAdvanced, std::move(argName), minValue), maxValue(maxValue) { }
+  LowerUpperBoundArgumentOption(T& target_, char shortName_, std::string longName_, std::string desc, std::string group_, bool isAdvanced_, std::string argName, T minValue_, T maxValue_)
+      : LowerBoundArgumentOption<T>(target_, shortName_, std::move(longName_), std::move(desc), std::move(group_), isAdvanced_, std::move(argName), minValue_), maxValue(maxValue_) {}
 
   bool parse(std::string const& value) override
   {
@@ -184,8 +192,8 @@ struct LowerUpperBoundArgumentOption : LowerBoundArgumentOption<T> {
 
 template <>
 struct ArgumentOption<bool> : Option {
-  ArgumentOption(bool& target, char shortName, std::string longName, std::string desc, std::string group, bool isAdvanced)
-      : Option(shortName, std::move(longName), std::move(desc), std::move(group), isAdvanced, false), target(target) { }
+  ArgumentOption(bool& target_, char shortName_, std::string longName_, std::string desc, std::string group_, bool isAdvanced_)
+      : Option(shortName_, std::move(longName_), std::move(desc), std::move(group_), isAdvanced_, false), target(target_) {}
 
   bool parse(std::string const& value) override
   {
@@ -200,50 +208,15 @@ struct ArgumentOption<bool> : Option {
   }
 
   std::ostream& printValue(std::ostream& out) const override { return out << target; }
-  std::string printValue() const override { return io::Str() << target; }
+  std::string printValue() const override { return io::stringify(target); }
   std::string printNumericValue() const override { return ""; }
 
   bool& target;
 };
 
-struct ParsedOption {
-  explicit ParsedOption(const Option& opt)
-      : shortName(opt.shortName),
-        longName(opt.longName),
-        description(opt.description),
-        group(opt.group),
-        isAdvanced(opt.isAdvanced),
-        requireArgument(opt.requireArgument),
-        incrementalArgument(opt.incrementalArgument),
-        argumentName(opt.argumentName),
-        negated(opt.negated),
-        value(opt.printValue()) { }
-
-  friend std::ostream& operator<<(std::ostream& out, const ParsedOption& option)
-  {
-    if (option.negated)
-      out << "no ";
-    out << option.longName;
-    if (option.requireArgument)
-      out << " = " << option.value;
-    return out;
-  }
-
-  char shortName;
-  std::string longName;
-  std::string description;
-  std::string group;
-  bool isAdvanced;
-  bool requireArgument;
-  bool incrementalArgument;
-  std::string argumentName;
-  bool negated;
-  std::string value;
-};
-
 struct TargetBase {
-  TargetBase(std::string variableName, std::string desc, std::string group, bool isAdvanced)
-      : variableName(std::move(variableName)), description(std::move(desc)), group(std::move(group)), isOptionalVector(false), isAdvanced(isAdvanced) { }
+  TargetBase(std::string variableName_, std::string desc, std::string group_, bool isAdvanced_)
+      : variableName(std::move(variableName_)), description(std::move(desc)), group(std::move(group_)), isOptionalVector(false), isAdvanced(isAdvanced_) {}
 
   virtual ~TargetBase() = default;
 
@@ -263,8 +236,8 @@ struct TargetBase {
 
 template <typename T>
 struct Target : TargetBase {
-  Target(T& target, std::string variableName, std::string desc, std::string group, bool isAdvanced)
-      : TargetBase(std::move(variableName), std::move(desc), std::move(group), isAdvanced), target(target) { }
+  Target(T& target_, std::string variableName_, std::string desc, std::string group_, bool isAdvanced_)
+      : TargetBase(std::move(variableName_), std::move(desc), std::move(group_), isAdvanced_), target(target_) {}
 
   bool parse(std::string const& value) override
   {
@@ -387,21 +360,21 @@ public:
 
   void parseArgs(const std::string& args);
 
+  void setJsonParameters(std::string jsonParameters) { m_jsonParameters = std::move(jsonParameters); }
+  void setJsonParametersProvider(std::function<std::string()> jsonParametersProvider) { m_jsonParametersProvider = std::move(jsonParametersProvider); }
+
   std::vector<ParsedOption> getUsedOptionArguments() const;
 
   unsigned int numRequiredArguments() const { return m_nonOptionArguments.size() - m_numOptionalNonOptionArguments; }
 
 private:
-/* Modification for igraph: Disable functions that call forbidden
- * functions such as exit(). */
-#if 0
   void exitWithUsage(bool showAdvanced) const;
   void exitWithVersionInformation() const;
-#endif
   void exitWithError(const std::string& message) const;
-#if 0
+  void exitWithCompletion() const;
   void exitWithJsonParameters() const;
-#endif
+  void printBashCompletion() const;
+  void printZshCompletion() const;
 
   std::deque<std::unique_ptr<Option>> m_optionArguments;
   std::deque<std::unique_ptr<TargetBase>> m_nonOptionArguments;
@@ -414,6 +387,9 @@ private:
   unsigned int m_displayHelp = 0;
   bool m_displayVersion = false;
   bool m_printJsonParameters = false;
+  std::string m_completionShell;
+  std::string m_jsonParameters;
+  std::function<std::string()> m_jsonParametersProvider;
 
   unsigned int m_numOptionalNonOptionArguments = 0;
 };

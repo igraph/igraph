@@ -10,12 +10,16 @@
 #include "MemMapEquation.h"
 #include "FlowData.h"
 #include "InfoNode.h"
+#include "../utils/Log.h"
+#include "../utils/format.h"
 
 #include <vector>
 #include <set>
 #include <map>
+#include <limits>
 #include <utility>
 #include <algorithm>
+#include <unordered_map>
 
 namespace infomap {
 
@@ -37,9 +41,10 @@ std::ostream& operator<<(std::ostream& out, const MemMapEquation& mapEq)
 // Init
 // ===================================================
 
-void MemMapEquation::init(const Config& /*config*/)
+void MemMapEquation::init(const Config& config)
 {
   Log(3) << "MemMapEquation::init()...\n";
+  Base::init(config);
 }
 
 void MemMapEquation::initNetwork(InfoNode& root)
@@ -52,9 +57,11 @@ void MemMapEquation::initSuperNetwork(InfoNode& /*root*/)
   // TODO: How use enterFlow instead of flow
 }
 
-void MemMapEquation::initSubNetwork(InfoNode& /*root*/)
+void MemMapEquation::initSubNetwork(InfoNode& root)
 {
-  //	Base::initSubNetwork(root);
+  // The module's exit codeword in the index codebook of the sub-network, as for
+  // MapEquation. initNetwork has already set up the physical nodes (#1282).
+  Base::initSubNetwork(root);
 }
 
 void MemMapEquation::initPartition(std::vector<InfoNode*>& nodes)
@@ -125,11 +132,15 @@ void MemMapEquation::initPhysicalNodes(InfoNode& root)
       node.physicalNodes.emplace_back(zeroBasedIndex, node.data.flow);
     }
 
-    // If leaf nodes was not directly under root, make sure leaf modules have
-    // physical nodes defined also
+    // If leaf nodes were not directly under root, make sure modules have
+    // physical nodes defined also. Every module, not only the leaf modules:
+    // removeSubModules makes a module of modules a leaf module, and
+    // calcCodelengthOnModuleOfLeafNodes reads its physical nodes (#1209).
     if (depth > 1) {
-      for (auto it(root.begin_leaf_modules()); !it.isEnd(); ++it) {
+      for (auto it(root.begin_post_depth_first()); !it.isEnd(); ++it) {
         InfoNode& module = *it;
+        if (module.isLeaf() || &module == &root)
+          continue;
         std::map<unsigned int, double> physToFlow;
         for (auto& node : module) {
           for (PhysData& physData : node.physicalNodes) {
@@ -179,9 +190,11 @@ void MemMapEquation::initPhysicalNodes(InfoNode& root)
         }
       }
     } else {
-      // whole network with reconstructed tree
-      for (auto it(root.begin_leaf_modules()); !it.isEnd(); ++it) {
+      // whole network with reconstructed tree, every module as above
+      for (auto it(root.begin_post_depth_first()); !it.isEnd(); ++it) {
         InfoNode& module = *it;
+        if (module.isLeaf() || &module == &root)
+          continue;
         std::map<unsigned int, double> physToFlow;
         for (auto& node : module) {
           for (PhysData& physData : node.physicalNodes) {
@@ -207,9 +220,14 @@ void MemMapEquation::initPartitionOfPhysicalNodes(std::vector<InfoNode*>& nodes)
     unsigned int moduleIndex = node.index; // Assume unique module index for all nodes in this initiation phase
 
     for (PhysData& physData : node.physicalNodes) {
-      m_physToModuleToMemNodes[physData.physNodeIndex].insert(m_physToModuleToMemNodes[physData.physNodeIndex].end(),
-                                                              std::make_pair(moduleIndex, MemNodeSet(1, physData.sumFlowFromM2Node)));
+      m_physToModuleToMemNodes[physData.physNodeIndex].emplace_back(moduleIndex, 1, physData.sumFlowFromM2Node);
     }
+  }
+
+  // Keep each physical node's entries sorted by module id; the move and
+  // codelength code relies on this for lookups and summation order.
+  for (auto& moduleToMemNodes : m_physToModuleToMemNodes) {
+    std::sort(moduleToMemNodes.begin(), moduleToMemNodes.end(), [](const ModuleMemNodes& a, const ModuleMemNodes& b) { return a.module < b.module; });
   }
 
   m_memoryContributionsAdded = false;
@@ -233,8 +251,8 @@ void MemMapEquation::calculateNodeFlow_log_nodeFlow()
   nodeFlow_log_nodeFlow = 0.0;
   for (unsigned int i = 0; i < m_numPhysicalNodes; ++i) {
     const ModuleToMemNodes& moduleToMemNodes = m_physToModuleToMemNodes[i];
-    for (const auto& moduleToMemNode : moduleToMemNodes)
-      nodeFlow_log_nodeFlow += infomath::plogp(moduleToMemNode.second.sumFlow);
+    for (const auto& memNodes : moduleToMemNodes)
+      nodeFlow_log_nodeFlow += infomath::plogp(memNodes.sumFlow);
   }
 }
 
@@ -274,8 +292,8 @@ double MemMapEquation::calcCodelengthOnModuleOfLeafNodes(const InfoNode& parent)
 }
 
 void MemMapEquation::addMemoryContributions(InfoNode& current,
-                                            MemDeltaFlow& oldModuleDelta,
-                                            VectorMap<MemDeltaFlow>& moduleDeltaFlow)
+                                            DeltaFlowDataType& oldModuleDelta,
+                                            VectorMap<DeltaFlowDataType>& moduleDeltaFlow)
 {
   // Overlapping modules
   /*
@@ -290,38 +308,58 @@ void MemMapEquation::addMemoryContributions(InfoNode& current,
   unsigned int numPhysicalNodes = physicalNodes.size();
   for (unsigned int i = 0; i < numPhysicalNodes; ++i) {
     PhysData& physData = physicalNodes[i];
+    // plogp(sumFlowFromM2Node) is constant across every module holding this
+    // physical node, so compute it once per physical node instead of per
+    // (physical node, module). Bit-exact; the per-module plogp of the changed
+    // flows (old/new) still varies and stays in the loop.
+    const double physFlow = physData.sumFlowFromM2Node;
+    const double plogpPhysFlow = infomath::plogp(physFlow);
     ModuleToMemNodes& moduleToMemNodes = m_physToModuleToMemNodes[physData.physNodeIndex];
-    for (const auto& moduleToMemNode : moduleToMemNodes) {
-      unsigned int moduleIndex = moduleToMemNode.first;
-      auto& memNodeSet = moduleToMemNode.second;
+    for (const auto& memNodes : moduleToMemNodes) {
+      unsigned int moduleIndex = memNodes.module;
       if (moduleIndex == current.index) // From where the multiple assigned node is moved
       {
-        double oldPhysFlow = memNodeSet.sumFlow;
-        double newPhysFlow = memNodeSet.sumFlow - physData.sumFlowFromM2Node;
+        double oldPhysFlow = memNodes.sumFlow;
+        double newPhysFlow = memNodes.sumFlow - physFlow;
         oldModuleDelta.sumDeltaPlogpPhysFlow += infomath::plogp(newPhysFlow) - infomath::plogp(oldPhysFlow);
-        oldModuleDelta.sumPlogpPhysFlow += infomath::plogp(physData.sumFlowFromM2Node);
+        oldModuleDelta.sumPlogpPhysFlow += plogpPhysFlow;
       } else // To where the multiple assigned node is moved
       {
-        double oldPhysFlow = memNodeSet.sumFlow;
-        double newPhysFlow = memNodeSet.sumFlow + physData.sumFlowFromM2Node;
+        double oldPhysFlow = memNodes.sumFlow;
+        double newPhysFlow = memNodes.sumFlow + physFlow;
 
         double sumDeltaPlogpPhysFlow = infomath::plogp(newPhysFlow) - infomath::plogp(oldPhysFlow);
-        double sumPlogpPhysFlow = infomath::plogp(physData.sumFlowFromM2Node);
-        moduleDeltaFlow.add(moduleIndex, MemDeltaFlow(moduleIndex, 0.0, 0.0, sumDeltaPlogpPhysFlow, sumPlogpPhysFlow));
+        moduleDeltaFlow.add(moduleIndex, DeltaFlowDataType(moduleIndex, 0.0, 0.0, sumDeltaPlogpPhysFlow, plogpPhysFlow));
       }
     }
   }
   m_memoryContributionsAdded = true;
 }
 
-double MemMapEquation::getDeltaCodelengthOnMovingNode(InfoNode& current,
-                                                      MemDeltaFlow& oldModuleDelta,
-                                                      MemDeltaFlow& newModuleDelta,
-                                                      std::vector<FlowData>& moduleFlowData,
-                                                      std::vector<unsigned int>& moduleMembers)
+INFOMAP_HOT double MemMapEquation::getDeltaCodelengthOnMovingNode(InfoNode& current,
+                                                                  DeltaFlowDataType& oldModuleDelta,
+                                                                  DeltaFlowDataType& newModuleDelta,
+                                                                  std::vector<FlowDataType>& moduleFlowData,
+                                                                  std::vector<unsigned int>& moduleMembers)
 {
   double deltaL = Base::getDeltaCodelengthOnMovingNode(current, oldModuleDelta, newModuleDelta, moduleFlowData, moduleMembers);
 
+  double delta_nodeFlow_log_nodeFlow = oldModuleDelta.sumDeltaPlogpPhysFlow + newModuleDelta.sumDeltaPlogpPhysFlow + oldModuleDelta.sumPlogpPhysFlow - newModuleDelta.sumPlogpPhysFlow;
+
+  return deltaL - delta_nodeFlow_log_nodeFlow;
+}
+
+INFOMAP_HOT double MemMapEquation::getDeltaCodelengthOnMovingNodeHoisted(InfoNode& current,
+                                                                         DeltaFlowDataType& oldModuleDelta,
+                                                                         const OldSideTerms& oldSide,
+                                                                         DeltaFlowDataType& newModuleDelta,
+                                                                         std::vector<FlowDataType>& moduleFlowData,
+                                                                         std::vector<unsigned int>& moduleMembers)
+{
+  double deltaL = Base::getDeltaCodelengthOnMovingNodeHoisted(current, oldModuleDelta, oldSide, newModuleDelta, moduleFlowData, moduleMembers);
+
+  // The physical-codebook old-side terms are already per-node constants:
+  // addMemoryContributions() computed them once into oldModuleDelta.
   double delta_nodeFlow_log_nodeFlow = oldModuleDelta.sumDeltaPlogpPhysFlow + newModuleDelta.sumDeltaPlogpPhysFlow + oldModuleDelta.sumPlogpPhysFlow - newModuleDelta.sumPlogpPhysFlow;
 
   return deltaL - delta_nodeFlow_log_nodeFlow;
@@ -332,9 +370,9 @@ double MemMapEquation::getDeltaCodelengthOnMovingNode(InfoNode& current,
 // ===================================================
 
 void MemMapEquation::updateCodelengthOnMovingNode(InfoNode& current,
-                                                  MemDeltaFlow& oldModuleDelta,
-                                                  MemDeltaFlow& newModuleDelta,
-                                                  std::vector<FlowData>& moduleFlowData,
+                                                  DeltaFlowDataType& oldModuleDelta,
+                                                  DeltaFlowDataType& newModuleDelta,
+                                                  std::vector<FlowDataType>& moduleFlowData,
                                                   std::vector<unsigned int>& moduleMembers)
 {
   Base::updateCodelengthOnMovingNode(current, oldModuleDelta, newModuleDelta, moduleFlowData, moduleMembers);
@@ -348,6 +386,15 @@ void MemMapEquation::updateCodelengthOnMovingNode(InfoNode& current,
   nodeFlow_log_nodeFlow += delta_nodeFlow_log_nodeFlow;
   moduleCodelength -= delta_nodeFlow_log_nodeFlow;
   codelength -= delta_nodeFlow_log_nodeFlow;
+
+  // The flag marks that the memory contributions for THIS move were already
+  // accumulated onto the deltas by addMemoryContributions() (the optimize
+  // candidate-evaluation path). It is consumed by this one move; reset it so a
+  // following standalone moveNodeToPredefinedModule() — e.g. the single-node
+  // "drag along" in tryMoveEachNodeIntoBestModule(), which passes fresh
+  // zero-initialised deltas — recomputes its own contributions instead of
+  // updating the physical-node map while leaving nodeFlow_log_nodeFlow stale.
+  m_memoryContributionsAdded = false;
 }
 
 void MemMapEquation::updatePhysicalNodes(InfoNode& current, unsigned int oldModuleIndex, unsigned int bestModuleIndex)
@@ -357,28 +404,26 @@ void MemMapEquation::updatePhysicalNodes(InfoNode& current, unsigned int oldModu
     ModuleToMemNodes& moduleToMemNodes = m_physToModuleToMemNodes[physData.physNodeIndex];
 
     // Remove contribution to old module
-    auto overlapIt = moduleToMemNodes.find(oldModuleIndex);
-    if (overlapIt == moduleToMemNodes.end())
-      throw std::length_error(io::Str() << "Couldn't find old module " << oldModuleIndex << " in physical node " << physData.physNodeIndex);
+    auto overlapIt = findModuleMemNodes(moduleToMemNodes, oldModuleIndex);
+    if (overlapIt == moduleToMemNodes.end() || overlapIt->module != oldModuleIndex)
+      throw std::length_error(fmt::format(FMT_STRING("Couldn't find old module {} in physical node {}"), oldModuleIndex, physData.physNodeIndex));
 
-    MemNodeSet& oldMemNodeSet = overlapIt->second;
-    oldMemNodeSet.sumFlow -= physData.sumFlowFromM2Node;
-    if (--oldMemNodeSet.numMemNodes == 0)
+    overlapIt->sumFlow -= physData.sumFlowFromM2Node;
+    if (--overlapIt->numMemNodes == 0)
       moduleToMemNodes.erase(overlapIt);
 
     // Add contribution to new module
-    overlapIt = moduleToMemNodes.find(bestModuleIndex);
-    if (overlapIt == moduleToMemNodes.end()) {
-      moduleToMemNodes.insert(std::make_pair(bestModuleIndex, MemNodeSet(1, physData.sumFlowFromM2Node)));
+    overlapIt = findModuleMemNodes(moduleToMemNodes, bestModuleIndex);
+    if (overlapIt == moduleToMemNodes.end() || overlapIt->module != bestModuleIndex) {
+      moduleToMemNodes.insert(overlapIt, ModuleMemNodes(bestModuleIndex, 1, physData.sumFlowFromM2Node));
     } else {
-      MemNodeSet& newMemNodeSet = overlapIt->second;
-      ++newMemNodeSet.numMemNodes;
-      newMemNodeSet.sumFlow += physData.sumFlowFromM2Node;
+      ++overlapIt->numMemNodes;
+      overlapIt->sumFlow += physData.sumFlowFromM2Node;
     }
   }
 }
 
-void MemMapEquation::addMemoryContributionsAndUpdatePhysicalNodes(InfoNode& current, MemDeltaFlow& oldModuleDelta, MemDeltaFlow& newModuleDelta)
+void MemMapEquation::addMemoryContributionsAndUpdatePhysicalNodes(InfoNode& current, DeltaFlowDataType& oldModuleDelta, DeltaFlowDataType& newModuleDelta)
 {
   unsigned int oldModuleIndex = oldModuleDelta.module;
   unsigned int bestModuleIndex = newModuleDelta.module;
@@ -388,64 +433,59 @@ void MemMapEquation::addMemoryContributionsAndUpdatePhysicalNodes(InfoNode& curr
     ModuleToMemNodes& moduleToMemNodes = m_physToModuleToMemNodes[physData.physNodeIndex];
 
     // Remove contribution to old module
-    auto overlapIt = moduleToMemNodes.find(oldModuleIndex);
-    if (overlapIt == moduleToMemNodes.end())
+    auto overlapIt = findModuleMemNodes(moduleToMemNodes, oldModuleIndex);
+    if (overlapIt == moduleToMemNodes.end() || overlapIt->module != oldModuleIndex)
       throw std::length_error("Couldn't find old module among physical node assignments.");
 
-    MemNodeSet& oldMemNodeSet = overlapIt->second;
-    double oldPhysFlow = oldMemNodeSet.sumFlow;
-    double newPhysFlow = oldMemNodeSet.sumFlow - physData.sumFlowFromM2Node;
+    double oldPhysFlow = overlapIt->sumFlow;
+    double newPhysFlow = overlapIt->sumFlow - physData.sumFlowFromM2Node;
     oldModuleDelta.sumDeltaPlogpPhysFlow += infomath::plogp(newPhysFlow) - infomath::plogp(oldPhysFlow);
     oldModuleDelta.sumPlogpPhysFlow += infomath::plogp(physData.sumFlowFromM2Node);
-    oldMemNodeSet.sumFlow -= physData.sumFlowFromM2Node;
-    if (--oldMemNodeSet.numMemNodes == 0)
+    overlapIt->sumFlow -= physData.sumFlowFromM2Node;
+    if (--overlapIt->numMemNodes == 0)
       moduleToMemNodes.erase(overlapIt);
 
     // Add contribution to new module
-    overlapIt = moduleToMemNodes.find(bestModuleIndex);
-    if (overlapIt == moduleToMemNodes.end()) {
-      moduleToMemNodes.insert(std::make_pair(bestModuleIndex, MemNodeSet(1, physData.sumFlowFromM2Node)));
+    overlapIt = findModuleMemNodes(moduleToMemNodes, bestModuleIndex);
+    if (overlapIt == moduleToMemNodes.end() || overlapIt->module != bestModuleIndex) {
+      moduleToMemNodes.insert(overlapIt, ModuleMemNodes(bestModuleIndex, 1, physData.sumFlowFromM2Node));
       oldPhysFlow = 0.0;
       newPhysFlow = physData.sumFlowFromM2Node;
       newModuleDelta.sumDeltaPlogpPhysFlow += infomath::plogp(newPhysFlow) - infomath::plogp(oldPhysFlow);
       newModuleDelta.sumPlogpPhysFlow += infomath::plogp(physData.sumFlowFromM2Node);
     } else {
-      MemNodeSet& newMemNodeSet = overlapIt->second;
-      oldPhysFlow = newMemNodeSet.sumFlow;
-      newPhysFlow = newMemNodeSet.sumFlow + physData.sumFlowFromM2Node;
+      oldPhysFlow = overlapIt->sumFlow;
+      newPhysFlow = overlapIt->sumFlow + physData.sumFlowFromM2Node;
       newModuleDelta.sumDeltaPlogpPhysFlow += infomath::plogp(newPhysFlow) - infomath::plogp(oldPhysFlow);
       newModuleDelta.sumPlogpPhysFlow += infomath::plogp(physData.sumFlowFromM2Node);
-      ++newMemNodeSet.numMemNodes;
-      newMemNodeSet.sumFlow += physData.sumFlowFromM2Node;
+      ++overlapIt->numMemNodes;
+      overlapIt->sumFlow += physData.sumFlowFromM2Node;
     }
   }
 }
 
 void MemMapEquation::consolidateModules(std::vector<InfoNode*>& modules)
 {
-  std::map<unsigned int, std::map<unsigned int, unsigned int>> validate;
-
   for (unsigned int i = 0; i < m_numPhysicalNodes; ++i) {
     ModuleToMemNodes& modToMemNodes = m_physToModuleToMemNodes[i];
-    for (const auto& modToMemNode : modToMemNodes) {
-      if (++validate[modToMemNode.first][i] > 1)
+    for (unsigned int j = 0; j < modToMemNodes.size(); ++j) {
+      // Sorted strictly increasing module ids guarantee no (module, phys) duplicates
+      if (j > 0 && modToMemNodes[j].module <= modToMemNodes[j - 1].module)
         throw std::domain_error("[InfomapGreedy::consolidateModules] Error updating physical nodes: duplication error");
 
-      modules[modToMemNode.first]->physicalNodes.emplace_back(i, modToMemNode.second.sumFlow);
+      modules[modToMemNodes[j].module]->physicalNodes.emplace_back(i, modToMemNodes[j].sumFlow);
     }
   }
 }
 
-#if 0
 // ===================================================
 // Debug
 // ===================================================
 
 void MemMapEquation::printDebug() const
 {
-  std::cout << "MemMapEquation::m_numPhysicalNodes: " << m_numPhysicalNodes << "\n";
+  Log().print("MemMapEquation::m_numPhysicalNodes: {}\n", m_numPhysicalNodes);
   Base::printDebug();
 }
-#endif
 
 } // namespace infomap

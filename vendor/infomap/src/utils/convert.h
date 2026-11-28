@@ -11,11 +11,10 @@
 #define CONVERT_H_
 
 #include <stdexcept>
-#include <iomanip>
 #include <sstream>
 #include <string>
 #include <locale> // std::locale, std::tolower
-#include <iostream>
+#include <limits>
 #include <vector>
 
 namespace infomap {
@@ -52,7 +51,7 @@ namespace io {
   }
 
   template <typename T>
-  inline std::string stringify(T& x)
+  inline std::string stringify(const T& x)
   {
     std::ostringstream o;
     if (!(o << x))
@@ -61,7 +60,7 @@ namespace io {
   }
 
   template <>
-  inline std::string stringify(bool& x)
+  inline std::string stringify(const bool& x)
   {
     return x ? "true" : "false";
   }
@@ -107,7 +106,7 @@ namespace io {
     std::stringstream ss(s);
     std::string item;
     while (std::getline(ss, item, delim)) {
-      if (item.length() > 0) {
+      if (!item.empty()) {
         items.push_back(item);
       }
     }
@@ -121,29 +120,6 @@ namespace io {
     return items;
   }
 
-  class Str {
-  public:
-    Str() = default;
-    template <class T>
-    Str& operator<<(const T& t)
-    {
-      m_oss << stringify(t);
-      return *this;
-    }
-    Str& operator<<(std::ostream& (*f)(std::ostream&))
-    {
-      m_oss << f;
-      return *this;
-    }
-    operator std::string() const
-    {
-      return m_oss.str();
-    }
-
-  private:
-    std::ostringstream m_oss;
-  };
-
   template <typename T>
   inline bool stringToValue(std::string const& str, T& value)
   {
@@ -151,26 +127,36 @@ namespace io {
     return !!(istream >> value);
   }
 
+  template <typename T>
+  inline bool stringToUnsignedValue(std::string const& str, T& value)
+  {
+    std::istringstream istream(str);
+    istream >> std::ws;
+    if (!istream.good() || istream.peek() == '-' || istream.peek() == std::char_traits<char>::eof())
+      return false;
+
+    unsigned long long target = 0;
+    if (!(istream >> target))
+      return false;
+
+    istream >> std::ws;
+    if (!istream.eof() || target > std::numeric_limits<T>::max())
+      return false;
+
+    value = static_cast<T>(target);
+    return true;
+  }
+
   template <>
   inline bool stringToValue(std::string const& str, unsigned int& value)
   {
-    std::istringstream istream(str);
-    int target = 0;
-    istream >> target;
-    if (target < 0) return false;
-    value = target;
-    return true;
+    return stringToUnsignedValue(str, value);
   }
 
   template <>
   inline bool stringToValue(std::string const& str, unsigned long& value)
   {
-    std::istringstream istream(str);
-    int target = 0;
-    istream >> target;
-    if (target < 0) return false;
-    value = target;
-    return true;
+    return stringToUnsignedValue(str, value);
   }
 
   inline std::string firstWord(const std::string& line)
@@ -197,16 +183,70 @@ namespace io {
     return std::string(size - valStr.size(), paddingChar).append(valStr);
   }
 
-  inline std::string toPrecision(double value, unsigned int precision = 10, bool fixed = false)
+  // Whether `token` is exactly a non-negative decimal integer that fits an
+  // unsigned int, storing it in `value` when it is.
+  //
+  // `std::istream >> unsigned` accepts a leading '-' and stores the value modulo
+  // 2^32, so reading an id that way turned "-2" into 4294967294 instead of
+  // failing: a phantom node in its own module, and the real node silently losing
+  // its name. The link and *States rows never had that problem because they parse
+  // ids by hand; this is the same rule, in a place every id reader can reach.
+  //
+  // An optional leading '+' is accepted because detail::parseUnsigned, which the link
+  // rows use, accepts it -- the point of this function is to give every id reader the
+  // same rule, so it has to match the reader that was already right. A '-' is refused,
+  // and so is anything after the digits: the link rows refuse "1x" and "1.5" too, so
+  // the *Vertices and .clu readers refusing them is the same convention rather than a
+  // new one.
+  //
+  // The bound is checked after every digit, not once at the end, so `result` is at
+  // most 4294967295 entering an iteration and the next step reaches at most
+  // 42949672959 -- nowhere near the 64-bit ceiling. That is what keeps an arbitrarily
+  // long digit string safe: it is rejected by the eleventh digit at the latest. Move
+  // the check out of the loop and that stops being true.
+  inline bool parseNonNegativeInteger(const std::string& token, unsigned int& value)
   {
-    std::ostringstream o;
-    if (fixed)
-      o << std::fixed << std::setprecision(static_cast<int>(precision));
-    else
-      o << std::setprecision(static_cast<int>(precision));
-    if (!(o << value))
-      throw std::runtime_error((o << "stringify(" << value << ")", o.str()));
-    return o.str();
+    std::size_t index = 0;
+    if (index < token.size() && token[index] == '+')
+      ++index;
+    if (index >= token.size())
+      return false;
+
+    unsigned long long result = 0;
+    for (; index < token.size(); ++index) {
+      const char c = token[index];
+      if (c < '0' || c > '9')
+        return false;
+      result = result * 10 + static_cast<unsigned long long>(c - '0');
+      if (result > std::numeric_limits<unsigned int>::max())
+        return false;
+    }
+
+    value = static_cast<unsigned int>(result);
+    return true;
+  }
+
+  // Defined in convert.cpp with fmt, to keep the heavy fmt header out of this
+  // widely-included file. {:.{}g} reproduces std::setprecision(precision) with
+  // the default floatfield, {:.{}f} reproduces std::fixed << setprecision(...);
+  // both verified byte-for-byte against the previous iostream implementation.
+  std::string toPrecision(double value, unsigned int precision = 10, bool fixed = false);
+
+  //! Render a value as an RFC 4180 quoted CSV field: wrapped in quotes, with any quote in
+  //! it written twice. Without the doubling a name containing a quote closes the field
+  //! early and the row gains a column, which every CSV reader then mis-parses (#908).
+  inline std::string csvQuoted(const std::string& value)
+  {
+    std::string quoted;
+    quoted.reserve(value.size() + 2);
+    quoted += '"';
+    for (const char c : value) {
+      if (c == '"')
+        quoted += '"';
+      quoted += c;
+    }
+    quoted += '"';
+    return quoted;
   }
 
 } // namespace io

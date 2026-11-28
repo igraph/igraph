@@ -15,6 +15,7 @@
 
 ### Fixed
 
+- `igraph_community_infomap()` now returns `IGRAPH_INTERRUPTED` when interrupted. Previously, an interruption was reported as a generic failure (`IGRAPH_FAILURE`).
 - igraph's build system no longer selects BLAS and LAPACK libraries that use 64-bit integers (ILP64), such as `openblas64`, `flexiblas64` or the ILP64 interface of Intel MKL, when `BLA_VENDOR` is used with CMake 3.22 or later. igraph does not support these libraries, and linking to them caused crashes or incorrect results. Setting `BLA_SIZEOF_INTEGER` to a value other than 4 is now an error. The documentation now states that BLAS, LAPACK and ARPACK must use 32-bit integers.
 - Turn off CMake test preparation targets, introduced with CMake 4.4 and enabled by default with CMake 4.5. This eliminates warnings that CMake would otherwise produce for each test when using the Makefiles generator, due to igraph using `:` in test names.
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was directed with some mutual edges, but no multi-edges; the `mode=IGRAPH_ALL` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set. An incorrect cache entry may cause various igraph functions to return invalid results.
@@ -68,6 +69,7 @@
 - Proofread the documentation and error/warning message texts, correcting spelling, grammar, and formatting, using AI assistance.
 - nanoflann was updated to version 2.0.2
 - nanoflann is now configured not to link against the threads library, which eliminates linking issues on some platforms. igraph does not use nanoflann's multiprocessing features, so the threads library was not needed for this purpose.
+- Infomap was updated to version 2.16.1. The vendored copy is now unmodified upstream source.
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 - Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
 - The build system now uses the behaviour of CMake policies up to CMake 4.5.

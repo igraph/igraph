@@ -8,72 +8,44 @@
  ******************************************************************************/
 
 #include "Network.h"
-#include "../io/SafeFile.h"
-#include "../utils/FileURI.h"
+#include "InfomapError.h"
+#include "NetworkBuilder.h"
 #include "../utils/Log.h"
+#include "../utils/Console.h"
+#include "../utils/convert.h"
+#include "../utils/format.h"
 
 #include <cmath>
-#include <iostream>
 #include <algorithm>
+#include <limits>
+#include <set>
+#include <stdexcept>
 
 namespace infomap {
 
 using std::make_pair;
 
+namespace {
+
+#if !INFOMAP_FEATURE_REGULARIZED_MULTILAYER
+  const char* regularizedMultilayerFeatureError()
+  {
+    return "Regularized multilayer flow requires building with FEATURES=regularized-multilayer.";
+  }
+#endif
+
+} // namespace
+
 void Network::init()
 {
-  initValidHeadings();
-  m_multilayerStateIdBitShift = static_cast<unsigned int>(std::ceil(std::log2(m_config.matchableMultilayerIds)));
+  updateDerivedConfig();
 }
 
-void Network::initValidHeadings()
+void Network::updateDerivedConfig()
 {
-  auto& headingsPajek = m_validHeadings["pajek"];
-  headingsPajek.insert("*vertices");
-  headingsPajek.insert("*edges");
-  headingsPajek.insert("*arcs");
-
-  auto& headingsLinklist = m_validHeadings["link-list"];
-  headingsLinklist.insert("*links");
-  headingsLinklist.insert("*edges");
-  headingsLinklist.insert("*arcs");
-
-  auto& headingsBipartite = m_validHeadings["bipartite"];
-  headingsBipartite.insert("*vertices");
-  headingsBipartite.insert("*bipartite");
-
-  auto& headingsStates = m_validHeadings["states"];
-  headingsStates.insert("*vertices");
-  headingsStates.insert("*states");
-  headingsStates.insert("*edges");
-  headingsStates.insert("*arcs");
-  headingsStates.insert("*links");
-  headingsStates.insert("*contexts");
-  auto& ignoreHeadingsStates = m_ignoreHeadings["states"];
-  ignoreHeadingsStates.insert("*edges");
-  ignoreHeadingsStates.insert("*contexts");
-
-  auto& headingsMultilayer = m_validHeadings["multilayer"];
-  headingsMultilayer.insert("*vertices");
-  headingsMultilayer.insert("*multiplex");
-  headingsMultilayer.insert("*multilayer");
-  headingsMultilayer.insert("*intra");
-  headingsMultilayer.insert("*inter");
-
-  auto& headingsGeneral = m_validHeadings["general"];
-  headingsGeneral.insert("*vertices");
-  headingsGeneral.insert("*states");
-  headingsGeneral.insert("*multilayer");
-  headingsGeneral.insert("*intra");
-  headingsGeneral.insert("*inter");
-  headingsGeneral.insert("*paths");
-  headingsGeneral.insert("*edges");
-  headingsGeneral.insert("*arcs");
-  headingsGeneral.insert("*links");
-  headingsGeneral.insert("*contexts");
-  headingsGeneral.insert("*bipartite");
-  auto& ignoreHeadingsGeneral = m_ignoreHeadings["general"];
-  ignoreHeadingsGeneral.insert("*contexts");
+  m_multilayerStateIdBitShift = m_config.matchableMultilayerIds == 0
+      ? 0
+      : static_cast<unsigned int>(std::ceil(std::log2(m_config.matchableMultilayerIds)));
 }
 
 void Network::clear()
@@ -93,6 +65,9 @@ void Network::clear()
   // Meta data
   m_metaData.clear();
   m_numMetaDataColumns = 0;
+
+  // Embedded initial partition
+  m_initialPartitionPaths.clear();
 }
 
 void Network::readInputData(std::string filename, bool accumulate)
@@ -105,63 +80,14 @@ void Network::readInputData(std::string filename, bool accumulate)
   if (filename.empty()) {
     throw std::runtime_error("No input file to read network");
   }
-  FileURI networkFilename(filename, false);
-
-  parseNetwork(filename);
-  printSummary();
-}
-
-void Network::parseNetwork(const std::string& filename)
-{
-  Log() << "Parsing " << (m_config.isUndirectedFlow() ? "undirected" : "directed") << " network from file '" << filename << "'...\n";
-
-  parseNetwork(filename, m_validHeadings["general"], m_ignoreHeadings["general"]);
-}
-
-void Network::parseNetwork(const std::string& filename, const InsensitiveStringSet& validHeadings, const InsensitiveStringSet& ignoreHeadings, const std::string& startHeading)
-{
-  m_haveFileInput = true;
-  SafeInFile input(filename);
-
-  // Parse standard links by default until possible heading is reached
-  std::string heading = startHeading.length() > 0 ? startHeading : parseLinks(input);
-
-  while (heading.length() > 0 && heading[0] == '*') {
-    std::string headingLowerCase = io::tolower(io::firstWord(heading));
-    if (validHeadings.count(headingLowerCase) == 0) {
-      throw std::runtime_error(io::Str() << "Unrecognized heading in network file: '" << headingLowerCase << "'.");
-    }
-    if (ignoreHeadings.count(headingLowerCase) > 0) {
-      heading = ignoreSection(input, headingLowerCase);
-    } else if (headingLowerCase == "*vertices") {
-      heading = parseVertices(input, heading);
-    } else if (headingLowerCase == "*states") {
-      heading = parseStateNodes(input, heading);
-    } else if (headingLowerCase == "*edges") {
-      if (!m_config.isUndirectedFlow())
-        Log() << "\n --> Notice: Links marked as undirected but parsed as directed.\n";
-      heading = parseLinks(input);
-    } else if (headingLowerCase == "*arcs") {
-      if (m_config.isUndirectedFlow())
-        Log() << "\n --> Notice: Links marked as directed but parsed as undirected.\n";
-      heading = parseLinks(input);
-    } else if (headingLowerCase == "*links") {
-      heading = parseLinks(input);
-    } else if (headingLowerCase == "*multilayer" || headingLowerCase == "*multiplex") {
-      heading = parseMultilayerLinks(input);
-    } else if (headingLowerCase == "*intra") {
-      heading = parseMultilayerIntraLinks(input);
-    } else if (headingLowerCase == "*inter") {
-      heading = parseMultilayerInterLinks(input);
-    } else if (headingLowerCase == "*bipartite") {
-      heading = parseBipartiteLinks(input, heading);
-    } else {
-      heading = ignoreSection(input, headingLowerCase);
-    }
+  try {
+    buildNetworkFromInput(*this, filename);
+  } catch (const InfomapError&) {
+    throw;
+  } catch (const std::exception& e) {
+    throw InfomapError(ExitCode::InputError, e.what());
   }
-
-  postProcessInputData();
-  Log() << "Done!\n";
+  printSummary();
 }
 
 void Network::postProcessInputData()
@@ -171,347 +97,65 @@ void Network::postProcessInputData()
   }
 
   if (!haveMemoryInput()) {
-    // If no memory input, add physical nodes as state nodes to not miss unconnected nodes
-    for (auto& it : m_physNodes) {
-      addNode(it.second.physId, it.second.weight);
+    // If no memory input, add physical nodes as state nodes to not miss unconnected nodes.
+    // Only a weight given for the physical node replaces the state node's, so a
+    // weight set through addNode(id, weight) survives (#1183).
+    for (const auto& it : m_physNodes) {
+      const auto& physNode = it.second;
+      if (physNode.hasWeight) {
+        addNode(physNode.physId, physNode.weight);
+      } else {
+        addNode(physNode.physId);
+      }
     }
+    // The physical nodes now mirror the state nodes 1:1, and nothing reads
+    // m_physNodes' contents past this point (only numPhysicalNodes(), which is
+    // backed by a counter). Release the map -- a per-source std::map -- to cut
+    // the build peak. std::map::clear() deallocates its nodes.
+    m_physNodes.clear();
   }
 }
 
 void Network::readMetaData(const std::string& filename)
 {
-  Log() << "Parsing meta data from '" << filename << "'...\n";
-  SafeInFile input(filename);
-  std::string line;
-  while (!std::getline(input, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    m_extractor.clear();
-    m_extractor.str(line);
-
-    unsigned int nodeId;
-    if (!(m_extractor >> nodeId))
-      throw std::runtime_error(io::Str() << "Can't parse node id from line '" << line << "'");
-
-    std::vector<int> metaData;
-    unsigned int metaId;
-    while (m_extractor >> metaId) {
-      metaData.push_back(metaId);
-    }
-    if (metaData.empty())
-      throw std::runtime_error(io::Str() << "Can't parse any meta data from line '" << line << "'");
-
-    addMetaData(nodeId, metaData);
+  if (!m_metaData.empty()) {
+    Console::note(0, "External meta-data '{}' overrides {} meta-data entries already on the network (e.g. embedded JSON 'meta').", filename, m_metaData.size());
   }
-  Log() << " -> Parsed " << m_numMetaDataColumns << " columns of meta data for " << m_metaData.size() << " nodes.\n";
-}
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  HELPER METHODS
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-
-std::string Network::parseVertices(std::ifstream& file, const std::string& /*heading*/)
-{
-  Log() << "  Parsing vertices...\n"
-        << std::flush;
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    m_extractor.clear();
-    m_extractor.str(line);
-
-    unsigned int id = 0;
-    if (!(m_extractor >> id))
-      throw std::runtime_error(io::Str() << "Can't parse node id from line '" << line << "'");
-
-    auto nameStart = line.find_first_of('\"');
-    auto nameEnd = line.find_last_of('\"');
-    std::string name;
-    if (nameStart < nameEnd) {
-      name = std::string(line.begin() + nameStart + 1, line.begin() + nameEnd);
-      line = line.substr(nameEnd + 1);
-      m_extractor.clear();
-      m_extractor.str(line);
-    } else {
-      if (!(m_extractor >> name))
-        throw std::runtime_error(io::Str() << "Can't parse node name from line '" << line << "'");
-    }
-    double weight = 1.0;
-    if ((m_extractor >> weight)) {
-      m_haveNodeWeights = true;
-      if (weight < 0)
-        throw std::runtime_error(io::Str() << "Negative node weight (" << weight << ") from line '" << line << "'");
-    }
-
-    addPhysicalNode(id, weight, name);
+  try {
+    buildMetaDataFromInput(*this, filename);
+  } catch (const InfomapError&) {
+    throw;
+  } catch (const std::exception& e) {
+    throw InfomapError(ExitCode::InputError, e.what());
   }
-  Log() << "  -> " << m_physNodes.size() << " physical nodes added\n";
-  return line;
-}
-
-std::string Network::parseStateNodes(std::ifstream& file, const std::string& /*heading*/)
-{
-  m_higherOrderInputMethodCalled = true;
-  Log() << "  Parsing state nodes...\n"
-        << std::flush;
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    StateNode stateNode;
-    parseStateNode(line, stateNode);
-
-    addStateNode(stateNode);
-    addPhysicalNode(stateNode.physicalId);
-
-    ++m_numStateNodesFound;
-  }
-  Log() << "  -> " << m_numStateNodesFound << " state nodes added\n";
-  return line;
-}
-
-std::string Network::parseLinks(std::ifstream& file)
-{
-  // This is the default action, so check for links before printing
-  bool parsingLinks = false;
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    if (!parsingLinks) {
-      parsingLinks = true;
-      Log() << "  Parsing links...\n"
-            << std::flush;
-    }
-
-    unsigned int n1, n2;
-    double weight;
-    parseLink(line, n1, n2, weight);
-
-    addLink(n1, n2, weight);
-  }
-  if (parsingLinks)
-    Log() << "  -> " << m_numLinks << " links\n";
-  return line;
-}
-
-std::string Network::parseMultilayerLinks(std::ifstream& file)
-{
-  Log() << "  Parsing multilayer links...\n"
-        << std::flush;
-
-  if (m_config.matchableMultilayerIds > 0) {
-    Log() << "  Creating matchable state ids using: nodeId << (log2(" << m_config.matchableMultilayerIds << ") + 1) | layerId\n";
-  }
-
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    unsigned int layer1, n1, layer2, n2;
-    double weight;
-    parseMultilayerLink(line, layer1, n1, layer2, n2, weight);
-
-    // TODO: This explicit multilayer format can allow undirected but not the inter/intra format, clear?
-    addMultilayerLink(layer1, n1, layer2, n2, weight);
-  }
-  Log() << "  -> " << (m_numIntraLayerLinks + m_numInterLayerLinks) << " links in " << m_layers.size() << " layers\n";
-  Log() << "    -> " << m_numIntraLayerLinks << " intra-layer links\n";
-  Log() << "    -> " << m_numInterLayerLinks << " inter-layer links\n";
-  return line;
-}
-
-std::string Network::parseMultilayerIntraLinks(std::ifstream& file)
-{
-  Log() << "  Parsing intra-layer links...\n"
-        << std::flush;
-
-  if (m_config.matchableMultilayerIds > 0) {
-    Log() << "  Creating matchable state ids using: nodeId << (log2(" << m_config.matchableMultilayerIds << ") + 1) | layerId\n";
-  }
-
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    unsigned int layer, n1, n2;
-    double weight;
-    parseMultilayerIntraLink(line, layer, n1, n2, weight);
-
-    addMultilayerIntraLink(layer, n1, n2, weight);
-  }
-  Log() << "  -> " << m_numIntraLayerLinks << " intra-layer links\n";
-  return line;
-}
-
-std::string Network::parseMultilayerInterLinks(std::ifstream& file)
-{
-  Log() << "  Parsing inter-layer links...\n"
-        << std::flush;
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    unsigned int layer1, n, layer2;
-    double weight;
-    parseMultilayerInterLink(line, layer1, n, layer2, weight);
-
-    addMultilayerInterLink(layer1, n, layer2, weight);
-  }
-  Log() << "  -> " << m_numInterLayerLinks << " inter-layer links\n";
-  return line;
-}
-
-std::string Network::parseBipartiteLinks(std::ifstream& file, const std::string& heading)
-{
-  Log() << "  Parsing bipartite links...\n";
-  // Extract break point for bipartite links
-  m_extractor.clear();
-  m_extractor.str(heading);
-  std::string tmp;
-  if (!(m_extractor >> tmp >> m_bipartiteStartId))
-    throw std::runtime_error(io::Str() << "Can't parse bipartite start id from line '" << heading << "'");
-
-  Log() << "  -> Using bipartite start id " << m_bipartiteStartId << "\n";
-  m_config.bipartite = true;
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line.length() == 0 || line[0] == '#')
-      continue;
-
-    if (line[0] == '*')
-      break;
-
-    unsigned int n1, n2;
-    double weight;
-    parseLink(line, n1, n2, weight);
-    bool sourceIsFeature = n1 >= m_bipartiteStartId;
-    bool targetIsFeature = n2 >= m_bipartiteStartId;
-    if (sourceIsFeature == targetIsFeature) {
-      throw std::runtime_error(io::Str() << "Bipartite link '" << line << "' must cross bipartite start id " << m_bipartiteStartId << ".");
-    }
-    addLink(n1, n2, weight);
-  }
-  return line;
-}
-
-std::string Network::ignoreSection(std::ifstream& file, const std::string& heading)
-{
-  Log() << "(Ignoring section " << heading << ") ";
-  std::string line;
-  while (!std::getline(file, line).fail()) {
-    if (line[0] == '*')
-      break;
-  }
-  return line;
-}
-
-void Network::parseStateNode(const std::string& line, StateNetwork::StateNode& stateNode)
-{
-  m_extractor.clear();
-  m_extractor.str(line);
-  if (!(m_extractor >> stateNode.id >> stateNode.physicalId))
-    throw std::runtime_error(io::Str() << "Can't parse any state node from line '" << line << "'");
-
-  // Optional name enclosed in double quotes
-  auto nameStart = line.find_first_of('\"', m_extractor.tellg());
-  auto nameEnd = line.find_last_of('\"');
-  if (nameStart < nameEnd) {
-    stateNode.name = std::string(line.begin() + nameStart + 1, line.begin() + nameEnd);
-    m_extractor.seekg(nameEnd + 1);
-  }
-  // Optional weight, default to 1.0
-  if ((m_extractor >> stateNode.weight)) {
-    m_haveStateNodeWeights = true;
-    if (stateNode.weight < 0)
-      throw std::runtime_error(io::Str() << "Negative state node weight (" << stateNode.weight << ") from line '" << line << "'");
-  }
-}
-
-void Network::parseLink(const std::string& line, unsigned int& n1, unsigned int& n2, double& weight)
-{
-  m_extractor.clear();
-  m_extractor.str(line);
-  if (!(m_extractor >> n1 >> n2))
-    throw std::runtime_error(io::Str() << "Can't parse link data from line '" << line << "'");
-  (m_extractor >> weight) || (weight = 1.0);
-}
-
-void Network::parseMultilayerLink(const std::string& line, unsigned int& layer1, unsigned int& n1, unsigned int& layer2, unsigned int& n2, double& weight)
-{
-  m_extractor.clear();
-  m_extractor.str(line);
-  if (!(m_extractor >> layer1 >> n1 >> layer2 >> n2))
-    throw std::runtime_error(io::Str() << "Can't parse multilayer link data from line '" << line << "'");
-  (m_extractor >> weight) || (weight = 1.0);
-}
-
-void Network::parseMultilayerIntraLink(const std::string& line, unsigned int& layer, unsigned int& n1, unsigned int& n2, double& weight)
-{
-  m_extractor.clear();
-  m_extractor.str(line);
-  if (!(m_extractor >> layer >> n1 >> n2))
-    throw std::runtime_error(io::Str() << "Can't parse intra-multilayer link data from line '" << line << "'");
-  (m_extractor >> weight) || (weight = 1.0);
-}
-
-void Network::parseMultilayerInterLink(const std::string& line, unsigned int& layer1, unsigned int& n, unsigned int& layer2, double& weight)
-{
-  m_extractor.clear();
-  m_extractor.str(line);
-  if (!(m_extractor >> layer1 >> n >> layer2))
-    throw std::runtime_error(io::Str() << "Can't parse inter-multilayer link data from line '" << line << "'");
-  (m_extractor >> weight) || (weight = 1.0);
-  if (layer1 == layer2)
-    throw std::runtime_error(io::Str() << "Inter-layer link from line '" << line << "' doesn't go between different layers.");
-  // TODO: Same as intra-layer self-link?
 }
 
 void Network::printSummary()
 {
-  Log() << "-------------------------------------\n";
+  Console console;
+  console.section("Network");
+  console.metric("Input", m_config.networkFile);
+  console.metric("Direction", m_config.isUndirectedClustering() ? "undirected" : "directed");
   if (haveMemoryInput()) {
-    Log() << "  -> " << numNodes() << " state nodes\n";
-    Log() << "  -> " << numPhysicalNodes() << " physical nodes\n";
+    console.metric("Type", isMultilayerNetwork() ? "higher-order multilayer" : "higher-order state");
+    console.metric("State nodes", fmt::to_string(numNodes()));
+    console.metric("Physical nodes", fmt::to_string(numPhysicalNodes()));
+  } else if (m_bipartiteStartId > 0) {
+    console.metric("Type", "bipartite first-order");
+    console.metric("Bipartite start id", fmt::to_string(m_bipartiteStartId));
+    console.metric("Nodes", fmt::to_string(numNodes()));
   } else {
-    if (m_bipartiteStartId > 0)
-      Log() << "  -> " << numNodes() << " bipartite nodes\n";
-    else
-      Log() << "  -> " << numNodes() << " nodes\n";
+    console.metric("Type", "first-order");
+    console.metric("Nodes", fmt::to_string(numNodes()));
   }
-  Log() << "  -> " << numLinks() << " links with total weight " << m_totalLinkWeightAdded << "\n";
+  if (isMultilayerNetwork()) {
+    console.metric("Layers", fmt::to_string(m_layers.size()));
+    console.metric("Layer links", fmt::format(FMT_STRING("{} ({} intra, {} inter)"), m_numIntraLayerLinks + m_numInterLayerLinks, m_numIntraLayerLinks, m_numInterLayerLinks));
+  }
+  console.metric("Links", fmt::to_string(numLinks()));
+  console.metric("Total weight", fmt::format(FMT_STRING("{:g}"), m_totalLinkWeightAdded));
   if (m_numLinksIgnoredByWeightThreshold > 0) {
-    Log() << "  -> " << m_numLinksIgnoredByWeightThreshold << " links ignored by weight threshold with total weight " << m_totalLinkWeightIgnored << " (" << io::toPrecision(m_totalLinkWeightIgnored / (m_totalLinkWeightIgnored + m_totalLinkWeightAdded) * 100, 1, true) << "%)\n";
+    console.metric("Ignored by threshold", fmt::format(FMT_STRING("{} links, weight {:g} ({})"), m_numLinksIgnoredByWeightThreshold, m_totalLinkWeightIgnored, Console::percent(m_totalLinkWeightIgnored / (m_totalLinkWeightIgnored + m_totalLinkWeightAdded) * 100)));
   }
 }
 
@@ -525,10 +169,14 @@ void Network::addMultilayerLink(unsigned int layer1, unsigned int n1, unsigned i
   }
   unsigned int stateId1 = addMultilayerNode(layer1, n1);
   unsigned int stateId2 = addMultilayerNode(layer2, n2);
+  addMultilayerLink(stateId1, layer1, n1, stateId2, layer2, n2, weight);
+}
 
-  if (stateId1 == stateId2) {
-    // TODO: Handle self-links?
-  }
+void Network::addMultilayerLink(unsigned int stateId1, unsigned int layer1, unsigned int n1, unsigned int stateId2, unsigned int layer2, unsigned int, double weight)
+{
+  // if (stateId1 == stateId2) {
+  // TODO: Handle self-links?
+  // }
 
   if (layer1 == layer2) {
     ++m_numIntraLayerLinks;
@@ -537,18 +185,46 @@ void Network::addMultilayerLink(unsigned int layer1, unsigned int n1, unsigned i
     ++m_numInterLayerLinks;
   }
 
+  // The main expanded network builds through the flat buffer (mode A), exactly
+  // like ordinary/state networks: this is a write-only sink during expansion
+  // (the only main-map read was already dead code) and during explicit
+  // *Multilayer parsing, so aggregation can be deferred to finalizeLinks()
+  // instead of paying a per-source std::map. Mode is left at its default (A);
+  // only the transient per-layer networks stay mode B (see addMultilayerIntraLink).
   addLink(stateId1, stateId2, weight);
+}
+
+void Network::addMultilayerLinks(const std::vector<unsigned int>& sourceLayerIds,
+                                 const std::vector<unsigned int>& sourceNodeIds,
+                                 const std::vector<unsigned int>& targetLayerIds,
+                                 const std::vector<unsigned int>& targetNodeIds,
+                                 const std::vector<double>& weights)
+{
+  if (sourceLayerIds.size() != sourceNodeIds.size() || sourceLayerIds.size() != targetLayerIds.size() || sourceLayerIds.size() != targetNodeIds.size() || sourceLayerIds.size() != weights.size()) {
+    throw std::invalid_argument("sourceLayerIds, sourceNodeIds, targetLayerIds, targetNodeIds, and weights must have the same length");
+  }
+
+  for (std::size_t i = 0; i < sourceLayerIds.size(); ++i) {
+    addMultilayerLink(sourceLayerIds[i], sourceNodeIds[i], targetLayerIds[i], targetNodeIds[i], weights[i]);
+  }
 }
 
 void Network::generateStateNetworkFromMultilayer()
 {
+#if !INFOMAP_FEATURE_REGULARIZED_MULTILAYER
+  if (m_config.regularized) {
+    throw std::runtime_error(regularizedMultilayerFeatureError());
+  }
+#endif
+
   // As inter-layer links is directed to neighbouring nodes in target layer,
   // the symmetry is broken so we need directed links for inter-layer flow
-  m_haveDirectedInput = true;
-  if (m_config.isUndirectedFlow()) {
-    // TODO: Don't allow undirdir/outdirdir/rawdir?
+  if (!m_networks.empty() && m_config.isUndirectedFlow()) {
+    m_haveDirectedInput = true;
+    // undirdir is replaced by the directed model here and warns in configureNetworkMode (#1233).
+    // outdirdir and rawdir are not undirected flow and keep the intra-layer links as given.
     // Expand each undirected intra-layer link to two opposite directed links
-    Log() << "  -> Expanding undirected links to directed...\n";
+    Console::detail(1, "expanding undirected links to directed");
     for (auto& layerIt : m_networks) {
       auto& network = layerIt.second;
       network.undirectedToDirected();
@@ -557,33 +233,61 @@ void Network::generateStateNetworkFromMultilayer()
 
   if (!m_interLinks.empty()) {
     generateStateNetworkFromMultilayerWithInterLinks();
+  } else if (m_config.regularized) {
+    generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNodeStrengthRegularized();
   } else {
     generateStateNetworkFromMultilayerWithSimulatedInterLinks();
   }
+
+  // Update physId and layerId on link map
+  // TODO: Fix this here?
+  // for (const auto& node : m_nodeLinkMap) {
+  //   for (const auto& link : node.second) {
+  //     auto& s2 = m_nodes[link.first.id];
+  //     link.first.physicalId = s2.physicalId;
+  //     link.first.layerId = s2.layerId;
+  //   }
+  // }
+
   m_networks.clear();
   m_interLinks.clear();
 }
 
 void Network::generateStateNetworkFromMultilayerWithInterLinks()
 {
-  Log() << "Generating state network from multilayer networks with inter-layer links...\n"
-        << std::flush;
+  Console::detail(1, "generating state network from multilayer networks with inter-layer links");
+  Log(1) << std::flush;
   // First add intra-layer links
   for (auto& layerIt : m_networks) {
     unsigned int layer1 = layerIt.first;
     auto& network = layerIt.second;
     for (auto& linkIt : network.nodeLinkMap()) {
+      // Per-layer networks key links by physical node id
       auto& source = linkIt.first;
       const auto& subLinks = linkIt.second;
       for (auto& subIt : subLinks) {
         auto& target = subIt.first;
         double linkWeight = subIt.second.weight;
-        addMultilayerLink(layer1, source.physicalId, layer1, target.physicalId, linkWeight);
+        addMultilayerLink(layer1, source, layer1, target, linkWeight);
       }
     }
   }
 
-  Log() << "Connecting layers...\n";
+  // Spread drops an inter-layer link to a layer where the node has no intra-layer
+  // out-links, so the to-self links below are dropped there too: the relax-to-self
+  // flow relays the link's flow onward along those out-links, and without any the
+  // flow would be lost (#1314).
+  auto hasIntraOutLinks = [this](unsigned int layer, unsigned int physId) {
+    auto networkIt = m_networks.find(layer);
+    if (networkIt == m_networks.end()) {
+      return false;
+    }
+    const auto& linkMap = networkIt->second.nodeLinkMap();
+    auto linksIt = linkMap.find(physId);
+    return linksIt != linkMap.end() && !linksIt->second.empty();
+  };
+
+  Console::detail(1, "connecting layers");
   // Connect layers with inter-layer links spread out in target layer
   for (auto& it : m_interLinks) {
     auto& layerNode = it.first;
@@ -593,10 +297,21 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
     for (auto& it2 : it.second) {
       unsigned int layer2 = it2.first;
       double interWeight = it2.second;
+
+      if (m_config.multilayerRelaxToSelf) {
+        if (!hasIntraOutLinks(layer2, physId)) {
+          continue;
+        }
+        unsigned int stateId2 = addMultilayerNode(layer2, physId);
+        addLink(stateId1, stateId2, interWeight);
+        ++m_numInterLayerLinks;
+        continue;
+      }
+
       auto& targetNetwork = m_networks[layer2];
 
-      std::map<StateNode, std::map<StateNode, LinkData>>& targetLinks = targetNetwork.nodeLinkMap();
-      auto& outlinks = targetLinks[StateNode(physId)];
+      auto& targetLinks = targetNetwork.nodeLinkMap();
+      auto& outlinks = targetLinks[physId];
       if (outlinks.empty()) {
         continue;
       }
@@ -604,7 +319,7 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
       double sumIntraOutWeightTargetLayer = targetOutWeights[physId];
 
       for (auto& outLink : outlinks) {
-        auto& targetPhysId = outLink.first.physicalId;
+        auto& targetPhysId = outLink.first;
         auto& linkData = outLink.second;
         double intraWeight = linkData.weight;
         unsigned int stateId2i = addMultilayerNode(layer2, targetPhysId);
@@ -622,9 +337,25 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
       auto& layerNode = it.first;
       unsigned int layer2 = layerNode.layer;
       unsigned int physId = layerNode.node;
+
+      if (m_config.multilayerRelaxToSelf) {
+        if (!hasIntraOutLinks(layer2, physId)) {
+          continue;
+        }
+        unsigned int stateId2 = addMultilayerNode(layer2, physId);
+        for (auto& it2 : it.second) {
+          unsigned int layer1 = it2.first;
+          double interWeight = it2.second;
+          unsigned int stateId1 = addMultilayerNode(layer1, physId);
+          addLink(stateId1, stateId2, interWeight);
+          ++m_numInterLayerLinks;
+        }
+        continue;
+      }
+
       auto& targetNetwork = m_networks[layer2];
-      std::map<StateNode, std::map<StateNode, LinkData>>& targetLinks = targetNetwork.nodeLinkMap();
-      auto& outlinks = targetLinks[StateNode(physId)];
+      auto& targetLinks = targetNetwork.nodeLinkMap();
+      auto& outlinks = targetLinks[physId];
       if (outlinks.empty()) {
         continue;
       }
@@ -636,7 +367,7 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
         unsigned int stateId1 = addMultilayerNode(layer1, physId);
 
         for (auto& outLink : outlinks) {
-          auto& targetPhysId = outLink.first.physicalId;
+          auto& targetPhysId = outLink.first;
           auto& linkData = outLink.second;
           double intraWeight = linkData.weight;
           unsigned int stateId2i = addMultilayerNode(layer2, targetPhysId);
@@ -653,71 +384,85 @@ void Network::generateStateNetworkFromMultilayerWithInterLinks()
 
 void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinks()
 {
-  Log() << "Generating state network from multilayer networks with simulated inter-layer links...\n"
-        << std::flush;
+  if (m_config.multilayerRelaxByJensenShannonDivergence) {
+    return generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnLayerSimilarity();
+  }
+  return generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNodeStrength();
+}
+
+void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnLayerSimilarity()
+{
+  Console::detail(1, "generating state network from multilayer networks with simulated inter-layer links based on layer similarity");
+  Log(1) << std::flush;
   double relaxRate = m_config.multilayerRelaxRate;
 
-  int maxRelaxLimit = m_networks.size();
-  int relaxLimitSymmetric = m_config.multilayerRelaxLimit < 0 ? maxRelaxLimit : m_config.multilayerRelaxLimit;
-  int relaxLimitDown = m_config.multilayerRelaxLimitDown < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitDown);
-  int relaxLimitUp = m_config.multilayerRelaxLimitUp < 0 ? relaxLimitSymmetric : std::min(relaxLimitSymmetric, m_config.multilayerRelaxLimitUp);
+  // A negative limit means no limit, also across gaps in the layer ids
+  const unsigned int noRelaxLimit = std::numeric_limits<unsigned int>::max();
+  auto toRelaxLimit = [](int limit) { return limit < 0 ? std::numeric_limits<unsigned int>::max() : static_cast<unsigned int>(limit); };
+  unsigned int relaxLimitSymmetric = toRelaxLimit(m_config.multilayerRelaxLimit);
+  unsigned int relaxLimitDown = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitDown));
+  unsigned int relaxLimitUp = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitUp));
   auto haveUpOrDownLimit = m_config.multilayerRelaxLimitDown >= 0 || m_config.multilayerRelaxLimitUp >= 0;
 
-  Log() << "-> " << m_networks.size() << " networks\n";
-  Log() << "-> Relax rate: " << relaxRate << "\n";
+  Console::detail(1, "{} networks", m_networks.size());
+  Console::detail(1, "relax rate: {:g}", relaxRate);
   if (haveUpOrDownLimit) {
-    Log() << "-> Relax limit up: " << relaxLimitUp << (relaxLimitUp == maxRelaxLimit ? " (no limit)\n" : "\n");
-    Log() << "-> Relax limit down: " << relaxLimitDown << (relaxLimitDown == maxRelaxLimit ? " (no limit)\n" : "\n");
+    Console::detail(1, "relax limit up: {}", relaxLimitUp == noRelaxLimit ? "no limit" : std::to_string(relaxLimitUp));
+    Console::detail(1, "relax limit down: {}", relaxLimitDown == noRelaxLimit ? "no limit" : std::to_string(relaxLimitDown));
   } else if (m_config.multilayerRelaxLimit >= 0) {
-    Log() << "-> Relax limit: " << m_config.multilayerRelaxLimit << "\n";
+    Console::detail(1, "relax limit: {}", m_config.multilayerRelaxLimit);
   }
 
-  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](auto& layer1, auto& layer2) {
-    int diff = layer1 - layer2;
-    return layer1 >= layer2 ? diff <= relaxLimitDown : -diff <= relaxLimitUp;
+  // Whether a state in layer1 may relax to layer2. A layer is always within reach
+  // of itself, so the intra-layer links are kept with limit 0.
+  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](unsigned int layer1, unsigned int layer2) {
+    return layer1 >= layer2 ? layer1 - layer2 <= relaxLimitDown : layer2 - layer1 <= relaxLimitUp;
   };
+  // Layers further below than this are out of reach in both directions
+  unsigned int relaxReach = std::max(relaxLimitDown, relaxLimitUp);
 
   if (m_config.multilayerRelaxByJensenShannonDivergence) {
-    Log() << "-> Using Jensen-Shannon Divergence\n";
+    Console::detail(1, "using Jensen-Shannon divergence");
 
     for (unsigned int nodeId = 0; nodeId <= m_maxNodeIdInIntraLayerNetworks; ++nodeId) {
-      unsigned int layer2from = 0;
-
       // Calculate Jensen-Shannon similarity between all layers such that layer1 >= layer2,
-      // and then use its symmetry for layer2 > layer1
+      // and then use its symmetry for layer2 > layer1. Keep only the directions within
+      // the relax limits.
       std::map<unsigned int, std::map<unsigned int, double>> jsRelaxWeights;
       std::map<unsigned int, double> jsTotWeight;
 
-      for (unsigned int layer1 = 0; layer1 < m_networks.size(); ++layer1) {
-        unsigned int layer2to = layer1 + 1;
-        // Limit possible jumps to close by layers
-        if (m_config.multilayerRelaxLimit >= 0) {
-          layer2from = ((int)layer1 - m_config.multilayerRelaxLimit) < 0 ? 0 : layer1 - m_config.multilayerRelaxLimit;
-        }
-
-        auto& layer1LinkMap = m_networks[layer1].nodeLinkMap();
-        auto& layer1OutLinks = layer1LinkMap[StateNode(nodeId)];
+      for (auto& layer1It : m_networks) {
+        unsigned int layer1 = layer1It.first;
+        auto& layer1OutLinks = layer1It.second.nodeLinkMap()[nodeId];
         // Skip dangling nodes, because they have no information to calculate similarity
         if (layer1OutLinks.empty())
           continue;
 
-        double sumOutLinkWeightLayer1 = m_networks[layer1].outWeights()[nodeId];
+        double sumOutLinkWeightLayer1 = layer1It.second.outWeights()[nodeId];
 
-        for (unsigned int layer2 = layer2from; layer2 < layer2to; ++layer2) {
-          auto& layer2LinkMap = m_networks[layer2].nodeLinkMap();
-          auto& layer2OutLinks = layer2LinkMap[StateNode(nodeId)];
+        auto layer2It = m_networks.lower_bound(layer1 > relaxReach ? layer1 - relaxReach : 0);
+        for (; layer2It != m_networks.end() && layer2It->first <= layer1; ++layer2It) {
+          unsigned int layer2 = layer2It->first;
+          bool down = withinRelaxLimit(layer1, layer2);
+          bool up = withinRelaxLimit(layer2, layer1);
+          if (!down && !up)
+            continue;
+
+          auto& layer2OutLinks = layer2It->second.nodeLinkMap()[nodeId];
           if (layer2OutLinks.empty())
             continue;
 
-          double sumOutLinkWeightLayer2 = m_networks[layer2].outWeights()[nodeId];
+          double sumOutLinkWeightLayer2 = layer2It->second.outWeights()[nodeId];
 
           bool intersect;
           double div = calculateJensenShannonDivergence(intersect, layer1OutLinks, sumOutLinkWeightLayer1, layer2OutLinks, sumOutLinkWeightLayer2);
           double jsWeight = 1.0 - div;
           if (intersect && (jsWeight >= m_config.multilayerJSRelaxLimit)) {
-            jsTotWeight[layer1] += jsWeight;
-            jsRelaxWeights[layer1][layer2] = jsWeight;
-            if (layer1 != layer2) {
+            if (down) {
+              jsTotWeight[layer1] += jsWeight;
+              jsRelaxWeights[layer1][layer2] = jsWeight;
+            }
+            if (up && layer1 != layer2) {
               jsTotWeight[layer2] += jsWeight;
               jsRelaxWeights[layer2][layer1] = jsWeight;
             }
@@ -725,61 +470,76 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinks()
         }
       }
 
-      // Second loop over all pairs of layers
-      unsigned int layer2to = m_networks.size();
-
-      for (unsigned int layer1 = 0; layer1 < m_networks.size(); ++layer1) {
-        // Limit possible jumps to close by layers
-        if (m_config.multilayerRelaxLimit >= 0) {
-          layer2from = ((int)layer1 - m_config.multilayerRelaxLimit) < 0 ? 0 : layer1 - m_config.multilayerRelaxLimit;
-          layer2to = (layer1 + m_config.multilayerRelaxLimit) > m_networks.size() ? m_networks.size() : layer1 + m_config.multilayerRelaxLimit;
-        }
-
+      // Second loop over the pairs of layers within the relax limits
+      for (auto& jsRelaxWeightsLayer1It : jsRelaxWeights) {
+        unsigned int layer1 = jsRelaxWeightsLayer1It.first;
         double sumOutLinkWeightLayer1 = m_networks[layer1].outWeights()[nodeId];
-
-        auto jsRelaxWeightsLayer1It = jsRelaxWeights.find(layer1);
-        auto jsTotWeightIt = jsTotWeight.find(layer1);
+        double jsTotWeightLayer1 = jsTotWeight[layer1];
 
         // Create inter-links to the intra-connected nodes in other layers
-        for (unsigned int layer2 = layer2from; layer2 < layer2to; ++layer2) {
-          if (jsRelaxWeightsLayer1It != jsRelaxWeights.end()) {
-            auto jsRelaxWeightsIt = jsRelaxWeightsLayer1It->second.find(layer2);
-            if (jsRelaxWeightsIt != jsRelaxWeightsLayer1It->second.end()) {
-              bool isIntra = layer2 == layer1;
+        for (auto& jsRelaxWeightsIt : jsRelaxWeightsLayer1It.second) {
+          unsigned int layer2 = jsRelaxWeightsIt.first;
+          bool isIntra = layer2 == layer1;
 
-              // Create inter-links to the outgoing nodes in the target layer
-              double linkWeightNormalizationFactor;
-              if (isIntra) {
-                linkWeightNormalizationFactor = 1;
-              } else {
-                linkWeightNormalizationFactor = jsRelaxWeightsIt->second * relaxRate / (1.0 - relaxRate) * sumOutLinkWeightLayer1 / jsTotWeightIt->second;
-              }
+          // Create inter-links to the outgoing nodes in the target layer
+          double linkWeightNormalizationFactor;
+          if (isIntra) {
+            linkWeightNormalizationFactor = 1;
+          } else {
+            linkWeightNormalizationFactor = jsRelaxWeightsIt.second * relaxRate / (1.0 - relaxRate) * sumOutLinkWeightLayer1 / jsTotWeightLayer1;
+          }
 
-              auto& targetLinks = m_networks[layer2].nodeLinkMap();
-              auto& targetOutlinks = targetLinks[StateNode(nodeId)];
-              if (targetOutlinks.empty()) {
-                continue;
-              }
-              for (auto& outLink : targetOutlinks) {
-                auto& n2 = outLink.first.physicalId;
-                auto& linkData = outLink.second;
-                double intraWeight = linkData.weight;
-                // Add intra link weight as teleport weight to source node
-                unsigned int stateId1 = addMultilayerNode(layer1, nodeId, intraWeight);
-                unsigned int stateId2i = addMultilayerNode(layer2, n2, 0.0);
+          auto& targetLinks = m_networks[layer2].nodeLinkMap();
+          auto& targetOutlinks = targetLinks[nodeId];
+          if (targetOutlinks.empty()) {
+            continue;
+          }
+          for (auto& outLink : targetOutlinks) {
+            auto& n2 = outLink.first;
+            auto& linkData = outLink.second;
+            double intraWeight = linkData.weight;
+            // Add intra link weight as teleport weight to source node
+            // TODO: Why, and only first intra link that sets the teleport weight?
+            unsigned int stateId1 = addMultilayerNode(layer1, nodeId, intraWeight);
+            unsigned int stateId2i = addMultilayerNode(layer2, n2, 0.0);
 
-                double weight = intraWeight == 0.0 ? 0.0 : linkWeightNormalizationFactor * intraWeight;
-                addLink(stateId1, stateId2i, weight);
-                ++m_numInterLayerLinks;
-              }
-            }
+            double weight = intraWeight == 0.0 ? 0.0 : linkWeightNormalizationFactor * intraWeight;
+            addLink(stateId1, stateId2i, weight);
+            ++m_numInterLayerLinks;
           }
         }
       }
     }
-
-    return;
   }
+}
+
+void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNodeStrength()
+{
+  Console::detail(1, "generating state network from multilayer networks with simulated inter-layer links");
+  Log(1) << std::flush;
+  double relaxRate = m_config.multilayerRelaxRate;
+
+  // A negative limit means no limit. Layer ids can have gaps, so no limit is
+  // not the number of layers but the largest difference (#1322).
+  const unsigned int maxRelaxLimit = std::numeric_limits<unsigned int>::max();
+  auto toRelaxLimit = [](int limit) { return limit < 0 ? std::numeric_limits<unsigned int>::max() : static_cast<unsigned int>(limit); };
+  unsigned int relaxLimitSymmetric = toRelaxLimit(m_config.multilayerRelaxLimit);
+  unsigned int relaxLimitDown = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitDown));
+  unsigned int relaxLimitUp = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitUp));
+  auto haveUpOrDownLimit = m_config.multilayerRelaxLimitDown >= 0 || m_config.multilayerRelaxLimitUp >= 0;
+
+  Console::detail(1, "{} networks", m_networks.size());
+  Console::detail(1, "relax rate: {:g}", relaxRate);
+  if (haveUpOrDownLimit) {
+    Console::detail(1, "relax limit up: {}", relaxLimitUp == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitUp));
+    Console::detail(1, "relax limit down: {}", relaxLimitDown == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitDown));
+  } else if (m_config.multilayerRelaxLimit >= 0) {
+    Console::detail(1, "relax limit: {}", m_config.multilayerRelaxLimit);
+  }
+
+  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](unsigned int layer1, unsigned int layer2) {
+    return layer1 >= layer2 ? layer1 - layer2 <= relaxLimitDown : layer2 - layer1 <= relaxLimitUp;
+  };
 
   for (auto& it1 : m_networks) {
     auto layer1 = it1.first;
@@ -804,6 +564,7 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinks()
       if (sumOutWeightAllLayers <= 0) {
         continue;
       }
+
       for (auto& it2 : m_networks) {
         auto layer2 = it2.first;
         if (!withinRelaxLimit(layer1, layer2)) {
@@ -812,26 +573,178 @@ void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinks()
         auto& network2 = it2.second;
         bool isIntra = layer2 == layer1;
 
+        if (m_config.multilayerRelaxToSelf && !isIntra) {
+          // Couple only to the same physical node in the target layer, carrying
+          // the same per-layer relaxation mass the spread model distributes over
+          // the node's neighbours there (r * s_j(n) / S_n). The home layer is
+          // left to the spread model below.
+          double targetOutWeight = network2.outWeights()[n1];
+          if (targetOutWeight <= 0) {
+            continue; // n1 absent/dangling in the target layer
+          }
+          double weight = relaxRate * targetOutWeight / sumOutWeightAllLayers;
+          if (weight < 1e-16) {
+            continue;
+          }
+          unsigned int stateId2 = addMultilayerNode(layer2, n1);
+          addLink(stateId1, stateId2, weight);
+          ++m_numInterLayerLinks;
+          continue;
+        }
+
+        auto& targetLinks = network2.nodeLinkMap();
+        auto& targetOutlinks = targetLinks[n1];
+        if (targetOutlinks.empty()) {
+          continue;
+        }
+        // After the empty check: a node without intra-layer out-links has sumOutLinkWeightLayer1 == 0.
         double linkWeightNormalizationFactor = relaxRate / sumOutWeightAllLayers;
         if (isIntra) {
           linkWeightNormalizationFactor += (1.0 - relaxRate) / sumOutLinkWeightLayer1;
         }
-
-        auto& targetLinks = network2.nodeLinkMap();
-        auto& targetOutlinks = targetLinks[StateNode(n1)];
-        if (targetOutlinks.empty()) {
-          continue;
-        }
         for (auto& outLink : targetOutlinks) {
-          auto& n2 = outLink.first.physicalId;
+          auto& n2 = outLink.first;
           auto& linkData = outLink.second;
           double intraWeight = linkData.weight;
           unsigned int stateId2i = addMultilayerNode(layer2, n2);
 
-          double weight = intraWeight == 0.0 ? 0.0 : linkWeightNormalizationFactor * intraWeight;
+          double weight = linkWeightNormalizationFactor * intraWeight;
+          if (weight < 1e-16) {
+            continue;
+          }
           addLink(stateId1, stateId2i, weight);
           ++m_numInterLayerLinks; // TODO: Count all as one?
         }
+      }
+    }
+  }
+}
+
+void Network::generateStateNetworkFromMultilayerWithSimulatedInterLinksBasedOnNodeStrengthRegularized()
+{
+  Console::detail(1, "generating regularized state network from multilayer networks with simulated inter-layer links");
+  Log(1) << std::flush;
+  // double relaxRate = m_config.multilayerRelaxRate;
+
+  unsigned int L = m_networks.size();
+  // unsigned int N = numPhysicalNodes();
+  // A negative limit means no limit, also across gaps in the layer ids (#1322).
+  const unsigned int maxRelaxLimit = std::numeric_limits<unsigned int>::max();
+  auto toRelaxLimit = [](int limit) { return limit < 0 ? std::numeric_limits<unsigned int>::max() : static_cast<unsigned int>(limit); };
+  unsigned int relaxLimitSymmetric = toRelaxLimit(m_config.multilayerRelaxLimit);
+  unsigned int relaxLimitDown = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitDown));
+  unsigned int relaxLimitUp = std::min(relaxLimitSymmetric, toRelaxLimit(m_config.multilayerRelaxLimitUp));
+  auto haveUpOrDownLimit = m_config.multilayerRelaxLimitDown >= 0 || m_config.multilayerRelaxLimitUp >= 0;
+
+  // double interLinkStrength = std::log(L);
+  // double interLinkWeight = std::log(L) / L;
+  // The inter-layer prior spreads ln(L_i) over the L_i layers that hold physical node i,
+  // so its per-link weight is only a constant while every node is in every layer.
+  // double intraLinkStrength = std::log(N) / L;
+  if (haveUpOrDownLimit) {
+    // TODO: create a map with aggregated inter-flow for each layer with limits.
+  }
+
+  Console::detail(1, "{} networks and {} physical nodes", m_networks.size(), m_physNodes.size());
+  // Log(1) << "-> Relax rate: " << relaxRate << "\n";
+  if (haveUpOrDownLimit) {
+    Console::detail(1, "relax limit up: {}", relaxLimitUp == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitUp));
+    Console::detail(1, "relax limit down: {}", relaxLimitDown == maxRelaxLimit ? "no limit" : std::to_string(relaxLimitDown));
+    throw std::runtime_error("Relax limits not implemented for regularized flow");
+  } else if (m_config.multilayerRelaxLimit >= 0) {
+    Console::detail(1, "relax limit: {}", m_config.multilayerRelaxLimit);
+    throw std::runtime_error("Relax limits not implemented for regularized flow");
+  }
+
+  auto withinRelaxLimit = [relaxLimitDown, relaxLimitUp](unsigned int layer1, unsigned int layer2) {
+    return layer1 >= layer2 ? layer1 - layer2 <= relaxLimitDown : layer2 - layer1 <= relaxLimitUp;
+  };
+
+  // Which physical nodes each layer holds, and which layers hold each physical node.
+  // With --multilayer-skip-absent-nodes a node belongs to a layer only if that layer's
+  // links mention it, so the prior spans what the data shows; by default a node is
+  // assumed to exist in every layer, unobserved where its links are missing. Both maps
+  // stay proportional to the input: the rosters together hold one entry per (node,
+  // layer) pair that the prior covers.
+  std::map<unsigned int, std::vector<unsigned int>> nodesInLayer;
+  std::map<unsigned int, std::vector<unsigned int>> layersOfNode;
+
+  for (auto& it : m_networks) {
+    auto layer = it.first;
+    auto& roster = nodesInLayer[layer];
+
+    if (m_config.multilayerSkipAbsentNodes) {
+      std::set<unsigned int> present;
+      for (const auto& outLinks : it.second.nodeLinkMap()) {
+        present.insert(outLinks.first);
+        for (const auto& outLink : outLinks.second) {
+          present.insert(outLink.first);
+        }
+      }
+      roster.assign(present.begin(), present.end());
+    } else {
+      roster.reserve(m_physNodes.size());
+      for (const auto& physNodeIt : m_physNodes) {
+        roster.push_back(physNodeIt.first);
+      }
+    }
+
+    for (auto n : roster) {
+      layersOfNode[n].push_back(layer);
+    }
+  }
+
+  for (auto& it1 : m_networks) {
+    auto layer1 = it1.first;
+    auto& network1 = it1.second;
+
+    // Loop over the physical nodes this layer holds, even if they lack intra links, to
+    // add inter links
+    for (auto n1 : nodesInLayer[layer1]) {
+      unsigned int stateId1 = addMultilayerNode(layer1, n1);
+
+      // double sumOutLinkWeightLayer1 = network1.outWeights()[n1];
+      // Multiply observed link weight with this factor to account for the physical part of inter-link flow
+      // double gamma = 1 + interLinkStrength / (sumOutLinkWeightLayer1 + intraLinkStrength);
+      // Log(1) << "(" << layer1 << "," << n1 << "): gamma = 1 + " << interLinkStrength << " / (" << sumOutLinkWeightLayer1 << " + " << intraLinkStrength << ") = " << gamma << "\n";
+      // Need original weight to calculate correct inter-layer relax rate.
+
+      // Add intra links
+      auto targetOutLinksIt = network1.nodeLinkMap().find(n1);
+      if (targetOutLinksIt != network1.nodeLinkMap().end()) {
+        for (auto& outLink : targetOutLinksIt->second) {
+          auto& n2 = outLink.first;
+          auto& linkData = outLink.second;
+          // double weight = linkData.weight * gamma;
+          double weight = linkData.weight;
+          unsigned int stateId2i = addMultilayerNode(layer1, n2);
+
+          if (weight < 1e-16) {
+            continue;
+          }
+          addLink(stateId1, stateId2i, weight);
+          ++m_numIntraLayerLinks;
+        }
+      }
+
+      // Add inter links. The prior couples node n1 across the L_i layers that hold it
+      // with total strength ln(L_i), which is zero for a node confined to one layer:
+      // nothing to spread, and the per-link weight below would divide by zero.
+      const auto& layers = layersOfNode[n1];
+      if (layers.size() < 2) {
+        continue;
+      }
+      const auto numInterTargets = m_config.noSelfLinks ? layers.size() - 1 : layers.size();
+      const double interLinkWeight = m_config.regularizationStrength * m_config.interRegularizationStrength * std::log(static_cast<double>(layers.size())) / numInterTargets;
+
+      for (auto layer2 : layers) {
+        if (!withinRelaxLimit(layer1, layer2) || (m_config.noSelfLinks && layer1 == layer2)) {
+          continue;
+        }
+
+        unsigned int stateId2 = addMultilayerNode(layer2, n1);
+        addLink(stateId1, stateId2, interLinkWeight);
+        ++m_numInterLayerLinks;
       }
     }
   }
@@ -855,15 +768,14 @@ double Network::calculateJensenShannonDivergence(bool& intersect, const OutLinkM
   auto layer1OutLinkItEnd = layer1OutLinks.end();
   auto layer2OutLinkItEnd = layer2OutLinks.end();
   while (layer1OutLinkIt != layer1OutLinkItEnd && layer2OutLinkIt != layer2OutLinkItEnd) {
-    int diff = layer1OutLinkIt->first.id - layer2OutLinkIt->first.id;
-    if (diff < 0) {
+    if (layer1OutLinkIt->first < layer2OutLinkIt->first) {
       // If the first state node has a link that the second has not
       double p1 = layer1OutLinkIt->second.weight / ow1;
       h1 -= p1 * log2(p1);
       double p12 = pi1 * layer1OutLinkIt->second.weight / ow1;
       h12 -= p12 * log2(p12);
       layer1OutLinkIt++;
-    } else if (diff > 0) {
+    } else if (layer2OutLinkIt->first < layer1OutLinkIt->first) {
       // If the second state node has a link that the second has not
       double p2 = layer2OutLinkIt->second.weight / ow2;
       h2 -= p2 * log2(p2);
@@ -919,20 +831,47 @@ void Network::simulateInterLayerLinks()
 void Network::addMultilayerIntraLink(unsigned int layer, unsigned int n1, unsigned int n2, double weight)
 {
   m_higherOrderInputMethodCalled = true;
-  bool added = m_networks[layer].addLink(n1, n2, weight);
+  // The main network gets its expansion links later and builds via the flat
+  // buffer (mode A) like ordinary/state networks, so it is left at its default
+  // mode. Only the transient per-layer network stays mode B: its nested map +
+  // outWeights are read directly during expansion, so set before addLink so it
+  // does not enter the buffer path.
+  auto& layerNetwork = m_networks[layer];
+  layerNetwork.m_useMapBuild = true;
+  bool added = layerNetwork.addLink(n1, n2, weight);
   if (added) {
     ++m_numIntraLayerLinks;
     m_maxNodeIdInIntraLayerNetworks = std::max(m_maxNodeIdInIntraLayerNetworks, std::max(n1, n2));
+  }
+  addPhysicalNode(n1);
+  addPhysicalNode(n2);
+}
+
+void Network::addMultilayerIntraLinks(const std::vector<unsigned int>& layerIds,
+                                      const std::vector<unsigned int>& sourceNodeIds,
+                                      const std::vector<unsigned int>& targetNodeIds,
+                                      const std::vector<double>& weights)
+{
+  if (layerIds.size() != sourceNodeIds.size() || layerIds.size() != targetNodeIds.size() || layerIds.size() != weights.size()) {
+    throw std::invalid_argument("layerIds, sourceNodeIds, targetNodeIds, and weights must have the same length");
+  }
+
+  for (std::size_t i = 0; i < layerIds.size(); ++i) {
+    addMultilayerIntraLink(layerIds[i], sourceNodeIds[i], targetNodeIds[i], weights[i]);
   }
 }
 
 void Network::addMultilayerInterLink(unsigned int layer1, unsigned int n, unsigned int layer2, double interWeight)
 {
   if (layer1 == layer2) {
-    throw std::runtime_error(io::Str() << "Inter-layer link (layer1, node, layer2): " << layer1 << ", " << n << ", " << layer2 << " must have layer1 != layer2");
+    throw std::runtime_error(fmt::format(FMT_STRING("Inter-layer link (layer1, node, layer2): {}, {}, {} must have layer1 != layer2"), layer1, n, layer2));
   }
   m_higherOrderInputMethodCalled = true;
-
+  // Inter-layer links are buffered in m_interLinks and only realized on the main
+  // network during expansion, which builds via the flat buffer (mode A). The main
+  // network is left at its default mode here. (File input expands before any
+  // numLinks() read; an in-memory numLinks() read before expansion just finalizes
+  // an empty buffer, which the first expansion addLink re-opens via definalize().)
   auto& interLinks = m_interLinks[LayerNode(layer1, n)];
   auto it = interLinks.find(layer2);
 
@@ -940,6 +879,20 @@ void Network::addMultilayerInterLink(unsigned int layer1, unsigned int n, unsign
     ++m_numInterLayerLinks;
   }
   interLinks[layer2] += interWeight;
+}
+
+void Network::addMultilayerInterLinks(const std::vector<unsigned int>& sourceLayerIds,
+                                      const std::vector<unsigned int>& nodeIds,
+                                      const std::vector<unsigned int>& targetLayerIds,
+                                      const std::vector<double>& weights)
+{
+  if (sourceLayerIds.size() != nodeIds.size() || sourceLayerIds.size() != targetLayerIds.size() || sourceLayerIds.size() != weights.size()) {
+    throw std::invalid_argument("sourceLayerIds, nodeIds, targetLayerIds, and weights must have the same length");
+  }
+
+  for (std::size_t i = 0; i < sourceLayerIds.size(); ++i) {
+    addMultilayerInterLink(sourceLayerIds[i], nodeIds[i], targetLayerIds[i], weights[i]);
+  }
 }
 
 unsigned int Network::addMultilayerNode(unsigned int layerId, unsigned int physicalId, double weight)
@@ -957,7 +910,7 @@ unsigned int Network::addMultilayerNode(unsigned int layerId, unsigned int physi
   bool matchableMultilayerIds = m_config.matchableMultilayerIds != 0;
 
   if (matchableMultilayerIds && layerId > m_config.matchableMultilayerIds) {
-    throw std::runtime_error(io::Str() << "Cannot add node with layer " << layerId << " to network with matchable multilayer ids using largest layer id " << m_config.matchableMultilayerIds);
+    throw std::runtime_error(fmt::format(FMT_STRING("Cannot add node with layer {} to network with matchable multilayer ids using largest layer id {}"), layerId, m_config.matchableMultilayerIds));
   }
 
   auto ret = matchableMultilayerIds
@@ -969,6 +922,37 @@ unsigned int Network::addMultilayerNode(unsigned int layerId, unsigned int physi
   m_layerNodeToStateId[layerId][physicalId] = stateNode.id;
   m_layers.insert(layerId);
   return stateNode.id;
+}
+
+unsigned int Network::addMultilayerNode(unsigned int stateId, unsigned int layerId, unsigned int physicalId, double weight)
+{
+  return addMultilayerNode(stateId, layerId, physicalId, weight, std::string());
+}
+
+unsigned int Network::addMultilayerNode(unsigned int stateId, unsigned int layerId, unsigned int physicalId, double weight, std::string name)
+{
+  m_higherOrderInputMethodCalled = true;
+
+  // Create state node if not already exist, return state node id
+  auto& layerIt = m_layerNodeToStateId[layerId];
+  auto it = layerIt.find(physicalId);
+
+  if (it != layerIt.end()) {
+    return it->second;
+  }
+
+  auto ret = addStateNode(stateId, physicalId, std::move(name));
+  auto& stateNode = ret.first->second;
+  stateNode.layerId = layerId;
+  stateNode.weight = weight;
+  m_layerNodeToStateId[layerId][physicalId] = stateNode.id;
+  m_layers.insert(layerId);
+  return stateNode.id;
+}
+
+void Network::addInitialPartitionPath(unsigned int nodeId, const Path& path, TreeLeafIdType idType)
+{
+  m_initialPartitionPaths.push_back(TreePath { nodeId, path, idType });
 }
 
 void Network::addMetaData(unsigned int nodeId, int meta)
@@ -983,7 +967,7 @@ void Network::addMetaData(unsigned int nodeId, const std::vector<int>& metaData)
   if (m_numMetaDataColumns == 0) {
     m_numMetaDataColumns = metaData.size();
   } else if (metaData.size() != m_numMetaDataColumns) {
-    throw std::runtime_error(io::Str() << "Must have same number of dimensions in meta data, error trying to add meta data '" << io::stringify(metaData, ",") << "' on node " << nodeId << ".");
+    throw std::runtime_error(fmt::format(FMT_STRING("Must have same number of dimensions in meta data, error trying to add meta data '{}' on node {}."), io::stringify(metaData, ","), nodeId));
   }
 }
 

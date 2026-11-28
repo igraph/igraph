@@ -18,7 +18,7 @@ namespace infomap {
 
 class ElapsedTime {
 public:
-  ElapsedTime(double elapsedTime = 0.0) : m_elapsedTime(elapsedTime) { }
+  ElapsedTime(double elapsedTime = 0.0) : m_elapsedTime(elapsedTime) {}
 
   double getSeconds() const { return m_elapsedTime; }
 

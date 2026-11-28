@@ -12,13 +12,16 @@
 
 #include "FlowData.h"
 #include "InfoEdge.h"
+#ifndef SWIG
+#include "ObjectPool.h"
+#endif
 #include "iterators/infomapIterators.h"
 #include "iterators/IterWrapper.h"
 #include "../utils/MetaCollection.h"
 
 #include <stdexcept>
 #include <memory>
-#include <iostream>
+#include <ostream>
 #include <vector>
 #include <limits>
 
@@ -26,6 +29,42 @@ namespace infomap {
 
 class InfomapBase;
 
+#ifndef SWIG
+// Internal allocation plumbing; kept out of the SWIG bindings so the pool type
+// does not leak into the generated wrappers.
+class InfoNode;
+
+template <typename T>
+class ObjectPool;
+using NodePool = ObjectPool<InfoNode>;
+
+// Feature-only InfoNode fields, allocated out-of-line only when meta-data or
+// regularized-multilayer flow is active. Ordinary and higher-order (state)
+// networks never allocate this, so a node pays only the owning pointer.
+struct InfoNodeExtras {
+  std::vector<int> metaData; // Categorical value for each meta data dimension
+  std::vector<LayerTeleFlowData> layerTeleFlowData; // For regularized multilayer flow
+  std::unique_ptr<MetaCollection> metaCollection; // For modules; meta data only
+
+  InfoNodeExtras() = default;
+  InfoNodeExtras(const InfoNodeExtras& other)
+      : metaData(other.metaData),
+        layerTeleFlowData(other.layerTeleFlowData),
+        metaCollection(other.metaCollection ? std::make_unique<MetaCollection>(*other.metaCollection) : nullptr) {}
+};
+#endif
+
+/**
+ * Tree node with raw-pointer ownership.
+ *
+ * An InfoNode owns the active child chain reachable through firstChild/lastChild
+ * and the collapsed child chain reachable through collapsedFirstChild/
+ * collapsedLastChild. Destruction deletes both chains. releaseChildren() only
+ * detaches the active chain from this parent; the caller must reattach or delete
+ * those nodes. Reparenting helpers detach children before deleting the removed
+ * intermediate node. An InfoNode also owns its sub-Infomap pointer and outgoing
+ * InfoEdge objects; incoming edge pointers are non-owning back-references.
+ */
 class InfoNode {
 public:
   using child_iterator = ChildIterator<InfoNode*>;
@@ -65,7 +104,6 @@ public:
   unsigned int stateId = 0; // Unique state node id for the leaf nodes
   unsigned int physicalId = 0; // Physical id equals stateId for first order networks, otherwise can be non-unique
   unsigned int layerId = 0; // Layer id for multilayer networks
-  std::vector<int> metaData; // Categorical value for each meta data dimension
 
   InfoNode* owner = nullptr; // Infomap owner (if this is an Infomap root)
   InfoNode* parent = nullptr;
@@ -79,8 +117,14 @@ public:
   bool dirty = false;
 
   std::vector<PhysData> physicalNodes;
-  MetaCollection metaCollection; // For modules
   std::vector<unsigned int> stateNodes; // For physically aggregated nodes
+
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+  // Lossy map equation leaf aggregates, additive over contained leaf nodes:
+  // sum of p_alpha * h_alpha (share of the Markov entropy rate) and sum of plogp(p_alpha).
+  double lossyEntropy = 0.0;
+  double lossyFlowLogFlow = 0.0;
+#endif
 
 private:
   unsigned int m_childDegree = 0;
@@ -91,6 +135,19 @@ private:
   std::vector<InfoEdge*> m_inEdges;
 
   InfomapBase* m_infomap = nullptr;
+
+#ifndef SWIG
+  // Owning pool. Set by InfomapBase::allocNode for every pool-allocated node;
+  // stays nullptr only for the value-member root, which is never pool-freed.
+  NodePool* m_pool = nullptr;
+  // Pool that out-edges of this node are allocated from (same instance's edge
+  // pool). nullptr for standalone nodes, whose edges fall back to new/delete.
+  EdgePool* m_edgePool = nullptr;
+  // Out-of-line feature-only fields (meta data / regularized multilayer);
+  // nullptr for the common case (ordinary + higher-order networks).
+  std::unique_ptr<InfoNodeExtras> m_extras;
+  friend class InfomapBase;
+#endif
 
 public:
   InfoNode(const FlowData& flowData)
@@ -114,7 +171,6 @@ public:
         stateId(other.stateId),
         physicalId(other.physicalId),
         layerId(other.layerId),
-        metaData(other.metaData),
         parent(other.parent),
         previous(other.previous),
         next(other.next),
@@ -124,21 +180,35 @@ public:
         collapsedLastChild(other.collapsedLastChild),
         codelength(other.codelength),
         dirty(other.dirty),
-        metaCollection(other.metaCollection),
+        physicalNodes(other.physicalNodes),
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+        lossyEntropy(other.lossyEntropy),
+        lossyFlowLogFlow(other.lossyFlowLogFlow),
+#endif
         m_childDegree(other.m_childDegree),
         m_childrenChanged(other.m_childrenChanged),
-        m_numLeafMembers(other.m_numLeafMembers) { }
+        m_numLeafMembers(other.m_numLeafMembers),
+        m_extras(other.m_extras ? std::make_unique<InfoNodeExtras>(*other.m_extras) : nullptr)
+  {
+  }
 
   ~InfoNode() noexcept;
 
+  // Copy-assignment is required: InfomapIteratorPhysical holds a
+  // std::map<unsigned int, InfoNode> and its defaulted operator= copy-assigns
+  // the mapped InfoNode values. Mirror the copy constructor member-for-member
+  // so the two copy paths stay consistent (the previous hand-written version
+  // had silently dropped physicalNodes). stateNodes is intentionally omitted in
+  // both, matching the constructor's long-standing behavior.
   InfoNode& operator=(const InfoNode& other)
   {
+    if (this == &other)
+      return *this;
     data = other.data;
     index = other.index;
     stateId = other.stateId;
     physicalId = other.physicalId;
     layerId = other.layerId;
-    metaData = other.metaData;
     parent = other.parent;
     previous = other.previous;
     next = other.next;
@@ -148,23 +218,63 @@ public:
     collapsedLastChild = other.collapsedLastChild;
     codelength = other.codelength;
     dirty = other.dirty;
-    metaCollection = other.metaCollection;
+    physicalNodes = other.physicalNodes;
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+    lossyEntropy = other.lossyEntropy;
+    lossyFlowLogFlow = other.lossyFlowLogFlow;
+#endif
     m_childDegree = other.m_childDegree;
     m_childrenChanged = other.m_childrenChanged;
     m_numLeafMembers = other.m_numLeafMembers;
+    m_extras = other.m_extras ? std::make_unique<InfoNodeExtras>(*other.m_extras) : nullptr;
     return *this;
   }
 
   // ---------------------------- Getters ----------------------------
 
-  unsigned int getMetaData(unsigned int dimension = 0) noexcept
+  // Body lives in InfoNode.cpp so the SWIG-parsed header carries only the
+  // declaration (metaData now lives in the SWIG-hidden extras struct).
+  unsigned int getMetaData(unsigned int dimension = 0) noexcept;
+
+#ifndef SWIG
+  // ---------------------------- Out-of-line extras ----------------------------
+  static const std::vector<int>& emptyMetaData() noexcept
   {
-    if (dimension >= metaData.size()) {
-      return 0;
-    }
-    auto meta = metaData[dimension];
-    return meta < 0 ? 0 : static_cast<unsigned int>(meta);
+    static const std::vector<int> empty;
+    return empty;
   }
+  static const std::vector<LayerTeleFlowData>& emptyLayerTeleFlowData() noexcept
+  {
+    static const std::vector<LayerTeleFlowData> empty;
+    return empty;
+  }
+
+  const std::vector<int>& metaData() const noexcept { return m_extras ? m_extras->metaData : emptyMetaData(); }
+  const std::vector<LayerTeleFlowData>& layerTeleFlowData() const noexcept { return m_extras ? m_extras->layerTeleFlowData : emptyLayerTeleFlowData(); }
+
+  bool hasExtras() const noexcept { return m_extras != nullptr; }
+  InfoNodeExtras& ensureExtras()
+  {
+    if (!m_extras)
+      m_extras = std::make_unique<InfoNodeExtras>();
+    return *m_extras;
+  }
+
+  // ---------------------------- Meta collection ----------------------------
+  // Allocated only for nodes that carry meta data, via the extras struct.
+  bool hasMetaCollection() const noexcept { return m_extras && m_extras->metaCollection != nullptr; }
+  MetaCollection& metaCollection() noexcept { return *m_extras->metaCollection; } // precondition: hasMetaCollection()
+  const MetaCollection& metaCollection() const noexcept { return *m_extras->metaCollection; }
+  const MetaCollection* metaCollectionPtr() const noexcept { return m_extras ? m_extras->metaCollection.get() : nullptr; }
+
+  MetaCollection& ensureMetaCollection()
+  {
+    auto& extras = ensureExtras();
+    if (!extras.metaCollection)
+      extras.metaCollection = std::make_unique<MetaCollection>();
+    return *extras.metaCollection;
+  }
+#endif
 
   // ---------------------------- Infomap ----------------------------
   InfomapBase& getInfomap();
@@ -311,13 +421,15 @@ public:
   void sortChildrenOnFlow(bool recurse = true) noexcept;
 
   /**
-   * Release the children and store the child pointers for later expansion
+   * Move the active child chain to the collapsed child chain without deleting
+   * it. The node owns the collapsed chain until expandChildren() restores it or
+   * deleteChildren()/destruction deletes it.
    * @return the number of children collapsed
    */
   unsigned int collapseChildren() noexcept;
 
   /**
-   * Expand collapsed children
+   * Move the collapsed child chain back to the active child chain.
    * @return the number of collapsed children expanded
    */
   unsigned int expandChildren();
@@ -329,8 +441,17 @@ public:
 
   void setNumLeafNodes(unsigned int value) noexcept { m_numLeafMembers = value; }
 
+  /**
+   * Append child to this node's active child chain and transfer tree ownership
+   * to this parent. The child must not still be owned by another active chain.
+   */
   void addChild(InfoNode* child) noexcept;
 
+  /**
+   * Detach this node from its active child chain without deleting any child.
+   * Child parent/sibling links are not rewritten; callers must reattach or
+   * delete the detached chain before those stale links can be observed.
+   */
   void releaseChildren() noexcept;
 
   /**
@@ -345,6 +466,25 @@ public:
    */
   unsigned int replaceWithChildren() noexcept;
 
+#ifndef SWIG
+  // Tree surgery for the search, not binding API; kept out of the SWIG wrappers.
+  /**
+   * Reversibly take this node out of its parent's child chain and put its own
+   * children there in its place. Unlike replaceWithChildren() the node stays
+   * alive with its parent, sibling and child pointers intact, so
+   * restoreLiftedChildren() undoes the move exactly and destroyLifted() commits
+   * it. Nothing else may touch the parent's chain in between.
+   * @return false, and no change, on a root or a leaf
+   */
+  bool liftChildrenIntoParent() noexcept;
+
+  //! Undo liftChildrenIntoParent(): take the children back and re-link this node.
+  void restoreLiftedChildren() noexcept;
+
+  //! Commit liftChildrenIntoParent(): the children stay with the parent, this node is deleted.
+  void destroyLifted() noexcept;
+#endif
+
   void replaceWithChildrenDebug() noexcept;
 
   /**
@@ -354,20 +494,62 @@ public:
 
   void replaceChildrenWithGrandChildrenDebug() noexcept;
 
+  /**
+   * Delete this node.
+   *
+   * removeChildren=false leaves firstChild intact, so the destructor deletes the
+   * active child chain. removeChildren=true clears firstChild before deletion,
+   * leaving the previous child chain for the caller to reattach or delete.
+   */
   void remove(bool removeChildren) noexcept;
 
+  /**
+   * Delete active and collapsed child chains owned by this node.
+   */
   void deleteChildren() noexcept;
 
   void addOutEdge(InfoNode& target, double weight, double flow = 0.0) noexcept
   {
-    auto* edge = new InfoEdge(*this, target, weight, flow);
+    auto* edge = m_edgePool != nullptr
+        ? m_edgePool->alloc(*this, target, weight, flow)
+        : new InfoEdge(*this, target, weight, flow);
     m_outEdges.push_back(edge);
     target.m_inEdges.push_back(edge);
   }
 
 private:
   void calcChildDegree() noexcept;
+
+  // Destroy a node through its owning pool, or via plain delete if it was not
+  // pool-allocated (e.g. a standalone node built in a test). Lets InfoNode stay
+  // usable without an InfomapBase pool while still recycling pooled nodes.
+  static void destroyNode(InfoNode* node) noexcept;
 };
+
+// Guards the InfoNode shrink (feature-only fields moved out-of-line into
+// InfoNodeExtras). The common case (ordinary + higher-order) pays only the
+// extras pointer. The lossy feature adds two doubles inline.
+// Achieved on this toolchain: 328 -> 296 B in the default build (the three
+// feature-only fields' 56 nominal bytes net ~32 after alignment); the lossy
+// feature adds two doubles (~312 B). The bounds carry a small margin so struct
+// layout/alignment differences across platforms (Windows/macOS CI) don't trip
+// the guard, while still catching a regression back toward the un-shrunk sizes
+// (328 default / 344 lossy).
+//
+// Skip the guard under debug-STL configs (_GLIBCXX_DEBUG, libc++ debug,
+// MSVC _ITERATOR_DEBUG_LEVEL>0): those inflate std::vector/iterator layout, so
+// InfoNode legitimately exceeds these release-layout bounds without any real
+// regression. The guard's job is to catch re-bloat in normal builds, not to
+// constrain debug-iterator layouts.
+#if !defined(_GLIBCXX_DEBUG) && !defined(_GLIBCXX_DEBUG_PEDANTIC)                            \
+    && !defined(_LIBCPP_DEBUG) && !(defined(_LIBCPP_DEBUG_LEVEL) && _LIBCPP_DEBUG_LEVEL > 0) \
+    && !(defined(_ITERATOR_DEBUG_LEVEL) && _ITERATOR_DEBUG_LEVEL > 0)
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+static_assert(sizeof(InfoNode) <= 320, "InfoNode grew beyond the shrink target (lossy build)");
+#else
+static_assert(sizeof(InfoNode) <= 304, "InfoNode grew beyond the shrink target");
+#endif
+#endif
 
 } // namespace infomap
 
