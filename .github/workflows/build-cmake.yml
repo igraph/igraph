@@ -22,11 +22,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: ['x86_64', 'ucrt-x86_64', 'clang-x86_64']
+        arch: ['ucrt-x86_64', 'clang-x86_64']
         shared_libs: ['shared', 'static']
         include:
-          - arch: x86_64
-            msystem: MINGW64
           - arch: ucrt-x86_64
             msystem: UCRT64
           - arch: clang-x86_64
