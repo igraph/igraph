@@ -525,14 +525,14 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_mat
 
     options->n = n;
     options->nev = high;
-    options->ncv = 2 * options->nev < n ? 2 * options->nev : n;
+    options->ncv = 0; /* 0 means "automatic" */
     options->which[0] = 'L'; options->which[1] = 'A';
 
     IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage,
                                        &tmpvalues, &tmpvectors));
 
     options->nev = low;
-    options->ncv = 2 * options->nev < n ? 2 * options->nev : n;
+    options->ncv = 0; /* 0 means "automatic" */
     options->which[0] = 'S'; options->which[1] = 'A';
 
     IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage,
@@ -631,7 +631,7 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix
         }
 
         options->n = n;
-        options->ncv = 2 * options->nev < n ? 2 * options->nev : n;
+        options->ncv = 0; /* 0 means "automatic" */
 
         if (!fun) {
             fun = igraph_i_eigen_matrix_sym_arpack_cb;
@@ -1382,7 +1382,7 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
     }
 
     options->n = (int) n;
-    options->ncv = 2 * options->nev < options->n ? 2 * options->nev : options->n;
+    options->ncv = 0; /* 0 means "automatic" */
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
