@@ -32,6 +32,25 @@
 #include "core/math.h" /* M_SQRT2 */
 #include "misc/graphicality.h"
 
+/* Checks that all fitness scores are finite and non-negative.
+ * The vector must not be empty. */
+static igraph_error_t check_fitness(const igraph_vector_t *fitness) {
+    igraph_real_t min, max;
+
+    igraph_vector_minmax(fitness, &min, &max);
+    if (isnan(min)) {
+        IGRAPH_ERROR("Fitness scores must not be NaN.", IGRAPH_EINVAL);
+    }
+    if (min < 0) {
+        IGRAPH_ERRORF("Fitness scores must not be negative, got %g.", IGRAPH_EINVAL, min);
+    }
+    if (max == IGRAPH_INFINITY) {
+        IGRAPH_ERROR("Fitness scores must be finite.", IGRAPH_EINVAL);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \ingroup generators
  * \function igraph_static_fitness_game
@@ -63,7 +82,7 @@
  *
  * </para><para>
  * To generate random undirected graphs with a given expected degree sequence, set
- * \p fitness_out (and in the directed case \p fitness_out) to the desired expected
+ * \p fitness_out (and in the directed case \p fitness_in) to the desired expected
  * degrees, and \p no_of_edges to the corresponding edge count, i.e. half the sum of
  * expected degrees in the undirected case, and the sum of out- or in-degrees in the
  * directed case.
@@ -144,8 +163,9 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_int_t no_of_ed
     }
 
     /* Sanity checks for the fitnesses */
-    if (igraph_vector_min(fitness_out) < 0 && (!directed || igraph_vector_min(fitness_in) < 0)) {
-        IGRAPH_ERROR("Fitness scores must not be negative.", IGRAPH_EINVAL);
+    IGRAPH_CHECK(check_fitness(fitness_out));
+    if (directed) {
+        IGRAPH_CHECK(check_fitness(fitness_in));
     }
 
     /* Avoid getting into an infinite loop when too many edges are requested. */

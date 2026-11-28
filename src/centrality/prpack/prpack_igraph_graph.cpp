@@ -30,6 +30,20 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
     }
 
+    if (weights && ecount > 0) {
+        igraph_real_t min, max;
+        igraph_vector_minmax(weights, &min, &max);
+        if (min < 0) {
+            IGRAPH_ERROR("Edge weights must not be negative.", IGRAPH_EINVAL);
+        }
+        if (isnan(min)) {
+            IGRAPH_ERROR("Edge weights must not be NaN.", IGRAPH_EINVAL);
+        }
+        if (!isfinite(max)) {
+            IGRAPH_ERROR("Edge weights must not be infinite.", IGRAPH_EINVAL);
+        }
+    }
+
     // Get the number of vertices and edges. For undirected graphs, we add
     // an edge in both directions.
     num_vs = (int) vcount;
@@ -49,7 +63,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         p_weight = vals = new double[num_es];
     }
 
-    // Count the number of ignored edges (those with negative or zero weight)
+    // Count the number of ignored edges (those with zero weight)
     int num_ignored_es = 0;
 
     if (treat_as_directed) {
@@ -67,13 +81,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
 
             // Handle the weight
             if (weights != NULL) {
-                // Does this edge have zero or negative weight?
-                if (VECTOR(*weights)[eid] < 0) {
-                    // Negative weights are disallowed.
-                    IGRAPH_ERROR("Edge weights must not be negative.", IGRAPH_EINVAL);
-                } else if (isnan(VECTOR(*weights)[eid])) {
-                    IGRAPH_ERROR("Edge weights must not be NaN.", IGRAPH_EINVAL);
-                } else if (VECTOR(*weights)[eid] == 0) {
+                if (VECTOR(*weights)[eid] == 0) {
                     // Edges with zero weight are ignored.
                     num_ignored_es++;
                     continue;
@@ -107,12 +115,11 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
 
             int temp = igraph_vector_int_size(&neis);
 
-            // TODO: should loop edges be added in both directions?
             int *p_head_copy = p_head;
             for (int j = 0; j < temp; j++) {
                 if (weights != NULL) {
-                    if (VECTOR(*weights)[VECTOR(neis)[j]] <= 0) {
-                        // Ignore
+                    if (VECTOR(*weights)[VECTOR(neis)[j]] == 0) {
+                        // Edges with zero weight are ignored.
                         num_ignored_es++;
                         continue;
                     }

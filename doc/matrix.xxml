@@ -102,6 +102,8 @@
 <!-- doxrox-include igraph_matrix_ncol -->
 <!-- doxrox-include igraph_matrix_is_symmetric -->
 <!-- doxrox-include igraph_matrix_maxdifference -->
+<!-- doxrox-include igraph_matrix_is_any_nan -->
+<!-- doxrox-include igraph_matrix_is_all_finite -->
 </section>
 
 <section id="matrix-searching-for-elements"><title>Searching for elements</title>

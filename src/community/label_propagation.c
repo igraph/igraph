@@ -189,13 +189,13 @@ static igraph_error_t community_label_propagation(
                 if (retention) {
                     /* If we are using retention, we first check if the current label
                     is among the maximum label. */
-                    j = (long)VECTOR(*membership)[v1];
+                    j = VECTOR(*membership)[v1];
                     if (j < 0 || /* Doesn't have a label yet */
                         VECTOR(label_weights)[j] == 0 || /* Label not present in neighbors */
                         VECTOR(label_weights)[j] < max_count /* Label not dominant */) {
                         /* Select randomly from the dominant labels */
                         k = RNG_INTEGER(0, igraph_vector_int_size(&dominant_labels) - 1);
-                        k = VECTOR(dominant_labels)[(long int)k];
+                        k = VECTOR(dominant_labels)[k];
                         /* If label changes, we will continue running */
                         if (k != j) {
                             running = true;

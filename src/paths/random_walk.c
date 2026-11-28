@@ -302,10 +302,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
     }
 
     if (start < 0 || start >= vc) {
-        IGRAPH_ERRORF("Starting vertex must be between 0 and the "
-                      "number of vertices in the graph (%" IGRAPH_PRId
-                      "), got %" IGRAPH_PRId ".", IGRAPH_EINVVID,
-                      vc, start);
+        IGRAPH_ERROR("Random walk starting vertex ID out of range.", IGRAPH_EINVVID);
     }
     if (steps < 0) {
         IGRAPH_ERRORF("Number of steps should be non-negative, got %"

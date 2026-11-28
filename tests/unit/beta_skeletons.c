@@ -170,6 +170,39 @@ int main(void) {
     print_graph_canon(&graph);
     igraph_destroy(&graph);
 
+    /* Regression tests: for beta > 2 (lune) and beta < 0.5, points inside the
+     * empty region were not found by the k-d tree search, giving extra edges. */
+    {
+        igraph_real_t tri_points[] = { 0, 0,  1, 0,  0.5, 0.9 };
+        igraph_real_t flat_points[] = { 0, 0,  1, 0,  0.5, 0.01 };
+        igraph_matrix_t tri, flat;
+        igraph_bool_t adj;
+
+        igraph_matrix_init_array(&tri, tri_points, 3, 2, IGRAPH_ROW_MAJOR);
+        igraph_matrix_init_array(&flat, flat_points, 3, 2, IGRAPH_ROW_MAJOR);
+
+        /* Each point lies in the lune of the opposite edge. */
+        igraph_lune_beta_skeleton(&graph, &tri, 3);
+        IGRAPH_ASSERT(igraph_ecount(&graph) == 0);
+        igraph_destroy(&graph);
+
+        /* Point 2 lies in the region of edge 0-1, but not vice versa. */
+        igraph_lune_beta_skeleton(&graph, &flat, 0.4);
+        IGRAPH_ASSERT(igraph_ecount(&graph) == 2);
+        igraph_are_adjacent(&graph, 0, 1, &adj);
+        IGRAPH_ASSERT(!adj);
+        igraph_destroy(&graph);
+
+        igraph_circle_beta_skeleton(&graph, &flat, 0.4);
+        IGRAPH_ASSERT(igraph_ecount(&graph) == 2);
+        igraph_are_adjacent(&graph, 0, 1, &adj);
+        IGRAPH_ASSERT(!adj);
+        igraph_destroy(&graph);
+
+        igraph_matrix_destroy(&flat);
+        igraph_matrix_destroy(&tri);
+    }
+
     igraph_matrix_destroy(&rot_square_lattice);
     igraph_matrix_destroy(&trig_lattice);
     igraph_matrix_destroy(&point_3d_mat);

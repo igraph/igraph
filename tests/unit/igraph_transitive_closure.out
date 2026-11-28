@@ -90,3 +90,23 @@ edges: {
 1 2
 3 4
 }
+
+Graph and vertex attributes are kept, edge attributes are dropped
+directed: true
+vcount: 4
+edges: {
+0 1
+0 2
+1 2
+2 1
+}
+name="test graph"
+Vertex 0: weight=10 label=""
+Vertex 1: weight=11 label=""
+Vertex 2: weight=12 label="two"
+Vertex 3: weight=13 label=""
+Edge 0 (0-1):
+Edge 1 (0-2):
+Edge 2 (1-2):
+Edge 3 (2-1):
+

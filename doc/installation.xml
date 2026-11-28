@@ -46,7 +46,7 @@
   <itemizedlist>
     <listitem>
       <para>
-        <ulink url="http://www.xmlsoft.org/">libxml2</ulink>,
+        <ulink url="http://www.xmlsoft.org/">libxml2</ulink> (version 2.7.4 or later),
         required for GraphML support
       </para>
     </listitem>
@@ -97,6 +97,12 @@
       </para>
     </listitem>
   </itemizedlist>
+  <para>
+    The BLAS, LAPACK and ARPACK libraries must use 32-bit integers
+    (the LP64 interface). Libraries built with 64-bit integers (ILP64),
+    such as <literal>openblas64</literal> or the ILP64 interface of Intel MKL,
+    are not supported, and using them leads to crashes or incorrect results.
+  </para>
   <para>
     When building the development version of igraph,
     <literal>bison</literal>, <literal>flex</literal> and

@@ -82,6 +82,29 @@ int main(void) {
     print_closure(&graph);
     igraph_destroy(&graph);
 
+    printf("\nGraph and vertex attributes are kept, edge attributes are dropped\n");
+    igraph_set_attribute_table(&igraph_cattribute_table);
+    igraph_small(&graph, 4, IGRAPH_DIRECTED,
+                 0,1, 1,2, 2,1, 3,3,
+                 -1);
+    SETGAS(&graph, "name", "test graph");
+    SETVAN(&graph, "weight", 0, 10);
+    SETVAN(&graph, "weight", 1, 11);
+    SETVAN(&graph, "weight", 2, 12);
+    SETVAN(&graph, "weight", 3, 13);
+    SETVAS(&graph, "label", 2, "two");
+    SETEAN(&graph, "capacity", 0, 5);
+    {
+        igraph_t closure;
+        igraph_transitive_closure(&graph, &closure);
+        print_graph_canon(&closure);
+        print_attributes(&closure);
+        IGRAPH_ASSERT(!igraph_cattribute_has_attr(&closure, IGRAPH_ATTRIBUTE_EDGE, "capacity"));
+        igraph_destroy(&closure);
+    }
+    igraph_destroy(&graph);
+    igraph_set_attribute_table(NULL);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

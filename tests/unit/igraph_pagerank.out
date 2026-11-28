@@ -63,6 +63,14 @@ Small undirected multigraph (unit weights)
 ARPACK: ( 0.187838 0.486486 0.325676 )
 PRPACK: ( 0.187838 0.486486 0.325676 )
 
+Small undirected graph with self-loop (unweighted)
+ARPACK: ( 0.184211 0.631579 0.184211 )
+PRPACK: ( 0.184211 0.631579 0.184211 )
+
+Small undirected graph with self-loop (weighted)
+ARPACK: ( 0.117105 0.631579 0.251316 )
+PRPACK: ( 0.117105 0.631579 0.251316 )
+
 Large test graph, unweighted
 
 Large test graph, weighted

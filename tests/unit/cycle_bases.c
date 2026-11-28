@@ -176,6 +176,17 @@ int main(void) {
     print_check_destroy(&graph, &result);
 #endif
 
+    /* Weights are not supported yet; they must be rejected, not silently ignored. */
+    {
+        igraph_vector_t weights;
+        igraph_ring(&graph, 3, IGRAPH_UNDIRECTED, false, true);
+        igraph_vector_init_range(&weights, 1, 4);
+        CHECK_ERROR(igraph_fundamental_cycles(&graph, &weights, &result, -1, -1), IGRAPH_UNIMPLEMENTED);
+        CHECK_ERROR(igraph_minimum_cycle_basis(&graph, &weights, &result, -1, true, true), IGRAPH_UNIMPLEMENTED);
+        igraph_vector_destroy(&weights);
+        igraph_destroy(&graph);
+    }
+
     igraph_vector_int_list_destroy(&result);
 
     VERIFY_FINALLY_STACK();

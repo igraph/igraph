@@ -109,6 +109,7 @@
 <section id="degree-sequences"><title>Degree sequences</title>
 <!-- doxrox-include igraph_is_graphical -->
 <!-- doxrox-include igraph_is_bigraphical -->
+<!-- doxrox-include igraph_is_potentially_connected -->
 </section>
 
 <section id="centrality-measures"><title>Centrality measures</title>

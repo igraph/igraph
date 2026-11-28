@@ -40,7 +40,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         igraph_destroy(&g);
     }
 
-    // no need to call igraph_destroy() if igraph_read_graph_edgelist() returns an
+    // no need to call igraph_destroy() if igraph_read_graph_graphdb() returns an
     // error code as we don't have a valid graph object in that case
 
     fclose(ifile);

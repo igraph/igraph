@@ -171,6 +171,26 @@ int main(void) {
     print_matrix(&m);
     igraph_matrix_destroy(&m);
 
+    /* igraph_matrix_is_any_nan() and igraph_matrix_is_all_finite() */
+    igraph_matrix_init(&m, 0, 0);
+    IGRAPH_ASSERT(!igraph_matrix_is_any_nan(&m));
+    IGRAPH_ASSERT(igraph_matrix_is_all_finite(&m));
+
+    igraph_matrix_resize(&m, 2, 3);
+    igraph_matrix_fill(&m, 1.5);
+    IGRAPH_ASSERT(!igraph_matrix_is_any_nan(&m));
+    IGRAPH_ASSERT(igraph_matrix_is_all_finite(&m));
+
+    MATRIX(m, 1, 2) = -IGRAPH_INFINITY;
+    IGRAPH_ASSERT(!igraph_matrix_is_any_nan(&m));
+    IGRAPH_ASSERT(!igraph_matrix_is_all_finite(&m));
+
+    MATRIX(m, 1, 2) = 0;
+    MATRIX(m, 0, 1) = IGRAPH_NAN;
+    IGRAPH_ASSERT(igraph_matrix_is_any_nan(&m));
+    IGRAPH_ASSERT(!igraph_matrix_is_all_finite(&m));
+    igraph_matrix_destroy(&m);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

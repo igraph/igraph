@@ -34,8 +34,22 @@ macro(find_dependencies)
 
   # Declare minimum supported version for some dependencies
   set(GLPK_VERSION_MIN "4.57") # 4.57 is the first version providing glp_on_error()
-  set(LIBXML2_VERSION_MIN "2.7.4") # 2.7.4 is the first version providing xmlStructuredErrorContext
   set(PLFIT_VERSION_MIN "0.9.3")
+  # libxml2 must be at least 2.7.4, the first version providing
+  # xmlStructuredErrorContext. This is not passed to find_package() because
+  # some of libxml2's own CMake packages accept only their exact version.
+
+  # igraph supports only BLAS and LAPACK libraries that use 32-bit integers
+  # (LP64), not 64-bit ones (ILP64). Since CMake 3.22, BLA_SIZEOF_INTEGER
+  # makes FindBLAS and FindLAPACK skip ILP64 variants. Older CMake versions
+  # ignore it.
+  if(DEFINED BLA_SIZEOF_INTEGER AND NOT BLA_SIZEOF_INTEGER STREQUAL "4")
+    message(FATAL_ERROR
+      "igraph requires BLAS and LAPACK libraries with 32-bit integers (LP64); "
+      "BLA_SIZEOF_INTEGER=${BLA_SIZEOF_INTEGER} is not supported."
+    )
+  endif()
+  set(BLA_SIZEOF_INTEGER 4)
 
   # Extend dependencies depending on whether we will be using the vendored
   # copies or not
@@ -44,7 +58,7 @@ macro(find_dependencies)
 
     if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} STREQUAL "AUTO")
       find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN} QUIET)
-      if(${LIBNAME_UPPER}_FOUND)
+      if(${DEPENDENCY}_FOUND)
         set(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} OFF)
       else()
         set(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} ON)
@@ -64,7 +78,7 @@ macro(find_dependencies)
 
     if(IGRAPH_${LIBNAME_UPPER}_SUPPORT STREQUAL "AUTO")
       find_package(${DEPENDENCY} ${${DEPENDENCY}_VERSION_MIN} QUIET)
-      if(${LIBNAME_UPPER}_FOUND)
+      if(${DEPENDENCY}_FOUND)
         set(IGRAPH_${LIBNAME_UPPER}_SUPPORT ON)
       else()
         set(IGRAPH_${LIBNAME_UPPER}_SUPPORT OFF)
@@ -74,7 +88,7 @@ macro(find_dependencies)
 
   # GraphML support is treated separately because the library name is different
   if(IGRAPH_GRAPHML_SUPPORT STREQUAL "AUTO")
-    find_package(LibXml2 ${LIBXML2_VERSION_MIN} QUIET)
+    find_package(LibXml2 QUIET)
     if(LibXml2_FOUND)
       set(IGRAPH_GRAPHML_SUPPORT ON)
     else()
@@ -141,7 +155,7 @@ macro(find_dependencies)
   set(HAVE_GLPK ${GLPK_FOUND})
   set(HAVE_INFOMAP ${INFOMAP_FOUND})
   set(HAVE_GMP ${GMP_FOUND})
-  set(HAVE_LIBXML ${LIBXML2_FOUND})
+  set(HAVE_LIBXML ${LibXml2_FOUND})
 
   # Check whether we need to link to the math library
   if(NOT DEFINED CACHE{NEED_LINKING_AGAINST_LIBM})

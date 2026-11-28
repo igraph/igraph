@@ -150,6 +150,14 @@ int main(void) {
     printf("Check for negative block size error handling.\n");
     CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_3, &block_sizes_neg, true, IGRAPH_SIMPLE_SW), IGRAPH_EINVAL);
 
+    /* NaN and infinite entries in the preference matrix */
+    igraph_matrix_fill(&pref_matrix_2, 0.5);
+    MATRIX(pref_matrix_2, 0, 1) = IGRAPH_NAN;
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_2, &block_sizes_2, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_2, &block_sizes_2, IGRAPH_DIRECTED, IGRAPH_MULTI_SW), IGRAPH_EINVAL);
+    MATRIX(pref_matrix_2, 0, 1) = IGRAPH_INFINITY;
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_2, &block_sizes_2, IGRAPH_DIRECTED, IGRAPH_MULTI_SW), IGRAPH_EINVAL);
+
     igraph_matrix_destroy(&pref_matrix_0);
     igraph_matrix_destroy(&pref_matrix_1);
     igraph_matrix_destroy(&pref_matrix_2);

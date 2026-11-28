@@ -112,7 +112,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         igraph_pseudo_diameter(&graph, &weights, &r, -1, NULL, NULL, false, false);
         igraph_diameter(&graph, &weights, &r, NULL, NULL, NULL, NULL, false, true);
-        igraph_average_path_length(&graph, &weights, &r, &r, true, true);
+        igraph_average_path_length(&graph, &weights, &r, &r2, true, true);
         igraph_radius(&graph, &weights, &r, IGRAPH_OUT);
 
         if (igraph_vcount(&graph) >= 1) {

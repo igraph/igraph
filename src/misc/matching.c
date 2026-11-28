@@ -404,7 +404,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
             label_changed = 0;
         }
 
-        debug("Considering vertex %ld\n", v);
+        debug("Considering vertex %" IGRAPH_PRId "\n", v);
 
         /* Line 5: find row u among the neighbors of v s.t. label(u) is minimal */
         IGRAPH_CHECK(igraph_neighbors(
@@ -419,17 +419,17 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
             }
         }
 
-        debug("  Neighbor with smallest label: %ld (label=%ld)\n", u, label_u);
+        debug("  Neighbor with smallest label: %" IGRAPH_PRId " (label=%" IGRAPH_PRId ")\n", u, label_u);
 
         if (label_u < no_of_nodes) {                         /* Line 6 */
             VECTOR(labels)[v] = VECTOR(labels)[u] + 1;         /* Line 7 */
             if (MATCHED(u)) {                                  /* Line 8 */
                 w = VECTOR(match)[u];
-                debug("  Vertex %ld is matched to %ld, performing a double push\n", u, w);
+                debug("  Vertex %" IGRAPH_PRId " is matched to %" IGRAPH_PRId ", performing a double push\n", u, w);
                 if (w != v) {
                     VECTOR(match)[u] = -1; VECTOR(match)[w] = -1;  /* Line 9 */
                     IGRAPH_CHECK(igraph_dqueue_int_push(&q, w));  /* Line 10 */
-                    debug("  Unmatching & activating vertex %ld\n", w);
+                    debug("  Unmatching & activating vertex %" IGRAPH_PRId "\n", w);
                     num_matched--;
                 }
             }
@@ -686,7 +686,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         debug("Matching:");
         igraph_vector_int_print(&match);
         debug("Unmatched vertices are marked by non-negative numbers:\n");
-        igraph_vector_print(&parent);
+        igraph_vector_int_print(&parent);
         debug("Labeling:");
         igraph_vector_print(&labels);
         debug("Slacks:");
@@ -698,7 +698,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         while (!igraph_dqueue_int_empty(&q)) {
             v = igraph_dqueue_int_pop(&q);
 
-            debug("Considering vertex %ld\n", v);
+            debug("Considering vertex %" IGRAPH_PRId "\n", v);
 
             /* v is always in the smaller set. Find the neighbors of v, which
              * are all in the larger set. Find the pairs of these nodes in
@@ -780,12 +780,12 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
         if (alternating_path_endpoint != -1) {
 #ifdef MATCHING_DEBUG
             debug("BFS parent tree:");
-            igraph_vector_print(&parent);
+            igraph_vector_int_print(&parent);
 #endif
             /* Increase the size of the matching with the alternating path. */
             v = alternating_path_endpoint;
             u = VECTOR(parent)[v];
-            debug("Extending matching with alternating path ending in %ld.\n", v);
+            debug("Extending matching with alternating path ending in %" IGRAPH_PRId ".\n", v);
 
             while (u != v) {
                 w = VECTOR(match)[v];
@@ -818,7 +818,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
 #ifdef MATCHING_DEBUG
         debug("Vertices reachable from unmatched ones via tight edges:\n");
         igraph_vector_int_print(&vec1);
-        igraph_vector_print(&vec2);
+        igraph_vector_int_print(&vec2);
 #endif
 
         /* At this point, vec1 contains the nodes in the smaller set (A)
@@ -858,7 +858,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
             }
         }
         min_slack += min_slack_2;
-        debug("Starting approximation for min_slack = %.4f (based on vertex pair %ld--%ld)\n",
+        debug("Starting approximation for min_slack = %.4f (based on vertex pair %" IGRAPH_PRId "--%" IGRAPH_PRId ")\n",
               min_slack, min_slack_u, min_slack_v);
 
         n = igraph_vector_int_size(&vec1);

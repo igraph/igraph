@@ -248,6 +248,309 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
 }
 
 
+/**
+ * \function igraph_is_potentially_connected
+ * \brief Is there a connected graph with the given graphical degree sequence?
+ *
+ * \experimental
+ *
+ * This function determines if there is a connected graph with a given graphical
+ * degree sequence. This function assumes that the degree sequence is graphical
+ * for the given allowed_edge_types, and does not check it.
+ * For non-graphical input the result is unspecified.
+ * The function will not crash or take excessive time, but the value it returns has no meaning.
+ * If graphicality is not known to hold, check it with \ref igraph_is_graphical() first.
+ *
+ * </para><para>
+ * For undirected graphs, it suffices that the sequence satisfies two conditions.
+ * Each degree must be positive, otherwise there would be an isolated vertex.
+ * The sum of degrees must be large enough to support n - 1 edges, that is, at least form a tree.
+ * There is one exception in the case of simple graphs with self-loops.
+ * For the sequence (2, 2), there are technically enough edges to form a tree,
+ * but placing them in such a way would require multiedges.
+ * Therefore, the only possible realization of two self-loops is disconnected.
+ *
+ * </para><para>
+ * For weak connectivity in directed graphs, the same conditions apply,
+ * essentially treating edges as if they were undirected.
+ *
+ * </para><para>
+ * For strong connectivity, there are differences between simple graphs and multigraphs.
+ * In multigraphs, it is sufficient that each in-degree and out-degree is positive.
+ * In simple graphs, an additional condition must be satisfied, given by Beineke-Harary,
+ * and later also by Hong-Liu-Lai.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Horvát, Sz. and Modes, C.D., Connectedness matters: construction and exact random sampling of connected networks. J. Phys. Complex. 2 015008 (2021).
+ * https://doi.org/10.1088/2632-072x/abced5
+ *
+ * </para><para>
+ * Hong, Y., Liu, Q. and Lai, H.-J.,
+ * Characterization of Digraphic Sequences with Strongly Connected Realizations. J. Graph Theory, 84: 191-201 (2016).
+ * https://doi.org/10.1002/jgt.22020
+ *
+ * </para><para>
+ * Beineke, L.W. and Harary, F., Local Restrictions for Various Classes of Directed Graphs.
+ * Journal of the London Mathematical Society, s1-40: 87-95 (1965).
+ * https://doi.org/10.1112/jlms/s1-40.1.87
+ *
+ * \param out_degrees A vector of integers specifying the degree sequence for
+ *     undirected graphs or the out-degree sequence for directed graphs.
+ * \param in_degrees A vector of integers specifying the in-degree sequence for
+ *     directed graphs. For undirected graphs, it must be \c NULL.
+ * \param allowed_edge_types The types of edges to allow in the graph:
+ *     \clist
+ *     \cli IGRAPH_SIMPLE_SW
+ *       simple graphs (i.e. no self-loops or multi-edges allowed).
+ *     \cli IGRAPH_LOOPS_SW
+ *       single self-loops are allowed, but not multi-edges.
+ *     \cli IGRAPH_MULTI_SW
+ *       multi-edges are allowed, but not self-loops.
+ *     \cli IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW
+ *       both self-loops and multi-edges are allowed.
+ *     \endclist
+ * \param mode Can be \c IGRAPH_WEAK or \c IGRAPH_STRONG. Controls checking
+ *     for a weakly or strongly connected realization of the degrees.
+ *     Ignored in the undirected case. For directed graphs, \c IGRAPH_STRONG
+ *     with self-loops allowed but multi-edges disallowed is not implemented
+ *     and returns \c IGRAPH_UNIMPLEMENTED.
+ * \param res Pointer to a Boolean. The result will be stored here.
+ *     This function assumes that the degree sequence is graphical for the given allowed_edge_types, and does not check it.
+ *     For non-graphical input the result is unspecified.
+ *     The function will not crash or take excessive time, but the value it returns has no meaning.
+ *     If graphicality is not known to hold, check it with \ref igraph_is_graphical() first.
+ *
+ * \return Error code.
+ *
+ * \sa \ref igraph_is_graphical
+ *
+ * Time complexity: O(n), where n is the length of the degree sequence(s).
+ */
+igraph_error_t igraph_is_potentially_connected(
+        const igraph_vector_int_t *out_degrees,
+        const igraph_vector_int_t *in_degrees,
+        const igraph_edge_type_sw_t allowed_edge_types,
+        igraph_connectedness_t mode,
+        igraph_bool_t *res) {
+
+    const igraph_bool_t directed = in_degrees != NULL;
+    const igraph_bool_t multigraph = !!(allowed_edge_types & IGRAPH_MULTI_SW);
+    const igraph_bool_t loopy = !!(allowed_edge_types & IGRAPH_LOOPS_SW);
+    const igraph_int_t n = igraph_vector_int_size(out_degrees);
+    igraph_int_t m;
+    igraph_int_t min_d = IGRAPH_INTEGER_MAX;
+    igraph_int_t min_outd = IGRAPH_INTEGER_MAX, min_ind = IGRAPH_INTEGER_MAX;
+
+    if (!directed) {
+        mode = IGRAPH_WEAK;
+    } else if (mode != IGRAPH_WEAK && mode != IGRAPH_STRONG) {
+        IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    }
+
+    if (!multigraph && loopy && mode == IGRAPH_STRONG) {
+        /* Strongly connected for simple graphs with self-loops unimplemented */
+        IGRAPH_ERROR("Potentially strongly connected check is not implemented"
+                     " for simple directed graphs with loops.", IGRAPH_UNIMPLEMENTED);
+    }
+
+    if (directed) {
+        if (igraph_vector_int_size(in_degrees) != n) {
+            IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
+        }
+        igraph_int_t outdegsum = 0, indegsum = 0;
+
+        for (igraph_int_t i=0; i < n; i++) {
+            const igraph_int_t outd = VECTOR(*out_degrees)[i];
+            const igraph_int_t ind =  VECTOR(*in_degrees)[i];
+            if (outd < 0) {
+                IGRAPH_ERROR("Out-degrees must not be negative.", IGRAPH_EINVAL);
+            }
+            if (ind < 0) {
+                IGRAPH_ERROR("In-degrees must not be negative.", IGRAPH_EINVAL);
+            }
+            outdegsum += outd;
+            indegsum += ind;
+            if (outd < min_outd) min_outd = outd;
+            if (ind < min_ind) min_ind = ind;
+            if (outd + ind < min_d) min_d = outd + ind;
+        }
+        if (outdegsum != indegsum) {
+            /* Not graphical */
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+        m = outdegsum;
+    }
+    else /* undirected */ {
+        igraph_int_t degsum = 0;
+
+        for (igraph_int_t i=0; i < n; i++) {
+            const igraph_int_t d = VECTOR(*out_degrees)[i];
+            if (d < 0) {
+                IGRAPH_ERROR("Degrees must not be negative.", IGRAPH_EINVAL);
+            }
+            degsum += d;
+            if (d < min_d) min_d = d;
+        }
+        if (degsum % 2 == 1) {
+            /* Not graphical */
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+        m = degsum / 2;
+    }
+
+    /* The null graph is disconnected. */
+    if (n == 0) {
+        *res = false;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* The singleton graph is connected, regardless of its degree. */
+    if (n == 1) {
+        *res = true;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* From here on, we assume n >= 2 */
+
+    if (mode == IGRAPH_WEAK) {
+        /* Special case: Undirected graph, multi-edges disallowed, self-loops allowed.
+         * The degree sequence (2, 2) has only a disconnected realization (a self loop
+         * on each vertex), even though its edge count is larger than that of a tree.
+         */
+        if (n == 2 && !directed && loopy && !multigraph) {
+            if (VECTOR(*out_degrees)[0] == 2 && VECTOR(*out_degrees)[1] == 2) {
+                *res = false;
+                return IGRAPH_SUCCESS;
+            }
+        }
+
+        *res = min_d > 0 && m >= n-1;
+        return IGRAPH_SUCCESS;
+    } else /* mode == IGRAPH_STRONG */ {
+        if (min_outd == 0 || min_ind == 0) {
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+        /* Min outdegree >= 1 and min indegree >= 1 */
+        if (multigraph) {
+            // Multigraphs can be connected into one hamiltonian cycle
+            // Then rest of stubs can be assigned arbitrarily
+            *res = true;
+            return IGRAPH_SUCCESS;
+        }
+        if (loopy) {
+            /* TODO: Implement potentially strongly connected for loopy simple directed graph case.
+             * This is now caught at the beginning of this function and IGRAPH_UNIMPLEMENTED is returned. */
+        }
+
+        /* Assume simple loopless now */
+        /* We follow Hong-Liu-Lai (2016) and Beineke-Harary (1965) */
+        igraph_vector_int_t out_degree_cumcounts, out_degree_counts;
+        igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
+        igraph_vector_int_t over;
+        igraph_int_t lhs, rhs_sum;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_out_degrees, n);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, n);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_cumcounts, n+1);
+
+        /* Compute out_degree_cumcounts[d+1] to be the no. of out-degrees == d */
+        for (igraph_int_t v = 0; v < n; v++) {
+            igraph_int_t indeg = VECTOR(*in_degrees)[v];
+            igraph_int_t outdeg = VECTOR(*out_degrees)[v];
+            if (indeg >= n || outdeg >= n) {
+                *res = false;
+                igraph_vector_int_destroy(&out_degree_cumcounts);
+                igraph_vector_int_destroy(&sorted_in_degrees);
+                igraph_vector_int_destroy(&sorted_out_degrees);
+                IGRAPH_FINALLY_CLEAN(3);
+                return IGRAPH_SUCCESS;
+            }
+            VECTOR(out_degree_cumcounts)[outdeg + 1]++;
+        }
+
+        /* Compute out_degree_cumcounts[d] to be the no. of out-degrees < d */
+        for (igraph_int_t outdeg = 0; outdeg < n; outdeg++) {
+            VECTOR(out_degree_cumcounts)[outdeg+1] += VECTOR(out_degree_cumcounts)[outdeg];
+        }
+
+        /* In the following loop, out_degree_counts[d] keeps track of the number of vertices
+         * with out-degree d that were already placed. */
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_counts, n);
+
+        for (igraph_int_t v = 0; v < n; v++) {
+            igraph_int_t outdeg = VECTOR(*out_degrees)[v];
+            igraph_int_t indeg  = VECTOR(*in_degrees)[v];
+            igraph_int_t idx = VECTOR(out_degree_cumcounts)[outdeg] + VECTOR(out_degree_counts)[outdeg];
+            VECTOR(sorted_out_degrees)[n - idx - 1] = outdeg;
+            VECTOR(sorted_in_degrees)[n - idx - 1] = indeg;
+            VECTOR(out_degree_counts)[outdeg]++;
+        }
+
+        igraph_vector_int_destroy(&out_degree_counts);
+        igraph_vector_int_destroy(&out_degree_cumcounts);
+        IGRAPH_FINALLY_CLEAN(2);
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&over, n);
+        lhs = 0;
+        rhs_sum = 0;
+        igraph_int_t at = 0;
+        igraph_int_t count = n;
+
+        for (igraph_int_t v = 0; v < n; v++) {
+            const igraph_int_t indeg = VECTOR(sorted_in_degrees)[v];
+            VECTOR(over)[indeg]++;
+        }
+
+
+        /* The sequence has a strongly connected realization unless a subset
+         * of the first k vertices, in non-increasing order of out-degree,
+         * has fewer incoming edges than outgoing ones, that is unless the
+         * Beineke-Harary / Hong-Liu-Lai condition fails for some k.
+         * Be optimistic and set to false if the condition is violated below.
+         */
+        *res = true;
+        for (igraph_int_t k = 1; k < n; k++) {
+            const igraph_int_t indeg = VECTOR(sorted_in_degrees)[k - 1];
+            const igraph_int_t outdeg = VECTOR(sorted_out_degrees)[k - 1];
+            lhs += (indeg - outdeg);
+
+            while (at < k) {
+                while (VECTOR(over)[at] > 0) {
+                    VECTOR(over)[at]--;
+                    count--;
+                    rhs_sum += at;
+                }
+                at++;
+            }
+            if (indeg >= k) {
+                VECTOR(over)[indeg]--;
+                count--;
+            }
+            else {
+                rhs_sum -= indeg;
+            }
+
+
+            const igraph_int_t rhs = rhs_sum + k * count;
+            if (lhs + rhs < 1) {
+                *res = false;
+                break;
+            }
+        }
+
+        igraph_vector_int_destroy(&over);
+        igraph_vector_int_destroy(&sorted_in_degrees);
+        igraph_vector_int_destroy(&sorted_out_degrees);
+        IGRAPH_FINALLY_CLEAN(3);
+        return IGRAPH_SUCCESS;
+    }
+}
+
 /***** Undirected case *****/
 
 /* Undirected graph with multi-self-loops:

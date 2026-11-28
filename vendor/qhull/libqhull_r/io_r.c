@@ -3662,7 +3662,7 @@ int qh_readfeasible(qhT *qh, int dim, const char *curline) {
     else
       linecount++;
     while (*s) {
-      while (isspace(*s))
+      while (isspace((unsigned char)*s))
         s++;
       value= qh_strtod(s, &t);
       if (s == t)
@@ -3670,7 +3670,7 @@ int qh_readfeasible(qhT *qh, int dim, const char *curline) {
       s= t;
       *(coords++)= value;
       if (++tokcount == dim) {
-        while (isspace(*s))
+        while (isspace((unsigned char)*s))
           s++;
         qh_strtod(s, &t);
         if (s != t) {
@@ -3734,9 +3734,9 @@ coordT *qh_readpoints(qhT *qh, int *numpoints, int *dimension, boolT *ismalloc) 
   if (qh->CDDinput) {
     while ((s= fgets(firstline, qh_MAXfirst, qh->fin))) {
       linecount++;
-      if (qh->HALFspace && linecount == 1 && isdigit(*s)) {
+      if (qh->HALFspace && linecount == 1 && isdigit((unsigned char)*s)) {
         dimfeasible= qh_strtol(s, &s);
-        while (isspace(*s))
+        while (isspace((unsigned char)*s))
           s++;
         if (qh_strtol(s, &s) == 1)
           linecount += qh_readfeasible(qh, dimfeasible, s);
@@ -3757,11 +3757,11 @@ coordT *qh_readpoints(qhT *qh, int *numpoints, int *dimension, boolT *ismalloc) 
     if (!memcmp(s, "begin", (size_t)5) || !memcmp(s, "BEGIN", (size_t)5))
       wasbegin= True;
     while (*s) {
-      while (isspace(*s))
+      while (isspace((unsigned char)*s))
         s++;
       if (!*s)
         break;
-      if (!isdigit(*s)) {
+      if (!isdigit((unsigned char)*s)) {
         if (!*qh->rbox_command) {
           strncat(qh->rbox_command, s, sizeof(qh->rbox_command)-1);
           firsttext= linecount;
@@ -3881,7 +3881,7 @@ coordT *qh_readpoints(qhT *qh, int *numpoints, int *dimension, boolT *ismalloc) 
     }
     islong= False;
     while (*s) {
-      while (isspace(*s))
+      while (isspace((unsigned char)*s))
         s++;
       value= qh_strtod(s, &t);
       if (s == t) {
@@ -3937,7 +3937,7 @@ coordT *qh_readpoints(qhT *qh, int *numpoints, int *dimension, boolT *ismalloc) 
           }
           coordp= qh->half_space;
         }
-        while (isspace(*s))
+        while (isspace((unsigned char)*s))
           s++;
         if (*s) {
           islong= True;
@@ -4104,7 +4104,7 @@ char *qh_skipfilename(qhT *qh, char *filename) {
   char *s= filename;  /* non-const due to return */
   char c;
 
-  while (*s && isspace(*s))
+  while (*s && isspace((unsigned char)*s))
     s++;
   c= *s++;
   if (c == '\0') {
@@ -4121,7 +4121,7 @@ char *qh_skipfilename(qhT *qh, char *filename) {
     }
     s++;
   }
-  else while (*s && !isspace(*s))
+  else while (*s && !isspace((unsigned char)*s))
       s++;
   return s;
 } /* skipfilename */

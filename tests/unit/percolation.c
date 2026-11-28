@@ -124,6 +124,24 @@ void test_bond(void) {
     igraph_vector_int_init_int(&duplicates, 5, 0,1,2,3,3);
     CHECK_ERROR(percolate_bond(&c_4, &duplicates, false), IGRAPH_EINVAL);
     igraph_vector_int_destroy(&duplicates);
+
+    printf("Error on invalid edge IDs\n");
+    igraph_vector_int_t invalid;
+    igraph_vector_int_init_int(&invalid, 2, 0, -1);
+    CHECK_ERROR(percolate_bond(&c_4, &invalid, false), IGRAPH_EINVEID);
+    VECTOR(invalid)[1] = igraph_ecount(&c_4);
+    CHECK_ERROR(percolate_bond(&c_4, &invalid, false), IGRAPH_EINVEID);
+    igraph_vector_int_destroy(&invalid);
+
+    printf("Edge order shorter than the largest edge ID\n");
+    igraph_t ring;
+    igraph_vector_int_t last_edge;
+    igraph_ring(&ring, 100, IGRAPH_UNDIRECTED, false, true);
+    igraph_vector_int_init_int(&last_edge, 1, 99);
+    percolate_bond(&ring, &last_edge, true);
+    igraph_vector_int_destroy(&last_edge);
+    igraph_destroy(&ring);
+
     printf("Null outputs\n");
     igraph_bond_percolation(&karate, NULL, NULL, NULL);
 
@@ -340,6 +358,15 @@ void test_edgelist_percolation(void) {
     CHECK_ERROR(percolate_edgelist(&odd, false), IGRAPH_EINVAL);
     printf("Percolation with ( -1 1 0 0 1 -1 ), negative numbers\n");
     CHECK_ERROR(percolate_edgelist(&negative, false), IGRAPH_EINVVID);
+
+    printf("Percolation with too large vertex IDs\n");
+    igraph_vector_int_t too_large;
+    igraph_vector_int_init_int(&too_large, 2, 0, 0);
+    VECTOR(too_large)[1] = IGRAPH_VCOUNT_MAX;
+    CHECK_ERROR(igraph_edgelist_percolation(&too_large, NULL, NULL), IGRAPH_EINVVID);
+    VECTOR(too_large)[1] = IGRAPH_INTEGER_MAX;
+    CHECK_ERROR(igraph_edgelist_percolation(&too_large, NULL, NULL), IGRAPH_EINVVID);
+    igraph_vector_int_destroy(&too_large);
 
     printf("Percolation with ( 0 0 0 1 1 2 2 0 ), k_3 with loop\n");
     percolate_edgelist(&loopy, true);

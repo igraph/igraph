@@ -236,11 +236,11 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  *
  * \param graph The graph object.
  * \param weights Optional edge weights. May be a \c NULL pointer,
- *    meaning unweighted edges, or a vector of non-negative values
+ *    meaning unweighted edges, or a vector of non-negative, finite values
  *    of the same length as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ * \param value If not a null pointer, then when using \c IGRAPH_PAGERANK_ALGO_ARPACK,
  *    the eigenvalue corresponding to the PageRank vector is stored here. It is
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
@@ -318,11 +318,11 @@ igraph_error_t igraph_pagerank(
  *
  * \param graph The graph object.
  * \param weights Optional edge weights: either a null pointer,
- *    indicating unweighted edges, or a vector of the same length
+ *    indicating unweighted edges, or a vector of non-negative, finite values of the same length
  *    as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ * \param value If not a null pointer, then when using \c IGRAPH_PAGERANK_ALGO_ARPACK,
  *    the eigenvalue corresponding to the PageRank vector is stored here. It is
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
@@ -415,11 +415,11 @@ igraph_error_t igraph_personalized_pagerank_vs(
  *
  * \param graph The graph object.
  * \param weights Optional edge weights. May be a \c NULL pointer,
- *    meaning unweighted edges, or a vector of non-negative values
+ *    meaning unweighted edges, or a vector of non-negative, finite values
  *    of the same length as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ * \param value If not a null pointer, then when using \c IGRAPH_PAGERANK_ALGO_ARPACK,
  *    the eigenvalue corresponding to the PageRank vector is stored here. It is
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
@@ -622,7 +622,10 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
             IGRAPH_ERROR("Edge weights must not be negative.", IGRAPH_EINVAL);
         }
         if (isnan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Edge weights must not be NaN.", IGRAPH_EINVAL);
+        }
+        if (!isfinite(max)) {
+            IGRAPH_ERROR("Edge weights must not be infinite.", IGRAPH_EINVAL);
         }
         if (min == 0 && max == 0) {
             /* Special case: all weights are zeros. Result is the same as the personalization vector. */

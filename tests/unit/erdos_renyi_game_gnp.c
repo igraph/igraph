@@ -251,10 +251,26 @@ void test_examples(void) {
     VERIFY_FINALLY_STACK();
 }
 
+void test_errors(void) {
+    igraph_t graph;
+
+    CHECK_ERROR(igraph_erdos_renyi_game_gnp(&graph, 10, -0.1, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_erdos_renyi_game_gnp(&graph, 10, 1.1, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED), IGRAPH_EINVAL);
+    /* Zero vertices, so that a NaN p cannot cause an unrelated error later. */
+    CHECK_ERROR(igraph_erdos_renyi_game_gnp(&graph, 0, IGRAPH_NAN, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_erdos_renyi_game_gnp(&graph, 0, IGRAPH_NAN, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_erdos_renyi_game_gnp(&graph, 0, IGRAPH_INFINITY, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_erdos_renyi_game_gnp(&graph, 10, IGRAPH_NAN, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, IGRAPH_EDGE_LABELED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_erdos_renyi_game_gnp(&graph, 10, IGRAPH_INFINITY, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, IGRAPH_EDGE_LABELED), IGRAPH_EINVAL);
+
+    VERIFY_FINALLY_STACK();
+}
+
 int main(void) {
 
     test_examples();
     stress_test();
+    test_errors();
 
     return 0;
 }

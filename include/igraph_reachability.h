@@ -42,7 +42,7 @@ IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
 
 
 IGRAPH_EXPORT igraph_error_t igraph_transitive_closure(const igraph_t *graph,
-                                                       igraph_t* closure);
+                                                       igraph_t *closure);
 
 IGRAPH_END_C_DECLS
 

@@ -1666,14 +1666,14 @@ igraph_error_t igraph_bipartite_game_gnp(
     IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     if (multiple) {
-        if (p < 0.0) {
+        if (!(p >= 0.0 && p < IGRAPH_INFINITY)) { /* also rejects NaN */
             IGRAPH_ERROR(
                 "Invalid expected edge multiplicity given for "
                 "bipartite G(n,p) multigraph model.",
                 IGRAPH_EINVAL);
         }
     } else {
-        if (p < 0.0 || p > 1.0) {
+        if (!(p >= 0.0 && p <= 1.0)) { /* also rejects NaN */
             IGRAPH_ERROR(
                 "Invalid connection probability given for bipartite G(n,p) model.",
                 IGRAPH_EINVAL);

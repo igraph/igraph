@@ -1,0 +1,81 @@
+( )
+simple: false, loops: false, multi: false, multiloops: false
+
+( 0 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 1 )
+simple:   n/a, loops:   n/a, multi:   n/a, multiloops:   n/a
+
+( 10 )
+simple:   n/a, loops:   n/a, multi:   n/a, multiloops:  true
+
+( 0 0 )
+simple: false, loops: false, multi: false, multiloops: false
+
+( 1 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 2 2 )
+simple:   n/a, loops: false, multi:  true, multiloops:  true
+
+( 4 2 2 )
+simple:   n/a, loops:  true, multi:  true, multiloops:  true
+
+( 1 2 2 2 2 2 2 2 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 2 2 2 2 2 0 )
+simple: false, loops: false, multi: false, multiloops: false
+
+( 3 2 2 1 1 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 3 2 1 1 1 1 1 )
+simple: false, loops: false, multi: false, multiloops: false
+
+( )
+( )
+simple: false, loops: false, multi: false, multiloops: false
+simple: false, loops:   n/a, multi: false, multiloops: false
+
+( 0 )
+( 0 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+simple:  true, loops:   n/a, multi:  true, multiloops:  true
+
+( 1 )
+( 1 )
+simple:   n/a, loops:  true, multi:   n/a, multiloops:  true
+simple:   n/a, loops:   n/a, multi:   n/a, multiloops:  true
+
+( 10 )
+( 10 )
+simple:   n/a, loops:   n/a, multi:   n/a, multiloops:  true
+simple:   n/a, loops:   n/a, multi:   n/a, multiloops:  true
+
+( 0 0 )
+( 0 0 )
+simple: false, loops: false, multi: false, multiloops: false
+simple: false, loops:   n/a, multi: false, multiloops: false
+
+( 1 0 )
+( 0 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+simple: false, loops:   n/a, multi: false, multiloops: false
+
+( 1 1 )
+( 1 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+simple:  true, loops:   n/a, multi:  true, multiloops:  true
+
+( 3 2 1 1 )
+( 1 1 3 2 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+simple:  true, loops:   n/a, multi:  true, multiloops:  true
+
+( 3 3 1 1 )
+( 1 1 3 3 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+simple: false, loops:   n/a, multi:  true, multiloops:  true
+

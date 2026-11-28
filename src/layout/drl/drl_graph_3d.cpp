@@ -751,6 +751,10 @@ void graph::Solve_Analytic( igraph_int_t node_ind, float &pos_x, float &pos_y,
         pos_x = damping * positions[ node_ind ].x + (1.0 - damping) * x_cen;
         pos_y = damping * positions[ node_ind ].y + (1.0 - damping) * y_cen;
         pos_z = damping * positions[ node_ind ].z + (1.0 - damping) * z_cen;
+    } else {
+        pos_x = positions[ node_ind ].x;
+        pos_y = positions[ node_ind ].y;
+        pos_z = positions[ node_ind ].z;
     }
 
     // No cut edge flag (?)

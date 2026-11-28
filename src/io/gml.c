@@ -398,12 +398,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_t eattrnames;
     igraph_trie_t gattrnames;
     igraph_attribute_record_list_t gattrs, vattrs, eattrs;
-    igraph_attribute_record_list_t *attrs[3];
     igraph_int_t edgeptr = 0;
     igraph_i_gml_parsedata_t context;
     igraph_bool_t entity_warned = false; /* used to warn at most once about unsupported entities */
-
-    attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
 
     IGRAPH_CHECK(igraph_i_gml_parsedata_init(&context));
     IGRAPH_FINALLY(igraph_i_gml_parsedata_destroy, &context);

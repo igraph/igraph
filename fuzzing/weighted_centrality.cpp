@@ -81,13 +81,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
             IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)));
 
+            /* Paths using u->v cannot start at v or end at u. Excluding equal
+             * endpoints leaves at most (n-1)^2-(n-2) = n^2-3n+3 pairs. */
             igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
                                            false, 4);
-            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount*(vcount-1)/2));
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount < 2 ? 0 : vcount*vcount - 3*vcount + 3));
 
+            /* Undirected paths cross between disjoint sets closer to u and v.
+             * At most a*b <= floor(n^2/4) pairs can contribute. */
             igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED,
                                            false, 3);
-            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount*(vcount-1)));
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount*vcount/4));
 
             if (vcount >= 10) {
                 igraph_betweenness_subset(&graph, &weights,

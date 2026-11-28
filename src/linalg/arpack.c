@@ -326,6 +326,108 @@ static igraph_error_t igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun,
     return IGRAPH_SUCCESS;
 }
 
+/* The 2x2 special cases receive the matrix only implicitly, through the
+ * matrix-vector product 'fun', just like ARPACK. This function recovers its
+ * entries, in row-major order, by multiplying with the unit vectors.
+ * It rejects matrices with non-finite entries. */
+static igraph_error_t igraph_i_arpack_probe_2x2(igraph_arpack_function_t *fun, void *extra,
+                                                igraph_real_t mat[4]) {
+    igraph_real_t e1[2] = { 1, 0 }, e2[2] = { 0, 1 }, col[2];
+
+    IGRAPH_CHECK(fun(col, e1, 2, extra));
+    mat[0] = col[0]; mat[2] = col[1];
+    IGRAPH_CHECK(fun(col, e2, 2, extra));
+    mat[1] = col[0]; mat[3] = col[1];
+
+    for (igraph_int_t i = 0; i < 4; i++) {
+        if (! isfinite(mat[i])) {
+            IGRAPH_ERROR("The matrix of the eigenproblem contains non-finite values.", IGRAPH_EINVAL);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/* Eigenvalues l1 >= l2 and orthonormal eigenvectors v1, v2 of the symmetric
+ * matrix ((a, b), (b, d)), computed with a Jacobi rotation, see Golub and
+ * Van Loan, Matrix Computations, 4th edition, Algorithm 8.5.1. */
+static void igraph_i_arpack_sym_eigen_2x2(igraph_real_t a, igraph_real_t b, igraph_real_t d,
+                                          igraph_real_t *l1, igraph_real_t *l2,
+                                          igraph_real_t v1[2], igraph_real_t v2[2]) {
+    /* Eigenvectors belonging to a and d after the rotation below. */
+    igraph_real_t x[2] = { 1, 0 }, y[2] = { 0, 1 };
+
+    if (b != 0) {
+        /* The rotation ((c, s), (-s, c)) with t = s/c diagonalizes the matrix
+         * if t^2 + 2 tau t - 1 = 0. We take the root with the smaller magnitude,
+         * computed without cancellation, which gives a rotation angle of at
+         * most 45 degrees. */
+        const igraph_real_t tau = (d - a) / (2 * b);
+        const igraph_real_t t = (tau >= 0 ? 1 : -1) / (fabs(tau) + hypot(1, tau));
+        const igraph_real_t c = 1 / hypot(1, t), s = t * c;
+        x[0] = c; x[1] = -s;
+        y[0] = s; y[1] = c;
+        a -= t * b;
+        d += t * b;
+    }
+
+    if (a >= d) {
+        *l1 = a; v1[0] = x[0]; v1[1] = x[1];
+        *l2 = d; v2[0] = y[0]; v2[1] = y[1];
+    } else {
+        *l1 = d; v1[0] = y[0]; v1[1] = y[1];
+        *l2 = a; v2[0] = x[0]; v2[1] = x[1];
+    }
+}
+
+/* Unit-length eigenvector v of the matrix mat (row-major) for the real
+ * eigenvalue l. Both (b, l - a) and (l - d, c) are orthogonal to a row of
+ * mat - l*I, thus they are eigenvectors unless zero. The one with the smaller
+ * norm is more affected by cancellation in l - a or l - d, and may even be zero,
+ * e.g. for triangular matrices, so we use the one with the larger norm. If both
+ * are zero, mat is l times the identity, and we use 'fallback'. */
+static void igraph_i_arpack_eigenvector_2x2(const igraph_real_t mat[4], igraph_real_t l,
+                                            const igraph_real_t fallback[2], igraph_real_t v[2]) {
+    const igraph_real_t a = mat[0], b = mat[1], c = mat[2], d = mat[3];
+    const igraph_real_t norm1 = hypot(b, l - a), norm2 = hypot(l - d, c);
+
+    if (norm1 == 0 && norm2 == 0) {
+        v[0] = fallback[0]; v[1] = fallback[1];
+    } else if (norm1 >= norm2) {
+        v[0] = b / norm1; v[1] = (l - a) / norm1;
+    } else {
+        v[0] = (l - d) / norm2; v[1] = c / norm2;
+    }
+}
+
+/* Decides whether the real eigenvalues l1 >= l2 must be swapped so that the one
+ * selected by 'which' comes first. Also checks that 'which' is valid, therefore
+ * it is called even when there is nothing to order. As in the general code
+ * path, a 'which' starting with X means LM. BE puts the largest eigenvalue
+ * first; note that the general path puts the smallest first when nev = 2. */
+static igraph_error_t igraph_i_arpack_order_2x2(const char which[2], igraph_bool_t symmetric,
+                                                igraph_real_t l1, igraph_real_t l2,
+                                                igraph_bool_t *swap) {
+#define WHICH(x, y) (which[0] == x && which[1] == y)
+    if (which[0] == 'X' || WHICH('L', 'M')) {
+        *swap = fabs(l2) > fabs(l1);
+    } else if (WHICH('S', 'M')) {
+        *swap = fabs(l2) < fabs(l1);
+    } else if (symmetric && (WHICH('L', 'A') || WHICH('B', 'E'))) {
+        *swap = false;
+    } else if (symmetric && WHICH('S', 'A')) {
+        *swap = true;
+    } else if (!symmetric && (WHICH('L', 'R') || WHICH('L', 'I') || WHICH('S', 'I'))) {
+        *swap = false; /* imaginary parts are all zero */
+    } else if (!symmetric && WHICH('S', 'R')) {
+        *swap = true;
+    } else {
+        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
+    }
+#undef WHICH
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * "Solver" for 2x2 nonsymmetric eigenvalue problems since ARPACK sometimes
  * blows up with these.
@@ -333,13 +435,8 @@ static igraph_error_t igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun,
 static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options, igraph_matrix_t* values,
                                        igraph_matrix_t* vectors) {
-    igraph_real_t vec[2], mat[4];
-    igraph_real_t a, b, c, d;
-    igraph_real_t trace, det, tsq4_minus_d;
-    igraph_complex_t eval1, eval2;
-    igraph_complex_t evec1[2], evec2[2];
-    igraph_bool_t swap_evals = false;
-    igraph_bool_t complex_evals = false;
+    igraph_real_t mat[4], l1, l2, v1[2], v2[2];
+    igraph_bool_t swap;
     int nev = options->nev;
 
     if (nev <= 0) {
@@ -349,124 +446,67 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
         nev = 2;
     }
 
-    /* Probe the values in the matrix */
-    vec[0] = 1; vec[1] = 0;
-    IGRAPH_CHECK(fun(mat, vec, 2, extra));
-    vec[0] = 0; vec[1] = 1;
-    IGRAPH_CHECK(fun(mat + 2, vec, 2, extra));
-    a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
+    IGRAPH_CHECK(igraph_i_arpack_probe_2x2(fun, extra, mat));
+    const igraph_real_t a = mat[0], b = mat[1], c = mat[2], d = mat[3];
+    const igraph_real_t mean = (a + d) / 2, half_diff = (a - d) / 2;
 
-    /* Get the trace and the determinant */
-    trace = a + d;
-    det = a * d - b * c;
-    tsq4_minus_d = trace * trace / 4 - det;
+    /* The eigenvalues are mean +- sqrt(disc). Kahan's algorithm, using fma(),
+     * computes the discriminant accurately even when the two terms cancel. */
+    const igraph_real_t bc = b * c;
+    const igraph_real_t disc = fma(half_diff, half_diff, bc) + fma(b, c, -bc);
 
-    /* Calculate the eigenvalues */
-    complex_evals = tsq4_minus_d < 0;
-    eval1 = igraph_complex_sqrt_real(tsq4_minus_d);
-    if (complex_evals) {
-        eval2 = igraph_complex_mul_real(eval1, -1);
-    } else {
-        /* to avoid having -0 in the imaginary part */
-        eval2 = igraph_complex(-IGRAPH_REAL(eval1), 0);
-    }
-    eval1 = igraph_complex_add_real(eval1, trace / 2);
-    eval2 = igraph_complex_add_real(eval2, trace / 2);
+    if (disc < 0) {
+        /* Complex conjugate pair mean +- i*im. Like ARPACK, regardless of
+         * 'which', we return the eigenvalue with positive imaginary part,
+         * followed by its conjugate when nev = 2, and the real and imaginary
+         * parts of its eigenvector (b, lambda - a) in two columns. */
+        const igraph_real_t im = sqrt(-disc);
+        const igraph_real_t norm = hypot(hypot(b, mean - a), im);
 
-    if (c != 0) {
-        evec1[0] = igraph_complex_sub_real(eval1, d);
-        evec1[1] = igraph_complex(c, 0);
-        evec2[0] = igraph_complex_sub_real(eval2, d);
-        evec2[1] = igraph_complex(c, 0);
-    } else if (b != 0) {
-        evec1[0] = igraph_complex(b, 0);
-        evec1[1] = igraph_complex_sub_real(eval1, a);
-        evec2[0] = igraph_complex(b, 0);
-        evec2[1] = igraph_complex_sub_real(eval2, a);
-    } else {
-        evec1[0] = igraph_complex(1, 0);
-        evec1[1] = igraph_complex(0, 0);
-        evec2[0] = igraph_complex(0, 0);
-        evec2[1] = igraph_complex(1, 0);
-    }
-
-    /* Sometimes we have to swap eval1 with eval2 and evec1 with eval2;
-     * determine whether we have to do it now */
-    if (options->which[0] == 'S') {
-        if (options->which[1] == 'M') {
-            /* eval1 must be the one with the smallest magnitude */
-            swap_evals = (igraph_complex_abs(eval1) > igraph_complex_abs(eval2));
-        } else if (options->which[1] == 'R') {
-            /* eval1 must be the one with the smallest real part */
-            swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
-        } else if (options->which[1] == 'I') {
-            /* eval1 must be the one with the smallest imaginary part */
-            swap_evals = (IGRAPH_IMAG(eval1) > IGRAPH_IMAG(eval2));
-        } else {
-            IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
+        IGRAPH_CHECK(igraph_i_arpack_order_2x2(options->which, false, 0, 0, &swap)); /* validate 'which' */
+        options->nconv = nev;
+        if (values) {
+            IGRAPH_CHECK(igraph_matrix_resize(values, nev, 2));
+            MATRIX(*values, 0, 0) = mean; MATRIX(*values, 0, 1) = im;
+            if (nev > 1) {
+                MATRIX(*values, 1, 0) = mean; MATRIX(*values, 1, 1) = -im;
+            }
         }
-    } else if (options->which[0] == 'L') {
-        if (options->which[1] == 'M') {
-            /* eval1 must be the one with the largest magnitude */
-            swap_evals = (igraph_complex_abs(eval1) < igraph_complex_abs(eval2));
-        } else if (options->which[1] == 'R') {
-            /* eval1 must be the one with the largest real part */
-            swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));
-        } else if (options->which[1] == 'I') {
-            /* eval1 must be the one with the largest imaginary part */
-            swap_evals = (IGRAPH_IMAG(eval1) < IGRAPH_IMAG(eval2));
-        } else {
-            IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
+        if (vectors) {
+            IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, 2));
+            MATRIX(*vectors, 0, 0) = b / norm;          MATRIX(*vectors, 0, 1) = 0;
+            MATRIX(*vectors, 1, 0) = (mean - a) / norm; MATRIX(*vectors, 1, 1) = im / norm;
         }
-    } else if (options->which[0] == 'X' && options->which[1] == 'X') {
-        /* No preference on the ordering of eigenvectors */
-    } else {
-        /* fprintf(stderr, "%c%c\n", options->which[0], options->which[1]); */
-        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
+        return IGRAPH_SUCCESS;
     }
 
+    const igraph_real_t e1[2] = { 1, 0 }, e2[2] = { 0, 1 };
+    if (b == 0 || c == 0) {
+        /* Triangular matrix, the eigenvalues are exactly a and d. */
+        l1 = fmax(a, d); l2 = fmin(a, d);
+    } else {
+        l1 = mean + sqrt(disc); l2 = mean - sqrt(disc);
+    }
+    igraph_i_arpack_eigenvector_2x2(mat, l1, e1, v1);
+    igraph_i_arpack_eigenvector_2x2(mat, l2, e2, v2);
+
+    IGRAPH_CHECK(igraph_i_arpack_order_2x2(options->which, false, l1, l2, &swap));
     options->nconv = nev;
 
-    if (swap_evals) {
-        igraph_complex_t dummy;
-        dummy = eval1; eval1 = eval2; eval2 = dummy;
-        dummy = evec1[0]; evec1[0] = evec2[0]; evec2[0] = dummy;
-        dummy = evec1[1]; evec1[1] = evec2[1]; evec2[1] = dummy;
-    }
-
-    if (complex_evals) {
-        /* The eigenvalues are conjugate pairs, so we store only the
-         * one with positive imaginary part */
-        if (IGRAPH_IMAG(eval1) < 0) {
-            eval1 = eval2;
-            evec1[0] = evec2[0]; evec1[1] = evec2[1];
-        }
-    }
-
-    if (values != 0) {
+    if (values) {
         IGRAPH_CHECK(igraph_matrix_resize(values, nev, 2));
-        MATRIX(*values, 0, 0) = IGRAPH_REAL(eval1);
-        MATRIX(*values, 0, 1) = IGRAPH_IMAG(eval1);
+        igraph_matrix_null(values);
+        MATRIX(*values, 0, 0) = swap ? l2 : l1;
         if (nev > 1) {
-            MATRIX(*values, 1, 0) = IGRAPH_REAL(eval2);
-            MATRIX(*values, 1, 1) = IGRAPH_IMAG(eval2);
+            MATRIX(*values, 1, 0) = swap ? l1 : l2;
         }
     }
-
-    if (vectors != 0) {
-        if (complex_evals) {
-            IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, 2));
-            MATRIX(*vectors, 0, 0) = IGRAPH_REAL(evec1[0]);
-            MATRIX(*vectors, 1, 0) = IGRAPH_REAL(evec1[1]);
-            MATRIX(*vectors, 0, 1) = IGRAPH_IMAG(evec1[0]);
-            MATRIX(*vectors, 1, 1) = IGRAPH_IMAG(evec1[1]);
-        } else {
-            IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, nev));
-            MATRIX(*vectors, 0, 0) = IGRAPH_REAL(evec1[0]);
-            MATRIX(*vectors, 1, 0) = IGRAPH_REAL(evec1[1]);
+    if (vectors) {
+        IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, nev));
+        for (igraph_int_t i = 0; i < 2; i++) {
+            MATRIX(*vectors, i, 0) = swap ? v2[i] : v1[i];
             if (nev > 1) {
-                MATRIX(*vectors, 0, 1) = IGRAPH_REAL(evec2[0]);
-                MATRIX(*vectors, 1, 1) = IGRAPH_REAL(evec2[1]);
+                MATRIX(*vectors, i, 1) = swap ? v1[i] : v2[i];
             }
         }
     }
@@ -481,10 +521,8 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
 static igraph_error_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options, igraph_vector_t* values,
                                        igraph_matrix_t* vectors) {
-    igraph_real_t vec[2], mat[4];
-    igraph_real_t a, b, c, d;
-    igraph_real_t trace, det, tsq4_minus_d;
-    igraph_real_t eval1, eval2;
+    igraph_real_t mat[4], l1, l2, v1[2], v2[2];
+    igraph_bool_t swap;
     int nev = options->nev;
 
     if (nev <= 0) {
@@ -494,69 +532,30 @@ static igraph_error_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun,
         nev = 2;
     }
 
-    /* Probe the values in the matrix */
-    vec[0] = 1; vec[1] = 0;
-    IGRAPH_CHECK(fun(mat, vec, 2, extra));
-    vec[0] = 0; vec[1] = 1;
-    IGRAPH_CHECK(fun(mat + 2, vec, 2, extra));
-    a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
+    IGRAPH_CHECK(igraph_i_arpack_probe_2x2(fun, extra, mat));
 
-    /* Get the trace and the determinant */
-    trace = a + d;
-    det = a * d - b * c;
-    tsq4_minus_d = trace * trace / 4 - det;
+    /* The matrix is assumed to be symmetric, and this is not checked, as in
+     * ARPACK. We use the average of the two off-diagonal entries to guard
+     * against rounding errors in the matrix-vector product. */
+    igraph_i_arpack_sym_eigen_2x2(mat[0], (mat[1] + mat[2]) / 2, mat[3], &l1, &l2, v1, v2);
 
-    if (tsq4_minus_d >= 0) {
-        /* Both eigenvalues are real */
-        eval1 = trace / 2 + sqrt(tsq4_minus_d);
-        eval2 = trace / 2 - sqrt(tsq4_minus_d);
-        if (c != 0) {
-            mat[0] = eval1 - d; mat[2] = eval2 - d;
-            mat[1] = c;       mat[3] = c;
-        } else if (b != 0) {
-            mat[0] = b;       mat[2] = b;
-            mat[1] = eval1 - a; mat[3] = eval2 - a;
-        } else {
-            mat[0] = 1; mat[2] = 0;
-            mat[1] = 0; mat[3] = 1;
-        }
-    } else {
-        /* Both eigenvalues are complex. Should not happen with symmetric
-         * matrices. */
-        IGRAPH_ERROR("ARPACK error, 2x2 matrix is not symmetric", IGRAPH_EINVAL);
-    }
-
-    /* eval1 is always the larger eigenvalue. If we want the smaller
-     * one, we have to swap eval1 with eval2 and also the columns of mat */
-    if (options->which[0] == 'S') {
-        trace = eval1; eval1 = eval2; eval2 = trace;
-        trace = mat[0]; mat[0] = mat[2]; mat[2] = trace;
-        trace = mat[1]; mat[1] = mat[3]; mat[3] = trace;
-    } else if (options->which[0] == 'L' || options->which[0] == 'B') {
-        /* Nothing to do here */
-    } else if (options->which[0] == 'X' && options->which[1] == 'X') {
-        /* No preference on the ordering of eigenvectors */
-    } else {
-        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
-    }
-
+    IGRAPH_CHECK(igraph_i_arpack_order_2x2(options->which, true, l1, l2, &swap));
     options->nconv = nev;
 
-    if (values != 0) {
+    if (values) {
         IGRAPH_CHECK(igraph_vector_resize(values, nev));
-        VECTOR(*values)[0] = eval1;
+        VECTOR(*values)[0] = swap ? l2 : l1;
         if (nev > 1) {
-            VECTOR(*values)[1] = eval2;
+            VECTOR(*values)[1] = swap ? l1 : l2;
         }
     }
-
-    if (vectors != 0) {
+    if (vectors) {
         IGRAPH_CHECK(igraph_matrix_resize(vectors, 2, nev));
-        MATRIX(*vectors, 0, 0) = mat[0];
-        MATRIX(*vectors, 1, 0) = mat[1];
-        if (nev > 1) {
-            MATRIX(*vectors, 0, 1) = mat[2];
-            MATRIX(*vectors, 1, 1) = mat[3];
+        for (igraph_int_t i = 0; i < 2; i++) {
+            MATRIX(*vectors, i, 0) = swap ? v2[i] : v1[i];
+            if (nev > 1) {
+                MATRIX(*vectors, i, 1) = swap ? v1[i] : v2[i];
+            }
         }
     }
 
@@ -776,38 +775,77 @@ igraph_error_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *ve
 
 /**
  * \function igraph_i_arpack_auto_ncv
- * \brief Tries to set up the value of \c ncv in an \c igraph_arpack_options_t
- *        automagically.
+ * \brief Chooses the value of \c ncv in an \c igraph_arpack_options_t.
+ *
+ * The default is ncv = min(n, max(2 nev + 1, 20)), the same as in SciPy,
+ * Arpack.jl and RSpectra.
+ *
+ * For symmetric problems, this default is used as is. Using ncv < n on small
+ * matrices made the symmetric solver fail with "No shifts could be applied"
+ * when the largest eigenvalue was repeated. For example, a perfect matching
+ * on 6 vertices with ncv = 5: the Lanczos tridiagonal matrix splits, and the
+ * Ritz estimate of the wanted eigenvalue stays just above the tolerance.
+ * With ncv = n, this failure was not observed in testing. The Krylov space
+ * generated by a single starting vector has at most as many dimensions as
+ * there are distinct eigenvalues (two for the matching), but ARPACK extends
+ * the basis with random orthogonal vectors when the Lanczos process breaks
+ * down. Once the basis spans the whole space, the residual is zero in exact
+ * arithmetic.
+ *
+ * For non-symmetric problems, ncv is additionally capped at
+ * min(n/2 + 2, n - 1), as long as this is at least 2 nev + 1. The cap was
+ * originally found empirically using the eigen_stress.c test. It is kept
+ * because in tests on small graphs, ncv = n did not help the non-symmetric
+ * solver, and made two problems more frequent:
+ *
+ * - With the vendored ARPACK, dnaupd failed more often with info = -8 (Schur
+ *   form computation failed) in directed PageRank. This was not observed with
+ *   arpack-ng 3.9.1.
+ * - Where PageRank is not unique (damping 1 and several closed components,
+ *   e.g. "A <--> C, D <--> E, B" with weights), the result had mixed signs
+ *   more often, with both the vendored ARPACK and arpack-ng 3.9.1.
+ *
+ * If the caller provided storage, ncv is also capped at storage->maxncv, as
+ * long as this still leaves a valid ncv (more than nev for symmetric problems,
+ * at least nev + 2 for non-symmetric ones). Otherwise the solver reports that
+ * the storage is too small.
+ *
+ * TODO: Review the non-symmetric cap once the vendored ARPACK is replaced by
+ * ARNAUD, the C rewrite of ARPACK used by SciPy. It may then be possible to
+ * use the same rule for both cases.
  */
-static void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
-    /* This is similar to how Octave determines the value of ncv, with some
-     * modifications. */
-    int min_ncv = options->nev * 2 + 1;
+static void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options, igraph_bool_t symmetric,
+                                     const igraph_arpack_storage_t *storage) {
+    const int min_ncv = options->nev * 2 + 1;
 
-    /* Use twice the number of desired eigenvectors plus one by default */
+    /* Use twice the number of desired eigenvectors plus one by default,
+     * but use at least 20 Lanczos vectors... */
     options->ncv = min_ncv;
-    /* ...but use at least 20 Lanczos vectors... */
     if (options->ncv < 20) {
         options->ncv = 20;
     }
-    /* ...but having ncv close to n leads to some problems with small graphs
-     * (example: PageRank of "A <--> C, D <--> E, B"), so we try to keep it
-     * no more than min(n/2 + 2, n - 1), bounds found empirically using the
-     * eigen_stress.c test...
-     */
-    if (options->ncv > options->n / 2 + 2) {
-        options->ncv = options->n / 2 + 2;
+    /* ...in the non-symmetric case, keep it no more than min(n/2 + 2, n - 1),
+     * see above... */
+    if (!symmetric) {
+        if (options->ncv > options->n / 2 + 2) {
+            options->ncv = options->n / 2 + 2;
+        }
+        if (options->ncv > options->n - 1) {
+            options->ncv = options->n - 1;
+        }
+        /* ...but we need at least min_ncv... */
+        if (options->ncv < min_ncv) {
+            options->ncv = min_ncv;
+        }
     }
-    if (options->ncv > options->n - 1) {
-        options->ncv = options->n - 1;
-    }
-    /* ...but we need at least min_ncv. */
-    if (options->ncv < min_ncv) {
-        options->ncv = min_ncv;
-    }
-    /* ...but at most n */
+    /* ...and at most n... */
     if (options->ncv > options->n) {
         options->ncv = options->n;
+    }
+    /* ...and at most what the caller's storage can hold, if that is enough. */
+    if (storage && options->ncv > storage->maxncv &&
+        storage->maxncv >= options->nev + (symmetric ? 1 : 2)) {
+        options->ncv = storage->maxncv;
     }
 }
 
@@ -891,7 +929,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
         options->ldv = options->n;
     }
     if (options->ncv == 0) {
-        igraph_i_arpack_auto_ncv(options);
+        igraph_i_arpack_auto_ncv(options, /* symmetric = */ true, storage);
     }
     if (options->lworkl == 0) {
         options->lworkl = options->ncv * (options->ncv + 8);
@@ -1166,7 +1204,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
         options->ldv = options->n;
     }
     if (options->ncv == 0) {
-        igraph_i_arpack_auto_ncv(options);
+        igraph_i_arpack_auto_ncv(options, /* symmetric = */ false, storage);
     }
     if (options->lworkl == 0) {
         options->lworkl = 3 * options->ncv * (options->ncv + 2);

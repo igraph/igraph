@@ -21,32 +21,34 @@
 #include <igraph.h>
 #include <cstdlib>
 
-// Verify that all communities are connected subgraphs
+// Verify that all communities induce connected subgraphs
 void check_communities_are_connected(const igraph_t *graph, const igraph_vector_int_t *membership) {
-    igraph_vector_int_t memb, comp, map;
-    igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    igraph_vector_int_t memb;
+    igraph_vector_int_list_t communities;
     igraph_int_t no;
 
     igraph_vector_int_init_copy(&memb, membership);
     igraph_reindex_membership(&memb, NULL, &no);
 
-    igraph_vector_int_init(&map, no);
-    igraph_vector_int_fill(&map, -1);
-
-    igraph_vector_int_init(&comp, 0);
-
-    igraph_connected_components(graph, &comp, NULL, NULL, IGRAPH_WEAK);
-
+    igraph_vector_int_list_init(&communities, no);
     for (igraph_int_t v=0; v < vcount; v++) {
-        if (VECTOR(map)[ VECTOR(memb)[v] ] == -1) {
-            VECTOR(map)[ VECTOR(memb)[v] ] = VECTOR(comp)[v];
-        } else {
-            IGRAPH_ASSERT(VECTOR(map)[ VECTOR(memb)[v] ] == VECTOR(comp)[v]);
-        }
+        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&communities, VECTOR(memb)[v]), v);
     }
 
-    igraph_vector_int_destroy(&comp);
-    igraph_vector_int_destroy(&map);
+    for (igraph_int_t c=0; c < no; c++) {
+        igraph_t subgraph;
+        igraph_bool_t connected;
+
+        igraph_induced_subgraph(graph, &subgraph,
+                                igraph_vss_vector(igraph_vector_int_list_get_ptr(&communities, c)),
+                                IGRAPH_SUBGRAPH_AUTO);
+        igraph_is_connected(&subgraph, &connected, IGRAPH_WEAK);
+        IGRAPH_ASSERT(connected);
+        igraph_destroy(&subgraph);
+    }
+
+    igraph_vector_int_list_destroy(&communities);
     igraph_vector_int_destroy(&memb);
 }
 

@@ -234,6 +234,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_hamming
   igraph_square_lattice
+  igraph_static_fitness_game
   igraph_static_power_law_game
   igraph_tree_from_parent_vector
   igraph_trussness
@@ -784,6 +785,8 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   dgemv
+  igraph_arpack_2x2
+  igraph_arpack_auto_ncv
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
   igraph_blas_dgemm
@@ -933,6 +936,7 @@ add_legacy_tests(
   igraph_is_graphical
   igraph_is_bigraphical
   igraph_realize_bipartite_degree_sequence
+  igraph_is_potentially_connected
 )
 
 # spatial

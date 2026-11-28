@@ -24,6 +24,8 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
+#include "graph/attributes.h"
+
 
 /**
  * \ingroup structural
@@ -219,6 +221,11 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
  * as a simple graph, i.e. self-loops and multi-edges will not be present,
  * regardless of whether they appeared in the original graph.
  *
+ * </para><para>
+ * Graph and vertex attributes are copied to the closure. Edge attributes
+ * are not preserved, as there is no correspondence between the edges of
+ * the original graph and those of the closure.
+ *
  * \param graph The graph object to analyze.
  * \param closure An uninitialized graph object. The graph representing the
  *    transitive closure will be created here.
@@ -259,9 +266,12 @@ igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closur
     IGRAPH_FINALLY_CLEAN(2);
 
     IGRAPH_CHECK(igraph_create(closure, &edges, no_of_nodes, directed));
+    IGRAPH_FINALLY(igraph_destroy, closure);
+
+    IGRAPH_CHECK(igraph_i_attribute_copy(closure, graph, /* graph= */ true, /* vertex= */ true, /* edge= */ false));
 
     igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }

@@ -613,7 +613,6 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
 
     igraph_vector_t myscores;
     igraph_vector_t *scores = vector;
-    igraph_real_t realvalue, *myvalue = value;
     igraph_real_t *tmax = theoretical_max, mytmax;
 
     if (!tmax) {
@@ -624,11 +623,8 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
         scores = &myscores;
         IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
     }
-    if (!value) {
-        myvalue = &realvalue;
-    }
 
-    IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, mode,
+    IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, value, mode,
                  /*weights=*/ NULL,
                  options));
 

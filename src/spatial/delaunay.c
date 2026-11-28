@@ -50,7 +50,7 @@ igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points) {
         IGRAPH_ERROR("Point sets must not be zero-dimensional.", IGRAPH_EINVAL);
     }
 
-    if (!igraph_vector_is_all_finite(&points->data)) {
+    if (!igraph_matrix_is_all_finite(points)) {
         IGRAPH_ERROR("Coordinates must not be NaN or infinite.", IGRAPH_EINVAL);
     }
 

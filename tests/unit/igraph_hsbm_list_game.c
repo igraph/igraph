@@ -85,6 +85,31 @@ int main(void) {
         printf("Two blocks, two clusters each, 3 and 2 vertices in cluster, each vertex connected to every other, except those in the same cluster.\n");
         call_and_print(10, &mlist, &rholist, &pref_matrix_list, 1);
 
+        igraph_vector_int_destroy(&mlist);
+        igraph_vector_list_clear(&rholist);
+        igraph_matrix_list_clear(&pref_matrix_list);
+    }
+
+    /* NaN in C or p */
+    {
+        igraph_t result;
+
+        igraph_vector_init_int(&rho, 1, 1);
+        igraph_vector_list_push_back(&rholist, &rho);
+        igraph_matrix_init(&pref_matrix, 1, 1);
+        MATRIX(pref_matrix, 0, 0) = IGRAPH_NAN;
+        igraph_matrix_list_push_back(&pref_matrix_list, &pref_matrix);
+        igraph_vector_int_init_int(&mlist, 1, 4);
+
+        CHECK_ERROR(igraph_hsbm_list_game(&result, 4, &mlist, &rholist, &pref_matrix_list, 0.5), IGRAPH_EINVAL);
+
+        MATRIX(*igraph_matrix_list_get_ptr(&pref_matrix_list, 0), 0, 0) = 0.5;
+        CHECK_ERROR(igraph_hsbm_list_game(&result, 4, &mlist, &rholist, &pref_matrix_list, IGRAPH_NAN), IGRAPH_EINVAL);
+
+        /* Empty C with non-empty rho */
+        igraph_matrix_resize(igraph_matrix_list_get_ptr(&pref_matrix_list, 0), 0, 0);
+        CHECK_ERROR(igraph_hsbm_list_game(&result, 4, &mlist, &rholist, &pref_matrix_list, 0.5), IGRAPH_EINVAL);
+
         igraph_vector_list_destroy(&rholist);
         igraph_matrix_list_destroy(&pref_matrix_list);
         igraph_vector_int_destroy(&mlist);

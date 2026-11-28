@@ -288,3 +288,33 @@ igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol) {
 igraph_error_t igraph_matrix_complex_zapsmall(igraph_matrix_complex_t *m, igraph_real_t tol) {
     return igraph_vector_complex_zapsmall(&m->data, tol);
 }
+
+/**
+ * \function igraph_matrix_is_any_nan
+ * \brief Checks if any element of a matrix is NaN.
+ *
+ * \param m The matrix to check.
+ * \return True if any element is NaN, false otherwise.
+ *
+ * \sa \ref igraph_matrix_is_all_finite()
+ *
+ * Time complexity: O(mn), the number of elements.
+ */
+igraph_bool_t igraph_matrix_is_any_nan(const igraph_matrix_t *m) {
+    return igraph_vector_is_any_nan(&m->data);
+}
+
+/**
+ * \function igraph_matrix_is_all_finite
+ * \brief Checks if all elements of a matrix are finite.
+ *
+ * \param m The matrix to check.
+ * \return True if none of the elements are infinite or NaN, false otherwise.
+ *
+ * \sa \ref igraph_matrix_is_any_nan()
+ *
+ * Time complexity: O(mn), the number of elements.
+ */
+igraph_bool_t igraph_matrix_is_all_finite(const igraph_matrix_t *m) {
+    return igraph_vector_is_all_finite(&m->data);
+}

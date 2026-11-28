@@ -17,6 +17,7 @@
 */
 
 #include <igraph.h>
+#include <math.h>
 #include "test_utilities.h"
 
 void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
@@ -28,7 +29,7 @@ void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
 }
 
 int main(void) {
-    igraph_t g;
+    igraph_t g, g2;
     igraph_matrix_t result;
     igraph_layout_drl_options_t options;
     int i;
@@ -44,6 +45,22 @@ int main(void) {
     igraph_layout_drl_3d(&g, &result, /*use_seed*/ 0, &options,
                   /*weights*/ NULL);
     check_and_destroy(&result, 50);
+
+    VERIFY_FINALLY_STACK();
+
+    printf("Path with an isolated vertex.\n");
+    /* Isolated vertices used to get uninitialized coordinates. */
+    igraph_small(&g2, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
+    igraph_matrix_init(&result, 0, 0);
+    igraph_layout_drl_3d(&g2, &result, /*use_seed*/ false, &options,
+                  /*weights*/ NULL);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&result) == 4);
+    IGRAPH_ASSERT(igraph_matrix_ncol(&result) == 3);
+    for (igraph_int_t j = 0; j < igraph_matrix_size(&result); j++) {
+        IGRAPH_ASSERT(isfinite(VECTOR(result.data)[j]));
+    }
+    check_and_destroy(&result, 50);
+    igraph_destroy(&g2);
 
     VERIFY_FINALLY_STACK();
 
