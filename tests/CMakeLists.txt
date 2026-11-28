@@ -892,6 +892,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_fisher_yates_shuffle
   igraph_random_sample
+  igraph_rng_init
   random_seed
 )
 
